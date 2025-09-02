@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:good_grab/infrastructure/models/create_intent_model.dart';
 import 'package:url_launcher/url_launcher.dart';
-
+import '../../infrastructure/navigation/routes.dart';
 import '../../infrastructure/constants/app_constants.dart';
 import '../../infrastructure/models/api_response_model.dart';
 import '../../infrastructure/network/dio_client.dart';
@@ -97,7 +97,8 @@ class PaymentStatusController extends GetxController {
           pDescription.value = "Congratulations! Your payment has been successfully processed. Thank you for choosing us.";
           transactionId = paymentStatusCheck.data!.payment!.transactionId!;
           paymentStatus.value = 'Success';
-          countdownTimer!.cancel();
+          // countdownTimer!.cancel();
+          Get.offAllNamed(Routes.home);
         }
         else if (paymentStatusCheck.data!.payment!.status == 'failed') {
 

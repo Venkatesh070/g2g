@@ -190,7 +190,9 @@ class OrderCancelPage extends BaseView<OrderCancelController> {
         GestureDetector(
             onTap: () async {
               if(controller.selectReason.value != -1){
-                if(controller.is2HoursLess.value && controller.reasonList[controller.selectReason.value].isPopup == "1"){
+                // Skip the 2-hour check when order status is confirmation_pending
+                final skipTimeCheck = controller.orderStatus.value == 'confirmation_pending';
+                if(!skipTimeCheck && controller.is2HoursLess.value && controller.reasonList[controller.selectReason.value].isPopup == "1"){
                   dontCancelOrderBottomSheet();
                 }
                 else{

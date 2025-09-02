@@ -27,6 +27,7 @@ class OrderCancelController extends GetxController {
   var pickupTime;
   var pickupEndTime;
   var is2HoursLess = true.obs;
+  var orderStatus = ''.obs;
 
   @override
   void onInit() {
@@ -36,6 +37,7 @@ class OrderCancelController extends GetxController {
     pickupDate = Get.arguments['pickupDate'];
     pickupTime = Get.arguments['pickupTime'];
     pickupEndTime = Get.arguments['pickupEndTime'];
+    orderStatus.value = (Get.arguments['orderStatus'] ?? '').toString();
     getCancelTime();
     Future.delayed(Duration.zero, () async {
       await getOrderCancelReasons();
