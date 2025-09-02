@@ -10,6 +10,7 @@ import 'infrastructure/config/env_config.dart';
 import 'infrastructure/config/environment.dart';
 
 import 'infrastructure/firebase/push_firebase_notification.dart';
+//first
 
 class Initializer {
   static Future<void> init() async {
