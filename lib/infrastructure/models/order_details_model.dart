@@ -1,0 +1,223 @@
+import 'package:good_grab/infrastructure/models/api_response_model.dart';
+class OrderDetailsModel extends Serializable{
+  int? orderId;
+  List<MenuDetails>? menuDetails;
+  String? orderStatus;
+  String? totalPaid;
+  String? price;
+  String? gstCharge;
+  double? platformFee;
+  RefundData? refundData;
+  RestaurantDetail? restaurantDetail;
+  bool? isRated;
+  double? rating;
+  String? paymentMethod;
+  String? createdDate;
+  String? pickupDate;
+  String? pickupTime;
+  String? pickupEndTime;
+  String? createdTime;
+
+  OrderDetailsModel(
+      {this.orderId,
+        this.menuDetails,
+        this.orderStatus,
+        this.totalPaid,
+        this.price,
+        this.gstCharge,
+        this.platformFee,
+        this.refundData,
+        this.restaurantDetail,
+        this.isRated,
+        this.rating,
+        this.paymentMethod,
+        this.createdDate,
+        this.pickupDate,
+        this.pickupTime,
+        this.pickupEndTime,
+        this.createdTime});
+
+  OrderDetailsModel.fromJson(Map<String, dynamic> json) {
+    orderId = json['order_id'];
+    if (json['menu_details'] != null) {
+      menuDetails = <MenuDetails>[];
+      json['menu_details'].forEach((v) {
+        menuDetails!.add(MenuDetails.fromJson(v));
+      });
+    }
+    orderStatus = json['order_status'];
+    totalPaid = json['total_paid'];
+    price = json['price'];
+    gstCharge = json['gst_charge'];
+    platformFee = double.parse((json['platform_fee']??0).toString());
+    refundData = json['refund_data'] != null
+        ? RefundData.fromJson(json['refund_data'])
+        : null;
+    restaurantDetail = json['restaurant_detail'] != null
+        ? RestaurantDetail.fromJson(json['restaurant_detail'])
+        : null;
+    isRated = json['is_rated']??false;
+    rating = double.parse((json['rating']??0).toString());
+    paymentMethod = json['payment_method'];
+    createdDate = json['created_date'];
+    createdTime = json['created_time'];
+    pickupDate = json['pickup_date'];
+    pickupTime = json['pickup_time'];
+    pickupEndTime = json['pickup_end_time'];
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['order_id'] = orderId;
+    if (menuDetails != null) {
+      data['menu_details'] = menuDetails!.map((v) => v.toJson()).toList();
+    }
+    data['order_status'] = orderStatus;
+    data['total_paid'] = totalPaid;
+    data['price'] = price;
+    data['gst_charge'] = gstCharge;
+    data['platform_fee'] = platformFee;
+    data['refund_data'] = refundData;
+    if (refundData != null) {
+      data['refund_data'] = refundData!.toJson();
+    }
+    if (restaurantDetail != null) {
+      data['restaurant_detail'] = restaurantDetail!.toJson();
+    }
+    data['is_rated'] = isRated;
+    data['rating'] = rating;
+    data['payment_method'] = paymentMethod;
+    data['created_date'] = createdDate;
+    data['created_time'] = createdTime;
+    data['pickup_date'] = pickupDate;
+    data['pickup_time'] = pickupTime;
+    data['pickup_end_time'] = pickupEndTime;
+    return data;
+  }
+}
+
+class MenuDetails {
+  int? menuId;
+  String? menuName;
+  int? quantity;
+  int? offerPrice;
+  int? finalPrice;
+  String? foodPreference;
+  String? menuType;
+
+  MenuDetails(
+      {this.menuId,
+        this.menuName,
+        this.quantity,
+        this.offerPrice,
+        this.finalPrice,
+        this.foodPreference,
+      });
+
+  MenuDetails.fromJson(Map<String, dynamic> json) {
+    menuId = json['menu_id'];
+    menuName = json['menu_name'];
+    menuType = json['menu_type']??'';
+    quantity = json['quantity'];
+    offerPrice = json['offer_price'] != null ? int.parse(json['offer_price'].toString()) : 0;
+    finalPrice = json['final_price'] != null ? int.parse(json['final_price'].toString()) : 0;
+    foodPreference = json['food_prefrence'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['menu_id'] = menuId;
+    data['menu_name'] = menuName;
+    data['menu_type'] = menuType;
+    data['quantity'] = quantity;
+    data['offer_price'] = offerPrice;
+    data['final_price'] = finalPrice;
+    data['food_prefrence'] = foodPreference;
+    return data;
+  }
+}
+
+class RestaurantDetail {
+  String? restaurantName;
+  String? restaurantProfile;
+  String? restaurantCoverProfile;
+  double? avgRating;
+  String? restaurantAddress;
+  int? totalReview;
+  int? isVeg;
+  double? latitude;
+  double? longitude;
+
+  RestaurantDetail(
+      {this.restaurantName,
+        this.restaurantProfile,
+        this.restaurantCoverProfile,
+        this.avgRating,
+        this.restaurantAddress,
+        this.totalReview,
+        this.isVeg,
+        this.latitude,
+        this.longitude
+      });
+
+  RestaurantDetail.fromJson(Map<String, dynamic> json) {
+    restaurantName = json['restaurant_name'];
+    restaurantProfile = json['restaurant_profile'];
+    restaurantCoverProfile = json['restaurant_cover_profile'];
+    avgRating = double.parse((json['avg_rating']??0).toString());
+    restaurantAddress = json['restaurant_address'];
+    totalReview = json['total_review']??0;
+    isVeg = int.parse((json['is_veg']??0).toString());
+    latitude = double.parse((json['latitude']??0).toString());
+    longitude = double.parse((json['longitude']??0).toString());
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['restaurant_name'] = restaurantName;
+    data['restaurant_profile'] = restaurantProfile;
+    data['restaurant_cover_profile'] = restaurantCoverProfile;
+    data['avg_rating'] = avgRating;
+    data['restaurant_address'] = restaurantAddress;
+    data['total_review'] = totalReview;
+    data['is_veg'] = isVeg;
+    data['latitude'] = latitude;
+    data['longitude'] = longitude;
+    return data;
+  }
+}
+
+class RefundData {
+  int? refundId;
+  String? reasonId;
+  String? reason;
+  String? refundStatus;
+  String? refundImage;
+
+  RefundData(
+      {this.refundId,
+        this.reasonId,
+        this.reason,
+        this.refundStatus,
+        this.refundImage});
+
+  RefundData.fromJson(Map<String, dynamic> json) {
+    refundId = json['refund_id'];
+    reasonId = json['reason_id'];
+    reason = json['reason']??'';
+    refundStatus = json['refund_status'];
+    refundImage = json['refund_image'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['refund_id'] = refundId;
+    data['reason_id'] = reasonId;
+    data['reason'] = reason;
+    data['refund_status'] = refundStatus;
+    data['refund_image'] = refundImage;
+    return data;
+  }
+}
+

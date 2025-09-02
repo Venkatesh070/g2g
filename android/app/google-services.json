@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "4519581228",
+    "project_id": "good-to-grab",
+    "storage_bucket": "good-to-grab.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:4519581228:android:3397ee4223411565242389",
+        "android_client_info": {
+          "package_name": "com.good.grab"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "4519581228-7ostssudjso3as88m00peaeju6e5ll6r.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCdXS_5vI82Xzc9V6fjjtcYOaXRK9W9cUQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "4519581228-7ostssudjso3as88m00peaeju6e5ll6r.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
