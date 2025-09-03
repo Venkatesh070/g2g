@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:get/get.dart';
 import 'package:good_grab/infrastructure/models/order_details_model.dart';
+import 'package:good_grab/infrastructure/shared/common_functions.dart';
 import 'package:good_grab/infrastructure/shared/snackbar.util.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -14,6 +15,7 @@ import '../../infrastructure/shared/error_screen.dart';
 import '../../infrastructure/shared/http_exception.dart';
 import '../../infrastructure/shared/pref_manager.dart';
 import '../../infrastructure/shared/progress_dialog.dart';
+import 'package:intl/intl.dart';
 
 class OrderDetailsController extends GetxController {
   var orderStatus = ''.obs;
@@ -39,17 +41,22 @@ class OrderDetailsController extends GetxController {
 
   var isRated = false.obs;
 
+  var cancelDiffMinutes = 0.obs; // Add this observable
+
   @override
   void onInit() {
     orderId = Get.arguments['orderId'];
     resId = Get.arguments['resId'];
     currency = Get.arguments['currency'] ?? "₹";
     orderStatus.value = Get.arguments['orderStatus'];
+
     Future.delayed(Duration.zero, () async {
       if (orderStatus.value == 'completd_pick_up') {
         appReview();
       }
+
       await getOrderDetails();
+      calculateCancelDiffMinutes();
     });
     super.onInit();
   }
@@ -61,7 +68,8 @@ class OrderDetailsController extends GetxController {
     try {
       Map<String, dynamic> params = {'order_id': orderId};
       ApiResponseModel<OrderDetailsModel> orderModel =
-          await DioClient.base(accessToken: accessToken).funGetOrderDetailsApi(params);
+          await DioClient.base(accessToken: accessToken)
+              .funGetOrderDetailsApi(params);
       if (orderModel.success! && orderModel.data != null) {
         loadingData.value = false;
         isOrderData.value = true;
@@ -82,7 +90,9 @@ class OrderDetailsController extends GetxController {
       }
     } on CustomHttpException catch (exception) {
       errorScreen(
-          error: handleApiException(exception.code, exception.response, exception.exception, type: exception.type));
+          error: handleApiException(
+              exception.code, exception.response, exception.exception,
+              type: exception.type));
       loadingData.value = false;
       isOrderData.value = false;
     } catch (exception) {
@@ -94,7 +104,8 @@ class OrderDetailsController extends GetxController {
   }
 
   Future<void> openMap(double latitude, double longitude) async {
-    String googleUrl = 'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
+    String googleUrl =
+        'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
     if (await canLaunchUrl(Uri.parse(googleUrl))) {
       await launchUrl(Uri.parse(googleUrl));
     } else {
@@ -126,7 +137,9 @@ class OrderDetailsController extends GetxController {
       if (comment.toString().isNotEmpty) {
         params['comment'] = comment;
       }
-      ApiResponseModel baseModel = await DioClient.base(accessToken: accessToken).funAddOrderRatingApi(params);
+      ApiResponseModel baseModel =
+          await DioClient.base(accessToken: accessToken)
+              .funAddOrderRatingApi(params);
       if (baseModel.success!) {
         progressDialog.dismiss();
         SnackBarUtil.showSuccess(message: baseModel.message!);
@@ -138,12 +151,13 @@ class OrderDetailsController extends GetxController {
         errorScreen(error: baseModel.message!);
       }
     } on CustomHttpException catch (exception) {
-
       print("sdlkjfd ${exception}");
       progressDialog.dismiss();
 
       errorScreen(
-          error: handleApiException(exception.code, exception.response, exception.exception, type: exception.type));
+          error: handleApiException(
+              exception.code, exception.response, exception.exception,
+              type: exception.type));
       return false;
     } catch (exception) {
       progressDialog.dismiss();
@@ -186,9 +200,22 @@ class OrderDetailsController extends GetxController {
 
   getCancelTime() {
     DateTime currentTime = DateTime.now();
-    DateTime pickupDateTime = DateTime.parse("${orderDetailsModel!.pickupDate!} ${orderDetailsModel!.pickupTime}");
+    DateTime pickupDateTime = DateTime.parse(
+        "${orderDetailsModel!.pickupDate!} ${orderDetailsModel!.pickupTime}");
     Duration timeDifference = pickupDateTime.difference(currentTime);
     is2HoursLess.value = timeDifference.inHours == 2;
     print("pickuptime ${is2HoursLess.value}");
+  }
+
+  void calculateCancelDiffMinutes() {
+    try {
+      final diffMinutes = CommonFunction.getDiffMinutesFromDateTime(
+        orderDetailsModel!.createdDate.toString(),
+        orderDetailsModel!.createdTime.toString(),
+      );
+      cancelDiffMinutes.value = diffMinutes;
+    } catch (e) {
+      cancelDiffMinutes.value = -9999; // fallback value
+    }
   }
 }

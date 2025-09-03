@@ -116,4 +116,34 @@ class CommonFunction {
     var date2 = DateFormat('HH:mm:ss').parse(strDate2);
     return date1.difference(date2).inHours.abs().toString();
   }
+
+  //Differnce in Minutes
+   static int getDiffMinutesFromDateTime(String createdDateStr, String createdTimeStr) {
+  try {
+    createdDateStr = createdDateStr.trim(); // e.g. Sep 02,2025
+    String timeStr = createdTimeStr.trim(); // e.g. 16:04 PM
+    String combinedStr = '$createdDateStr $timeStr';
+
+    // Fix case like "16:04 PM" → "04:04 PM"
+    final timeParts = timeStr.split(':');
+    if (timeParts.isNotEmpty) {
+      int hour = int.tryParse(timeParts[0]) ?? 0;
+      if (hour > 12) {
+        hour -= 12;
+        timeStr = '${hour.toString().padLeft(2, '0')}:${timeParts[1]}';
+        combinedStr = '$createdDateStr $timeStr';
+      }
+    }
+
+    // ✅ Correct parser (12h + AM/PM)
+    final createdDateTime = DateFormat('MMM dd,yyyy hh:mm a').parse(combinedStr);
+    final now = DateTime.now();
+
+    return now.difference(createdDateTime).inMinutes;
+  } catch (e) {
+    debugPrint("Error parsing datetime: $e");
+    return 0;
+  }
+}
+
 }
