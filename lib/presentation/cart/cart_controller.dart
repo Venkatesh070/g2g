@@ -5,19 +5,19 @@ import 'package:crypto/crypto.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:good_grab/res.dart';
+import 'package:lottie/lottie.dart';
 import 'package:good_grab/infrastructure/models/cart_model.dart';
 import 'package:good_grab/infrastructure/models/restaurant_availability_model.dart';
 import 'package:good_grab/infrastructure/shared/common_functions.dart';
 import 'package:good_grab/infrastructure/shared/progress_dialog.dart';
 import 'package:good_grab/infrastructure/theme/colors.theme.dart';
 import 'package:good_grab/infrastructure/theme/text.theme.dart';
-import 'package:good_grab/res.dart';
 import 'package:intl/intl.dart';
-import 'package:lottie/lottie.dart';
 import 'package:phonepe_payment_sdk/phonepe_payment_sdk.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 
-import '../../infrastructure/constants/app_constants.dart';
+import '../../infrastructure/constants/app_constants.dart'; 
 import '../../infrastructure/models/api_response_model.dart';
 import '../../infrastructure/models/create_intent_model.dart';
 import '../../infrastructure/navigation/routes.dart';
@@ -43,7 +43,9 @@ class CartController extends GetxController {
   var subTotalFinalPrice = (0.0).obs;
   var subTotalOfferPrice = (0.0).obs;
   var totalGst = (0.0).obs;
+  var platformGst = (0.0).obs;
   var platformFee = (0.0).obs;
+  var combinedGst = (0.0).obs;
   var totalPay = (0.0).obs;
   var totalQuantity = (0).obs;
   var isFillColor = false.obs;
@@ -107,7 +109,7 @@ class CartController extends GetxController {
 
   var rApiKey = ''.obs;
   var rSecretApiKey = 'u3FtMReoFcKlpsWfPwVzHza8'.obs;
-  // var platformFee = (5.0).obs;
+
   var newOrderId = 0.obs;
 
   @override
@@ -122,10 +124,11 @@ class CartController extends GetxController {
       cartId.value = await PrefManager.getInt(AppConstants.cartId);
       userId.value = await PrefManager.getInt(AppConstants.userId);
       await getUserData();
-      await getPickupDaysApi();
+      await getPickupDaysApi();    
     });
     super.onInit();
   }
+
   
 showTakeawayReminderDialog() {
   Get.dialog(
@@ -199,7 +202,6 @@ showTakeawayReminderDialog() {
     barrierDismissible: false,
   );
 }
-
 
 
   getRandomNumber() {
@@ -298,11 +300,13 @@ showTakeawayReminderDialog() {
         subTotalOfferPrice.value = cartModel.data!.cartDetails!.offerPrice!;
         subTotalFinalPrice.value = cartModel.data!.cartDetails!.finalPrice!;
         totalGst.value = cartModel.data!.cartDetails!.gstCharge!;
+        platformGst.value = cartModel.data!.cartDetails!.platformGst!;
+        platformFee.value = cartModel.data!.cartDetails!.platformFee ?? 0.0;
+        combinedGst.value = totalGst.value + platformGst.value;
         menuList.addAll(cartModel.data!.cartDetails!.menuDetail!);
-        platformFee.value = cartModel.data!.cartDetails!.platformFee!;
-        // platformFee.value = cartModel.data!.platformFee!;
-        // totalPay.value = subTotalFinalPrice.value + totalGst.value + platformFee.value;
-        totalPay.value = 1;
+        // totalPay.value = subTotalFinalPrice.value + combinedGst.value + platformFee.value;
+                  totalPay.value = 1;
+
 
         print("sjkdfk ${menuList.length}");
 
@@ -386,14 +390,15 @@ showTakeawayReminderDialog() {
           subTotalOfferPrice.value = cartModel.data!.cartDetails!.offerPrice!;
           subTotalFinalPrice.value = cartModel.data!.cartDetails!.finalPrice!;
           totalGst.value = cartModel.data!.cartDetails!.gstCharge!;
+          platformGst.value = cartModel.data!.cartDetails!.platformGst!;
           platformFee.value = cartModel.data!.cartDetails!.platformFee!;
-          //  platformFee.value = cartModel.data!.platformFee!;
-          // totalPay.value = subTotalFinalPrice.value + totalGst.value + platformFee.value;
+          combinedGst.value = totalGst.value + platformGst.value;
+          // totalPay.value = subTotalFinalPrice.value + combinedGst.value + platformFee.value;
           totalPay.value = 1;
 
           menuList.refresh();
         } else {
-          menuList.clear(); 
+          menuList.clear();
           isCartData.value = false;
         }
       } else {
@@ -494,8 +499,7 @@ showTakeawayReminderDialog() {
         'pickup_date': pickupDayList[pickupDayIndex.value].pickupDate!,
         'pickup_time': pickupStartTime.value,
         'pickup_end_time': pickupCloseTime.value,
-        'gst_charge': totalGst.value,
-        'platform_fee' : platformFee.value,
+        'gst_charge': combinedGst.value,
         'payment_type': "ONLINE",
         'payment_status': 'paid',
         "payment_method": "phone_pe",
@@ -714,7 +718,6 @@ showTakeawayReminderDialog() {
 
     ///changes by krishna
     phonePeTId.value = orderId;
-    print('orderId $orderId');
     var options = {
       'key': rApiKey.value,
       "amount": (getTotalPay().toInt() * 100), //change by krishna
@@ -868,8 +871,7 @@ showTakeawayReminderDialog() {
         'pickup_date': pickupDayList[pickupDayIndex.value].pickupDate!,
         'pickup_time': pickupStartTime.value,
         'pickup_end_time': pickupCloseTime.value,
-        'gst_charge': totalGst.value,
-        'platform_fee': platformFee.value,
+        'gst_charge': combinedGst.value,
         'payment_type': "ONLINE",
         'payment_status': 'pending',
         "payment_method": paymentMethodType,

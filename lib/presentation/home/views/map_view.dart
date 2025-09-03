@@ -105,7 +105,7 @@ class MapView extends GetView<HomeController> {
                                   return GestureDetector(
                                     onTap: () async {
                                       if (controller.isLoggedIn.value) {
-                                        if (controller.mapHomeList[index].totalQuantity != 0) {
+                                        if (controller.mapHomeList[index].totalQuantity != 0 && controller.mapHomeList[index].soldOutStatus != true) {
                                           var result = await Get.toNamed(Routes.homeDetails, arguments: {
                                             'resId': controller.mapHomeList[index].id,
                                             'currency': controller.currency.value,
@@ -361,7 +361,7 @@ class MapView extends GetView<HomeController> {
                                             left: 0,
                                             right: 0,
                                             child: controller.mapHomeList[index].totalQuantity ==
-                                                    0  
+                                                    0  || controller.mapHomeList[index].soldOutStatus!
                                                     /*|| !controller.homeList[index].isTodayAvailable!*/
                                                 ? Container(
                                                     decoration: BoxDecoration(
@@ -375,10 +375,10 @@ class MapView extends GetView<HomeController> {
                                             child: ConstrainedBox(
                                               constraints: BoxConstraints(
                                                 minWidth: Get.width * 0.25,
-                                                maxWidth: Get.width * 0.66,
+                                                maxWidth: Get.width * 0.64,
                                               ),
                                               child: controller.mapHomeList[index].totalQuantity ==
-                                                      0 /*|| !controller.homeList[index].isTodayAvailable!*/
+                                                      0 || controller.mapHomeList[index].soldOutStatus!
                                                   ? Container(
                                                       decoration: BoxDecoration(
                                                           color: ColorsTheme.colD0F0BF,

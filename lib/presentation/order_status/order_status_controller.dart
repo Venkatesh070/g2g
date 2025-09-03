@@ -18,8 +18,9 @@ class OrderStatusController extends GetxController{
     timer = Timer.periodic(const Duration(milliseconds: 1000), (t) {
       if (seconds == 0) {
         timer!.cancel();
-        Get.back(result:  true);
-        Get.back(result:  true);
+        // Get.back(result:  true);
+        // Get.back(result:  true);
+        Get.toNamed(Routes.home);
       } else {
         seconds = seconds - 1;
       }

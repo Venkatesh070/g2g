@@ -6,6 +6,7 @@ class OrderDetailsModel extends Serializable{
   String? totalPaid;
   String? price;
   String? gstCharge;
+  double? platformGst;
   double? platformFee;
   RefundData? refundData;
   RestaurantDetail? restaurantDetail;
@@ -26,6 +27,7 @@ class OrderDetailsModel extends Serializable{
         this.price,
         this.gstCharge,
         this.platformFee,
+        this.platformGst,
         this.refundData,
         this.restaurantDetail,
         this.isRated,
@@ -49,6 +51,7 @@ class OrderDetailsModel extends Serializable{
     totalPaid = json['total_paid'];
     price = json['price'];
     gstCharge = json['gst_charge'];
+    platformGst = double.parse((json['platform_gst']??0).toString());
     platformFee = double.parse((json['platform_fee']??0).toString());
     refundData = json['refund_data'] != null
         ? RefundData.fromJson(json['refund_data'])
@@ -77,6 +80,7 @@ class OrderDetailsModel extends Serializable{
     data['total_paid'] = totalPaid;
     data['price'] = price;
     data['gst_charge'] = gstCharge;
+    data['platform_gst'] = platformGst; //json['platform_gst]
     data['platform_fee'] = platformFee;
     data['refund_data'] = refundData;
     if (refundData != null) {

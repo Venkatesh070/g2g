@@ -366,13 +366,137 @@ class CartPage extends BaseView<CartController> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          'GST'.tr,
-                          style: regularTextStyle(
-                              fontSize: dimen11, color: ColorsTheme.colBlack),
+                        Row(
+                          children: [
+                            Text(
+                              'Total GST'.tr,
+                              style: regularTextStyle(
+                                  fontSize: dimen11,
+                                  color: ColorsTheme.colBlack),
+                            ),
+                            SizedBox(width: 5),
+                            GestureDetector(
+                              onTap: () {
+                                Get.dialog(
+                                  Dialog(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    insetPadding: const EdgeInsets.symmetric(
+                                        horizontal: 30, vertical: 24),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(20),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          // Header with icon + title
+                                          Row(
+                                            children: [
+                                              Icon(Icons.receipt_long,
+                                                  color: ColorsTheme.colPrimary,
+                                                  size: 26),
+                                              const SizedBox(width: 8),
+                                              Text(
+                                                'GST Details'.tr,
+                                                style: semiBoldTextStyle(
+                                                  fontSize: dimen16,
+                                                  color: ColorsTheme.colBlack,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 16),
+
+                                          // Item GST
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                'Item GST'.tr,
+                                                style: regularTextStyle(
+                                                  fontSize: dimen13,
+                                                  color: ColorsTheme.colBlack
+                                                      .withOpacity(0.7),
+                                                ),
+                                              ),
+                                              Text(
+                                                '${controller.currency.value}${controller.totalGst.value.toStringAsFixed(2)}',
+                                                style: semiBoldTextStyle(
+                                                  fontSize: dimen13,
+                                                  color: ColorsTheme.colBlack,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const Divider(height: 20),
+
+                                          // Platform GST
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                'Platform GST'.tr,
+                                                style: regularTextStyle(
+                                                  fontSize: dimen13,
+                                                  color: ColorsTheme.colBlack
+                                                      .withOpacity(0.7),
+                                                ),
+                                              ),
+                                              Text(
+                                                '${controller.currency.value}${controller.platformGst.value.toStringAsFixed(2)}',
+                                                style: semiBoldTextStyle(
+                                                  fontSize: dimen13,
+                                                  color: ColorsTheme.colBlack,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+
+                                          const SizedBox(height: 20),
+
+                                          // Close Button
+                                          SizedBox(
+                                            width: double.infinity,
+                                            child: ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor:
+                                                    ColorsTheme.colPrimary,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                ),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 12),
+                                              ),
+                                              onPressed: () => Get.back(),
+                                              child: Text(
+                                                'Close'.tr,
+                                                style: semiBoldTextStyle(
+                                                  fontSize: dimen13,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: Icon(
+                                Icons.info_outline,
+                                size: 16,
+                                color: ColorsTheme.colPrimary,
+                              ),
+                            ),
+                          ],
                         ),
                         Obx(() => Text(
-                              '${controller.currency.value}${controller.totalGst.value.toStringAsFixed(2)}', //change by krishna
+                              '${controller.currency.value}${controller.combinedGst.value.toStringAsFixed(2)}',
                               style: regularTextStyle(
                                   fontSize: dimen11,
                                   color: ColorsTheme.colBlack),
@@ -380,7 +504,7 @@ class CartPage extends BaseView<CartController> {
                       ],
                     ),
                   ),
-                     Container(
+                  Container(
                     margin: const EdgeInsets.only(bottom: 2),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,

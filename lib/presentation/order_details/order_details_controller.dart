@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:get/get.dart';
 import 'package:good_grab/infrastructure/models/order_details_model.dart';
 import 'package:good_grab/infrastructure/shared/snackbar.util.dart';
@@ -22,6 +24,7 @@ class OrderDetailsController extends GetxController {
   var resId = 0;
   var currency = '';
 
+
   var backResult = false.obs;
 
   OrderDetailsModel? orderDetailsModel;
@@ -29,6 +32,8 @@ class OrderDetailsController extends GetxController {
   var subTotalPrice = (0.0).obs;
   var subTotalOfferPrice = (0.0).obs;
   var otherTotalPrice = (0.0).obs;
+  var combinedGst = (0.0).obs;
+  var platformGst = (0.0).obs;
   var platformFee = (0.0).obs;
   var totalPrice = (0.0).obs;
 
@@ -65,8 +70,10 @@ class OrderDetailsController extends GetxController {
         subTotalPrice.value = double.parse(orderModel.data!.totalPaid.toString());
         subTotalOfferPrice.value = double.parse(orderModel.data!.price.toString());
         otherTotalPrice.value = double.parse(orderModel.data!.gstCharge.toString());
+        platformGst.value = double.parse(orderModel.data!.platformGst.toString());
+        combinedGst.value = otherTotalPrice.value + platformGst.value;
         platformFee.value = orderModel.data!.platformFee!;
-        totalPrice.value = subTotalPrice.value + otherTotalPrice.value + platformFee.value;
+        totalPrice.value = subTotalPrice.value + combinedGst.value + platformFee.value;
         isRated.value = orderDetailsModel!.isRated!;
         getCancelTime();
       } else {
@@ -143,6 +150,38 @@ class OrderDetailsController extends GetxController {
       errorScreen(error: 'something_went_wrong'.tr);
       return false;
     }
+  }
+
+  Timer? cancelTimer;
+  RxInt remainingSeconds = 300.obs; // 5 minutes
+
+  void startCancelTimer(DateTime? createdAt, Duration maxDuration) {
+    cancelTimer?.cancel();
+    if (createdAt == null) return;
+    final now = DateTime.now();
+    int secondsLeft = maxDuration.inSeconds - now.difference(createdAt).inSeconds;
+    if (secondsLeft <= 0) {
+      remainingSeconds.value = 0;
+      return;
+    }
+    remainingSeconds.value = secondsLeft;
+    cancelTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      final now = DateTime.now();
+      int secondsLeft = maxDuration.inSeconds - now.difference(createdAt).inSeconds;
+      if (secondsLeft <= 0) {
+        remainingSeconds.value = 0;
+        timer.cancel();
+        cancelTimer = null;
+      } else {
+        remainingSeconds.value = secondsLeft;
+      }
+    });
+  }
+
+  @override
+  void onClose() {
+    cancelTimer?.cancel();
+    super.onClose();
   }
 
   getCancelTime() {
