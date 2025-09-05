@@ -470,6 +470,7 @@ class HomeDetailsPage extends BaseView<HomeDetailsController> {
           InkWell(
             onTap: () {
               controller.onBack();
+              // Get.delete<HomeDetailsController>();
             },
             child: Container(
                 decoration: BoxDecoration(

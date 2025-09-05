@@ -577,10 +577,10 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                                             '${controller.currency}${controller.orderDetailsModel!.menuDetails![index].offerPrice!}',
                                             style: TextStyle(
                                                 fontSize: dimen11,
-                                                color: ColorsTheme.col8FA19C,
+                                                color: ColorsTheme.col5dD6E68,
                                                 fontWeight: FontWeight.w500,
                                                 decorationColor:
-                                                    ColorsTheme.col8FA19C,
+                                                    ColorsTheme.col5dD6E68,
                                                 decoration:
                                                     TextDecoration.lineThrough),
                                             maxLines: 2,
@@ -654,7 +654,7 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Subtotal'.tr,
+                          'Item Charges'.tr,
                           style: semiBoldTextStyle(
                               fontSize: dimen12, color: ColorsTheme.colBlack),
                         ),
@@ -664,9 +664,9 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                               '${controller.currency}${controller.subTotalOfferPrice.value}',
                               style: TextStyle(
                                   fontSize: dimen11,
-                                  color: ColorsTheme.col8FA19C,
+                                  color: ColorsTheme.col5dD6E68,
                                   fontWeight: FontWeight.w500,
-                                  decorationColor: ColorsTheme.col8FA19C,
+                                  decorationColor: ColorsTheme.col5dD6E68,
                                   decoration: TextDecoration.lineThrough),
                               maxLines: 2,
                             ),

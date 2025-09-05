@@ -1,12 +1,14 @@
 import 'dart:async';
 
 import 'package:get/get.dart';
+import 'package:good_grab/presentation/cart/cart_controller.dart';
+import 'package:good_grab/presentation/home-details/home_details_controller.dart';
+import 'package:good_grab/presentation/home/home_controller.dart';
 
 import '../../infrastructure/navigation/routes.dart';
 import '../../res.dart';
 
-class OrderStatusController extends GetxController{
-
+class OrderStatusController extends GetxController {
   var orderStatus = ''.obs;
   var orderStatusSubtitle = ''.obs;
   var orderFile = ''.obs;
@@ -20,7 +22,13 @@ class OrderStatusController extends GetxController{
         timer!.cancel();
         // Get.back(result:  true);
         // Get.back(result:  true);
-        Get.toNamed(Routes.home);
+        if (Get.isRegistered<HomeDetailsController>()) {
+          Get.delete<HomeDetailsController>();
+        }
+        if (Get.isRegistered<CartController>()) {
+          Get.delete<CartController>();
+        }
+        Get.offNamed(Routes.home);
       } else {
         seconds = seconds - 1;
       }
@@ -31,11 +39,10 @@ class OrderStatusController extends GetxController{
   void onInit() {
     initTimer();
     orderStatus.value = Get.arguments['status'];
-    if(orderStatus.value == 'success'){
+    if (orderStatus.value == 'success') {
       orderStatusSubtitle.value = Get.arguments['message'];
       orderFile.value = Res.successOrder;
-    }
-    else if(orderStatus.value == 'failed'){
+    } else if (orderStatus.value == 'failed') {
       orderStatusSubtitle.value = Get.arguments['message'];
       orderFile.value = Res.cancelOrder;
     }

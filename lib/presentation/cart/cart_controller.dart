@@ -179,25 +179,28 @@ showTakeawayReminderDialog() {
         ),
       ),
       actionsAlignment: MainAxisAlignment.center,
-      actions: [
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: ColorsTheme.colPrimary,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
-          ),
-          onPressed: () => Get.back(), // then trigger payment
-          child: Text(
-            'Ok',
-            style: semiBoldTextStyle(
-              fontSize: dimen13,
-              color: Colors.white,
-            ),
-          ),
+   actions: [
+  SizedBox(
+    width: double.infinity,
+    child: ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: ColorsTheme.colPrimary,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
         ),
-      ],
+        padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 12),
+      ),
+      onPressed: () => Get.back(), // then trigger payment
+      child: Text(
+        'Ok',
+        style: semiBoldTextStyle(
+          fontSize: dimen13,
+          color: Colors.white,
+        ),
+      ),
+    ),
+  ),
+],
     ),
     barrierDismissible: false,
   );

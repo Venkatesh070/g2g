@@ -296,7 +296,11 @@ class OrdersView extends GetView<HomeController> {
                                                             bottom: 8),
                                                     child: Text(
                                                       '${controller.orderList[index].currency ?? '₹ '}'
-                                                      '${double.tryParse(controller.orderList[index].totalPaid ?? '0')! + double.tryParse(controller.orderList[index].gst ?? '0')!}'
+                                                      '${double.tryParse(controller.orderList[index].totalPaid ?? '0')! 
+                                                      + double.tryParse(controller.orderList[index].gst ?? '0')!
+                                                      + double.tryParse(controller.orderList[index].platformGst ?? '0')!
+                                                      + double.tryParse(controller.orderList[index].platformFee ?? '0')!
+                                                      }'
                                                       ' | ${controller.orderList[index].createdAt ?? ''}',
                                                       style: regularTextStyle(
                                                         fontSize: dimen11,

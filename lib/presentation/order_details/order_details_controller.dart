@@ -52,7 +52,7 @@ class OrderDetailsController extends GetxController {
 
     Future.delayed(Duration.zero, () async {
       if (orderStatus.value == 'completd_pick_up') {
-        appReview();
+        // appReview();
       }
 
       await getOrderDetails();

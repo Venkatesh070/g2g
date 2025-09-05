@@ -202,10 +202,10 @@ class CartPage extends BaseView<CartController> {
                                                 style: TextStyle(
                                                     fontSize: dimen11,
                                                     color:
-                                                        ColorsTheme.col8FA19C,
+                                                        ColorsTheme.col5dD6E68,
                                                     fontWeight: FontWeight.w500,
                                                     decorationColor:
-                                                        ColorsTheme.col8FA19C,
+                                                        ColorsTheme.col5dD6E68,
                                                     decoration: TextDecoration
                                                         .lineThrough),
                                                 maxLines: 2,
@@ -326,7 +326,7 @@ class CartPage extends BaseView<CartController> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Subtotal'.tr,
+                          'Item Charges'.tr,
                           style: semiBoldTextStyle(
                               fontSize: dimen12, color: ColorsTheme.colBlack),
                         ),
@@ -337,9 +337,9 @@ class CartPage extends BaseView<CartController> {
                                 '${controller.currency.value}${controller.subTotalOfferPrice.value.toString()}',
                                 style: TextStyle(
                                     fontSize: dimen11,
-                                    color: ColorsTheme.col8FA19C,
+                                    color: ColorsTheme.col5dD6E68,
                                     fontWeight: FontWeight.w500,
-                                    decorationColor: ColorsTheme.col8FA19C,
+                                    decorationColor: ColorsTheme.col5dD6E68,
                                     decoration: TextDecoration.lineThrough),
                                 maxLines: 2,
                               ),
