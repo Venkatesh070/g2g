@@ -14,6 +14,7 @@ import '../../infrastructure/theme/colors.theme.dart';
 import '../../infrastructure/theme/text.theme.dart';
 import '../../res.dart';
 import 'order_details_controller.dart';
+import 'countdown_progree.dart';
 
 class OrderDetailsPage extends BaseView<OrderDetailsController> {
   OrderDetailsPage({super.key});
@@ -105,6 +106,45 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             getStatus(),
+                            // Highlight message for confirmation pending
+                            Visibility(
+                              visible: controller.orderStatus.value ==
+                                      'confirmation_pending' ||
+                                  controller.orderStatus.value ==
+                                      'Confirmation Pending',
+                              child: Container(
+                                margin: const EdgeInsets.only(
+                                    left: 18, right: 18, bottom: 15),
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color:
+                                      ColorsTheme.colPrimary.withOpacity(0.08),
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                      color: ColorsTheme.colPrimary
+                                          .withOpacity(0.2)),
+                                ),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Icon(Icons.hourglass_top_rounded,
+                                        color: ColorsTheme.colPrimary,
+                                        size: 18),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        controller.cancelDiffMinutes.value > 5
+                                            ? 'It’s taking a little longer than expected. Please hold on for some more time.'
+                                            : 'Waiting for restaurant partner acceptance. Please wait and do not start your journey until accepted.',
+                                        style: regularTextStyle(
+                                            fontSize: dimen11,
+                                            color: ColorsTheme.colBlack),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
                             Visibility(
                               visible: controller.orderStatus.value ==
                                   'pending_pick_up',
@@ -654,7 +694,7 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Subtotal'.tr,
+                          'Item Charges'.tr,
                           style: semiBoldTextStyle(
                               fontSize: dimen12, color: ColorsTheme.colBlack),
                         ),
@@ -664,7 +704,7 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                               '${controller.currency}${controller.subTotalOfferPrice.value}',
                               style: TextStyle(
                                   fontSize: dimen11,
-                                  color: ColorsTheme.col8FA19C,
+                                  color: ColorsTheme.col475751,
                                   fontWeight: FontWeight.w500,
                                   decorationColor: ColorsTheme.col8FA19C,
                                   decoration: TextDecoration.lineThrough),
@@ -685,7 +725,7 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                       ],
                     ),
                   ),
-                Container(
+                  Container(
                     margin: const EdgeInsets.only(bottom: 2),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -745,7 +785,8 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                                                 ),
                                               ),
                                               Text(
-                                            '${controller.currency}${controller.otherTotalPrice.value}',                                                style: semiBoldTextStyle(
+                                                '${controller.currency}${controller.otherTotalPrice.value}',
+                                                style: semiBoldTextStyle(
                                                   fontSize: dimen13,
                                                   color: ColorsTheme.colBlack,
                                                 ),
@@ -768,8 +809,8 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                                                 ),
                                               ),
                                               Text(
-
-                        '${controller.currency}${controller.platformGst.value}',                                                style: semiBoldTextStyle(
+                                                '${controller.currency}${controller.platformGst.value}',
+                                                style: semiBoldTextStyle(
                                                   fontSize: dimen13,
                                                   color: ColorsTheme.colBlack,
                                                 ),
@@ -819,8 +860,8 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                           ],
                         ),
                         Obx(() => Text(
-
-                        '${controller.currency}${controller.combinedGst.value}',                              style: regularTextStyle(
+                              '${controller.currency}${controller.combinedGst.value}',
+                              style: regularTextStyle(
                                   fontSize: dimen11,
                                   color: ColorsTheme.colBlack),
                             ))
@@ -838,38 +879,39 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                               fontSize: dimen11, color: ColorsTheme.colBlack),
                         ),
                         Obx(() => Text(
-
-                        '${controller.currency}${controller.platformFee.value}',                              style: regularTextStyle(
+                              '${controller.currency}${controller.platformFee.value}',
+                              style: regularTextStyle(
                                   fontSize: dimen11,
                                   color: ColorsTheme.colBlack),
                             ))
                       ],
                     ),
                   ),
-                Container(
-                  margin: const EdgeInsets.only(bottom: 2),
-                  child: Divider(
-                    color: ColorsTheme.colC4D9D4,
-                    thickness: 1,
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Total Pay'.tr,
-                      style: semiBoldTextStyle(fontSize: dimen12, color: ColorsTheme.colBlack),
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 2),
+                    child: Divider(
+                      color: ColorsTheme.colC4D9D4,
+                      thickness: 1,
                     ),
-                    Text(
-                      '${controller.currency}${controller.totalPrice.value}',
-                      style: semiBoldTextStyle(fontSize: dimen12, color: ColorsTheme.colBlack),
-                      maxLines: 2,
-                    )
-                  ],
-                ),
-              ],
-            )
-          ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Total Pay'.tr,
+                        style: semiBoldTextStyle(
+                            fontSize: dimen12, color: ColorsTheme.colBlack),
+                      ),
+                      Text(
+                        '${controller.currency}${controller.totalPrice.value}',
+                        style: semiBoldTextStyle(
+                            fontSize: dimen12, color: ColorsTheme.colBlack),
+                        maxLines: 2,
+                      )
+                    ],
+                  ),
+                ],
+              )),
         ],
       ),
     );
@@ -1338,46 +1380,70 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
     return Obx(() {
       final status = controller.orderStatus.value;
       final diffMinutes = controller.cancelDiffMinutes.value;
+      final secondsLeft = controller.remainingSeconds.value;
 
-      bool showButton = (status == 'confirmation_pending') && (diffMinutes <= 5);
+      final bool show = (status == 'confirmation_pending' ||
+              status == 'Confirmation Pending') &&
+          secondsLeft > 0 &&
+          (diffMinutes <= 96 && diffMinutes >= 0);
 
-      debugPrint("Cancel Diff Minutes in ODP $diffMinutes ,$showButton");
+      debugPrint(
+          "Cancel Diff Minutes in ODP $diffMinutes, secondsLeft=$secondsLeft, show=$show");
 
-
-      if (!showButton) return const SizedBox.shrink();
+      if (!show) return const SizedBox.shrink();
 
       return SafeArea(
         top: false,
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(18, 8, 18, 12),
-          decoration: BoxDecoration(color: ColorsTheme.colWhite, boxShadow: [
-            BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 8,
-                offset: const Offset(0, -2))
-          ]),
-          child: SizedBox(
-            width: double.infinity,
-            child: OutlinedButton(
-              style: OutlinedButton.styleFrom(
-                side: BorderSide(color: ColorsTheme.colFF4E4E, width: 1.5),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30)),
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                foregroundColor: ColorsTheme.colFF4E4E,
-              ),
-              onPressed: _openCancelSummaryDialog,
-              child: Text(
-                'Cancel Order'.tr,
-                style: semiBoldTextStyle(
-                    fontSize: dimen12, color: ColorsTheme.colFF4E4E),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Top countdown progress bar (shrinks right->left) with tortoise and MM:SS
+            Padding(
+              padding: const EdgeInsets.fromLTRB(18, 8, 18, 6),
+              child: CountdownProgressBar(
+                diffMinutes: controller.cancelDiffMinutes.value,
+                remainingSecondsExternal: controller.remainingSeconds.value,
+                totalMinutes: 5,
+                onFinished: () {
+                  // Optionally react when finished (e.g., hide UI or update controller)
+                },
+                barHeight: 6,
               ),
             ),
+            // Existing cancel button
+            Container(
+              padding: const EdgeInsets.fromLTRB(18, 8, 18, 12),
+              decoration:
+                  BoxDecoration(color: ColorsTheme.colWhite, boxShadow: [
+                BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 8,
+                    offset: const Offset(0, -2))
+              ]),
+              child: SizedBox(
+                width: double.infinity,
+                child: OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: ColorsTheme.colFF4E4E, width: 1.5),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30)),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    foregroundColor: ColorsTheme.colFF4E4E,
+                  ),
+                  onPressed: _openCancelSummaryDialog,
+                  child: Text(
+                    'Cancel Order'.tr,
+                    style: semiBoldTextStyle(
+                        fontSize: dimen12, color: ColorsTheme.colFF4E4E),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
-      ),
-    );
-  });
-}
+      );
+    });
+  }
 
   void _openCancelSummaryDialog() {
     if (controller.orderDetailsModel == null) return;
@@ -1388,7 +1454,7 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
     debugPrint('message: confirmation: $status');
 
     // For confirmation_pending (and payment_pending), show the custom-styled popup matching the reference
-    if (status == 'confirmation_pending' || status == 'payment_pending') {
+    if (status == 'confirmation_pending' || status == 'Confirmation Pending') {
       final String method = (order.paymentMethod ?? '').toUpperCase();
       final int totalQty = (order.menuDetails ?? [])
           .map((m) => m.quantity ?? 0)

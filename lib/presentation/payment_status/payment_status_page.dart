@@ -51,7 +51,7 @@ class PaymentStatusPage extends BaseView<PaymentStatusController> {
                 onTap: () {
                   if (controller.paymentStatus.value == "Success") {
                     Get.back(result: {"result": true, "transactionId": controller.transactionId});
-                    // Get.back(result: true);
+                    Get.back(result: true);
                   } else {
                     Get.back(result: false);
                   }

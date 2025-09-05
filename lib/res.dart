@@ -70,4 +70,7 @@ class Res {
   static const String splashLogoJson1 = "assets/splashLogoJson1.json";
   static const String successOrder = "assets/successOrder.json";
   static const String takeAway = "assets/takeAway.json";
+
+  //Added Later
+  static const String icConfirmPending = "assets/images/icConfirmPending.png";
 }

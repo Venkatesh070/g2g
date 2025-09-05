@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:good_grab/infrastructure/models/order_details_model.dart';
 import 'package:good_grab/infrastructure/shared/common_functions.dart';
@@ -84,6 +85,30 @@ class OrderDetailsController extends GetxController {
         totalPrice.value = subTotalPrice.value + combinedGst.value + platformFee.value;
         isRated.value = orderDetailsModel!.isRated!;
         getCancelTime();
+
+        // Start continuous 5-minute cancel countdown from order creation time
+        try {
+          final createdDate = orderDetailsModel!.createdDate?.trim();
+          final createdTime = orderDetailsModel!.createdTime?.trim();
+          if (createdDate != null && createdTime != null && createdDate.isNotEmpty && createdTime.isNotEmpty) {
+            // Normalize cases like "16:04 PM" -> "04:04 PM" (API sometimes sends 24h with AM/PM)
+            String timeStr = createdTime;
+            final parts = timeStr.split(':');
+            if (parts.isNotEmpty) {
+              final hour = int.tryParse(parts[0]) ?? 0;
+              if (hour > 12) {
+                timeStr = '${(hour - 12).toString().padLeft(2, '0')}:${parts[1]}';
+              }
+            }
+            debugPrint('Parsed timeStr: $timeStr');
+            // Parse using expected format: e.g., "Sep 02,2025 04:04 PM"
+            final createdAt = DateFormat('MMM dd,yyyy hh:mm a').parse('$createdDate $timeStr');
+                        debugPrint('Parsed createdAt: $createdAt');
+            startCancelTimer(createdAt, const Duration(minutes: 5));
+          }
+        } catch (_) {
+          // ignore parsing issues
+        }
       } else {
         loadingData.value = false;
         isOrderData.value = false;
@@ -172,24 +197,23 @@ class OrderDetailsController extends GetxController {
   void startCancelTimer(DateTime? createdAt, Duration maxDuration) {
     cancelTimer?.cancel();
     if (createdAt == null) return;
-    final now = DateTime.now();
-    int secondsLeft = maxDuration.inSeconds - now.difference(createdAt).inSeconds;
-    if (secondsLeft <= 0) {
-      remainingSeconds.value = 0;
-      return;
-    }
-    remainingSeconds.value = secondsLeft;
-    cancelTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+
+    // Align ticks to wall-clock seconds to keep animation smooth and consistent
+    void scheduleTick() {
       final now = DateTime.now();
-      int secondsLeft = maxDuration.inSeconds - now.difference(createdAt).inSeconds;
-      if (secondsLeft <= 0) {
-        remainingSeconds.value = 0;
-        timer.cancel();
+      final elapsed = now.difference(createdAt).inSeconds;
+      final secondsLeft = maxDuration.inSeconds - elapsed;
+      remainingSeconds.value = secondsLeft <= 0 ? 0 : secondsLeft;
+      if (remainingSeconds.value <= 0) {
+        cancelTimer?.cancel();
         cancelTimer = null;
-      } else {
-        remainingSeconds.value = secondsLeft;
+        return;
       }
-    });
+      final int msToNextSecond = 1000 - now.millisecond;
+      cancelTimer = Timer(Duration(milliseconds: msToNextSecond), scheduleTick);
+    }
+
+    scheduleTick();
   }
 
   @override

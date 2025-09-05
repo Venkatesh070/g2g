@@ -24,6 +24,10 @@ class ColorsTheme {
   static Color colA3A8A4 = HexColor("#A3A8A4");
   static Color col404040 = HexColor("#404040");
   static Color colFCFFFC = HexColor("#FCFFFC");
+  static Color colF5F5F5 = HexColor("#F5F5F5");
+  static Color colF59E0B = HexColor("#F59E0B");
+  static Color col475751 = HexColor("#475751");
+  
 
 
 }

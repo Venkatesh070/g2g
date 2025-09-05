@@ -416,7 +416,38 @@ class OrdersView extends GetView<HomeController> {
           ),
         ],
       );
-    } else {
+    }else if (controller.orderList[index].orderStatus! == 'confirmation_pending' ||
+        controller.orderList[index].orderStatus == 'confirmation_pending') {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+              width: 20,
+              height: 20,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: ColorsTheme.colF59E0B,
+              ),
+              alignment: Alignment.center,
+              margin: const EdgeInsets.only(right: 10),
+              child: Image.asset(
+                Res.icConfirmPending,
+                color: Colors.white,
+                width: 8,
+                height: 8,
+              )),
+          Text(
+            controller.orderList[index].orderStatus == 'confirmation_pending'
+                ? 'Confirmation Pending'
+                : 'Order Cancelled',
+            style:
+                boldTextStyle(fontSize: dimen11, color: ColorsTheme.colF59E0B),
+          ),
+        ],
+      );
+    }  
+    
+    else {
       return Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
