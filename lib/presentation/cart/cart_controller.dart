@@ -17,7 +17,7 @@ import 'package:intl/intl.dart';
 import 'package:phonepe_payment_sdk/phonepe_payment_sdk.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 
-import '../../infrastructure/constants/app_constants.dart'; 
+import '../../infrastructure/constants/app_constants.dart';
 import '../../infrastructure/models/api_response_model.dart';
 import '../../infrastructure/models/create_intent_model.dart';
 import '../../infrastructure/navigation/routes.dart';
@@ -124,88 +124,87 @@ class CartController extends GetxController {
       cartId.value = await PrefManager.getInt(AppConstants.cartId);
       userId.value = await PrefManager.getInt(AppConstants.userId);
       await getUserData();
-      await getPickupDaysApi();    
+      await getPickupDaysApi();
     });
     super.onInit();
   }
 
-  
-showTakeawayReminderDialog() {
-  Get.dialog(
-    AlertDialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
-      ),
-      titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-      contentPadding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
-      title: Row(
-        children: [
-          Icon(Icons.shopping_bag_outlined, color: ColorsTheme.colPrimary, size: 24),
-          const SizedBox(width: 8),
-          Text(
-            'Takeaway Reminder',
-            style: semiBoldTextStyle(
-              fontSize: dimen16,
-              color: ColorsTheme.colBlack,
-            ),
-          ),
-        ],
-      ),
-      
-      content: SizedBox(
-        width: Get.width * 0.75, // 👈 makes dialog ~75% of screen width
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+  showTakeawayReminderDialog() {
+    Get.dialog(
+      AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
+        ),
+        titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+        contentPadding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
+        title: Row(
           children: [
-            const SizedBox(height: 20),
-            SizedBox(
-              height: 100,
-              child: Lottie.asset(
-                Res.takeAway,
-                repeat: false,
-                animate: true,
-              ),
-            ),
-            const SizedBox(height: 20),
+            Icon(Icons.shopping_bag_outlined,
+                color: ColorsTheme.colPrimary, size: 24),
+            const SizedBox(width: 8),
             Text(
-              'This is a takeaway order.\nPlease collect it directly from the restaurant.',
-              textAlign: TextAlign.center,
-              style: regularTextStyle(
-                fontSize: dimen14,
+              'Takeaway Reminder',
+              style: semiBoldTextStyle(
+                fontSize: dimen16,
                 color: ColorsTheme.colBlack,
               ),
             ),
           ],
         ),
-      ),
-      actionsAlignment: MainAxisAlignment.center,
-   actions: [
-  SizedBox(
-    width: double.infinity,
-    child: ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: ColorsTheme.colPrimary,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+        content: SizedBox(
+          width: Get.width * 0.75, // 👈 makes dialog ~75% of screen width
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 20),
+              SizedBox(
+                height: 100,
+                child: Lottie.asset(
+                  Res.takeAway,
+                  repeat: false,
+                  animate: true,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'This is a takeaway order.\nPlease collect it directly from the restaurant.',
+                textAlign: TextAlign.center,
+                style: regularTextStyle(
+                  fontSize: dimen14,
+                  color: ColorsTheme.colBlack,
+                ),
+              ),
+            ],
+          ),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 12),
+        actionsAlignment: MainAxisAlignment.center,
+        actions: [
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: ColorsTheme.colPrimary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 25, vertical: 12),
+              ),
+              onPressed: () => Get.back(), // then trigger payment
+              child: Text(
+                'Ok',
+                style: semiBoldTextStyle(
+                  fontSize: dimen13,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
-      onPressed: () => Get.back(), // then trigger payment
-      child: Text(
-        'Ok',
-        style: semiBoldTextStyle(
-          fontSize: dimen13,
-          color: Colors.white,
-        ),
-      ),
-    ),
-  ),
-],
-    ),
-    barrierDismissible: false,
-  );
-}
-
+      barrierDismissible: false,
+    );
+  }
 
   getRandomNumber() {
     const ch = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
@@ -308,8 +307,7 @@ showTakeawayReminderDialog() {
         combinedGst.value = totalGst.value + platformGst.value;
         menuList.addAll(cartModel.data!.cartDetails!.menuDetail!);
         // totalPay.value = subTotalFinalPrice.value + combinedGst.value + platformFee.value;
-                  totalPay.value = 1;
-
+        totalPay.value = 1;
 
         print("sjkdfk ${menuList.length}");
 
@@ -711,6 +709,7 @@ showTakeawayReminderDialog() {
       }
     } catch (exception) {
       print(exception);
+      debugPrint('exception.toString()');
       progressDialog.dismiss();
       errorScreen(error: 'something_went_wrong'.tr);
     }
@@ -749,6 +748,15 @@ showTakeawayReminderDialog() {
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
+    debugPrint(
+        '_handlePaymentError: code=${response.code}, message=${response.error}');
+
+
+    if(response.error!['description'] == 'payment_error'){
+      errorScreen(error: 'Payment cancelled by user');
+      return;
+    }
+
     var message = response.error == null
         ? 'something_went_wrong'.tr
         : response.error!['description'].toString();
@@ -914,6 +922,8 @@ showTakeawayReminderDialog() {
     apiCalling.value = false;
     var progressDialog = ProgressDialog();
     progressDialog.show();
+    debugPrint("vgregregregreg ");
+
     try {
       var accessToken = await PrefManager.getString(AppConstants.accessToken);
       Map<String, dynamic> params = {
@@ -923,6 +933,7 @@ showTakeawayReminderDialog() {
       ApiResponseModel baseModel =
           await DioClient.base(accessToken: accessToken)
               .funPlaceCompleteOrderApi(params);
+
       progressDialog.dismiss();
       if (baseModel.success!) {
         PrefManager.remove(AppConstants.cartId);

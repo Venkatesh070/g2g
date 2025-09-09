@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:lottie/lottie.dart';
 import 'package:get/get.dart';
 import 'package:good_grab/infrastructure/core/base/base_view.dart';
 import 'package:good_grab/infrastructure/shared/common_functions.dart';
@@ -20,6 +21,9 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
   OrderDetailsPage({super.key});
 
   @override
+  bool extendBody() => true;
+
+  @override
   bool onBackPressed() {
     Get.back(result: controller.backResult.value);
     return false;
@@ -28,230 +32,253 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
   @override
   Widget body(BuildContext context) {
     return SafeArea(
+        bottom: false,
         child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-          child: Row(
-            children: [
-              InkWell(
-                onTap: () {
-                  Get.back(result: controller.backResult.value);
-                },
-                child: Icon(
-                  Icons.arrow_back,
-                  size: 25,
-                  color: ColorsTheme.colBlack,
-                ),
-              ),
-              Expanded(
-                child: Center(
-                  child: Text(
-                    'Order Details'.tr,
-                    style: boldTextStyle(
-                        fontSize: dimen16, color: ColorsTheme.colBlack),
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+              child: Row(
+                children: [
+                  InkWell(
+                    onTap: () {
+                      Get.back(result: controller.backResult.value);
+                    },
+                    child: Icon(
+                      Icons.arrow_back,
+                      size: 25,
+                      color: ColorsTheme.colBlack,
+                    ),
                   ),
-                ),
-              ),
-              const SizedBox(
-                width: 30,
-              )
-            ],
-          ),
-        ),
-        Expanded(
-            child: Obx(
-          () => controller.loadingData.value
-              ? Container(
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-                  child: ListView.builder(
-                      itemCount: 10,
-                      itemBuilder: (context, index) {
-                        return ListTile(
-                          contentPadding:
-                              const EdgeInsets.symmetric(vertical: 4),
-                          leading: const CustomShimmerWidget.rectangular(
-                            height: 64,
-                            width: 64,
-                            borderRadius: 16,
-                          ),
-                          title: Align(
-                            alignment: Alignment.centerLeft,
-                            child: CustomShimmerWidget.rectangular(
-                              height: 16,
-                              width: Get.size.width * 0.3,
-                            ),
-                          ),
-                          subtitle:
-                              const CustomShimmerWidget.rectangular(height: 14),
-                        );
-                      }),
-                )
-              : !controller.isOrderData.value
-                  ? SingleChildScrollView(
-                      child: Container(
-                          margin:
-                              EdgeInsets.symmetric(vertical: Get.height * 0.2),
-                          child: noDataScreen(
-                              noDataImage: Res.icRestaurant,
-                              title: '${'no_orders_title'.tr}?'.tr,
-                              subtitle: 'no_orders_subtitle'.tr)),
-                    )
-                  : SingleChildScrollView(
-                      child: Container(
-                        margin: const EdgeInsets.only(bottom: 15),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            getStatus(),
-                            // Highlight message for confirmation pending
-                            Visibility(
-                              visible: controller.orderStatus.value ==
-                                      'confirmation_pending' ||
-                                  controller.orderStatus.value ==
-                                      'Confirmation Pending',
-                              child: Container(
-                                margin: const EdgeInsets.only(
-                                    left: 18, right: 18, bottom: 15),
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color:
-                                      ColorsTheme.colPrimary.withOpacity(0.08),
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(
-                                      color: ColorsTheme.colPrimary
-                                          .withOpacity(0.2)),
-                                ),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Icon(Icons.hourglass_top_rounded,
-                                        color: ColorsTheme.colPrimary,
-                                        size: 18),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: Text(
-                                        controller.cancelDiffMinutes.value > 5
-                                            ? 'It’s taking a little longer than expected. Please hold on for some more time.'
-                                            : 'Waiting for restaurant partner acceptance. Please wait and do not start your journey until accepted.',
-                                        style: regularTextStyle(
-                                            fontSize: dimen11,
-                                            color: ColorsTheme.colBlack),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Visibility(
-                              visible: controller.orderStatus.value ==
-                                  'pending_pick_up',
-                              child: Container(
-                                margin: const EdgeInsets.only(
-                                    left: 18, right: 18, bottom: 15),
-                                child: Text(
-                                  'pickup_note'.tr,
-                                  style: regularTextStyle(
-                                      fontSize: dimen10,
-                                      color: ColorsTheme.col8FA19C),
-                                ),
-                              ),
-                            ),
-                            Visibility(
-                                visible: controller.orderStatus.value ==
-                                    'completd_pick_up',
-                                child: rateOrder()),
-                            controller.orderDetailsModel!.menuDetails != null &&
-                                    controller.orderDetailsModel!.menuDetails!
-                                        .isNotEmpty
-                                ? orderDetails()
-                                : Container(),
-                            billDetails(),
-                            Visibility(
-                              visible:
-                                  controller.orderStatus.value == 'initiate' ||
-                                      controller.orderStatus.value == 'intiate',
-                              child: GestureDetector(
-                                onTap: _openCancelSummaryDialog,
-                                child: Container(
-                                  margin: const EdgeInsets.only(
-                                      bottom: 8, left: 18, right: 18),
-                                  child: Column(
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(
-                                            'Order Cancel'.tr,
-                                            style: semiBoldTextStyle(
-                                                fontSize: dimen12,
-                                                color: ColorsTheme.colBlack),
-                                          ),
-                                          Icon(
-                                            Icons.arrow_forward_ios_outlined,
-                                            size: 15,
-                                            color: ColorsTheme.colBlack,
-                                          )
-                                        ],
-                                      ),
-                                      Container(
-                                        margin: const EdgeInsets.only(top: 8),
-                                        child: Divider(
-                                          color: ColorsTheme.colC4D9D4,
-                                          thickness: 1,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Visibility(
-                                visible: controller.orderStatus.value ==
-                                    'order_cancel',
-                                child: cancelOrder()),
-                            Visibility(
-                              visible: controller.orderStatus.value !=
-                                  'pending_pick_up',
-                              child: InkWell(
-                                onTap: () {
-                                  Get.toNamed(Routes.appContents, arguments: {
-                                    'title': 'Contact us'.tr,
-                                    'flag': 'contact'
-                                  });
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(30),
-                                      color: ColorsTheme.colPrimary),
-                                  margin: const EdgeInsets.only(
-                                      bottom: 15, left: 18, right: 18),
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 10, horizontal: 18),
-                                  child: Text(
-                                    'Contact us'.tr,
-                                    style: regularTextStyle(
-                                        fontSize: dimen11,
-                                        color: ColorsTheme.colWhite),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            controller.orderDetailsModel!.restaurantDetail !=
-                                    null
-                                ? restaurantDetails()
-                                : Container(),
-                            paymentType()
-                          ],
-                        ),
+                  Expanded(
+                    child: Center(
+                      child: Text(
+                        'Order Details'.tr,
+                        style: boldTextStyle(
+                            fontSize: dimen16, color: ColorsTheme.colBlack),
                       ),
                     ),
-        )),
-      ],
-    ));
+                  ),
+                  const SizedBox(
+                    width: 30,
+                  )
+                ],
+              ),
+            ),
+            Expanded(
+                child: Obx(
+              () => controller.loadingData.value
+                  ? Container(
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 30, vertical: 10),
+                      child: ListView.builder(
+                          itemCount: 10,
+                          itemBuilder: (context, index) {
+                            return ListTile(
+                              contentPadding:
+                                  const EdgeInsets.symmetric(vertical: 4),
+                              leading: const CustomShimmerWidget.rectangular(
+                                height: 64,
+                                width: 64,
+                                borderRadius: 16,
+                              ),
+                              title: Align(
+                                alignment: Alignment.centerLeft,
+                                child: CustomShimmerWidget.rectangular(
+                                  height: 16,
+                                  width: Get.size.width * 0.3,
+                                ),
+                              ),
+                              subtitle: const CustomShimmerWidget.rectangular(
+                                  height: 14),
+                            );
+                          }),
+                    )
+                  : !controller.isOrderData.value
+                      ? SingleChildScrollView(
+                          child: Container(
+                              margin: EdgeInsets.symmetric(
+                                  vertical: Get.height * 0.2),
+                              child: noDataScreen(
+                                  noDataImage: Res.icRestaurant,
+                                  title: '${'no_orders_title'.tr}?'.tr,
+                                  subtitle: 'no_orders_subtitle'.tr)),
+                        )
+                      : SingleChildScrollView(
+                          child: Container(
+                            margin: const EdgeInsets.only(bottom: 15),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                getStatus(),
+                                // Highlight message for confirmation pending
+                                Visibility(
+                                  visible: controller.orderStatus.value ==
+                                          'confirmation_pending' ||
+                                      controller.orderStatus.value ==
+                                          'Confirmation Pending',
+                                  child: Container(
+                                    margin: const EdgeInsets.only(
+                                        left: 18, right: 18, bottom: 15),
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: ColorsTheme.colPrimary
+                                          .withOpacity(0.08),
+                                      borderRadius: BorderRadius.circular(10),
+                                      border: Border.all(
+                                          color: ColorsTheme.colPrimary
+                                              .withOpacity(0.2)),
+                                    ),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: Lottie.asset(
+                                            'assets/confirm-order.json',
+                                            repeat: true,
+                                            fit: BoxFit.contain,
+                                            errorBuilder:
+                                                (context, error, stackTrace) =>
+                                                    Icon(
+                                              Icons.hourglass_top_rounded,
+                                              color: ColorsTheme.colPrimary,
+                                              size: 18,
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: Text(
+                                            controller.cancelDiffMinutes.value >
+                                                    5
+                                                ? 'It’s taking a little longer than expected. Please hold on for some more time.'
+                                                : 'Waiting for restaurant partner acceptance. Please wait and do not start your journey until accepted.',
+                                            style: regularTextStyle(
+                                                fontSize: dimen11,
+                                                color: ColorsTheme.colBlack),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                Visibility(
+                                  visible: controller.orderStatus.value ==
+                                      'pending_pick_up',
+                                  child: Container(
+                                    margin: const EdgeInsets.only(
+                                        left: 18, right: 18, bottom: 15),
+                                    child: Text(
+                                      'pickup_note'.tr,
+                                      style: regularTextStyle(
+                                          fontSize: dimen10,
+                                          color: ColorsTheme.col8FA19C),
+                                    ),
+                                  ),
+                                ),
+                                Visibility(
+                                    visible: controller.orderStatus.value ==
+                                        'completd_pick_up',
+                                    child: rateOrder()),
+                                controller.orderDetailsModel!.menuDetails !=
+                                            null &&
+                                        controller.orderDetailsModel!
+                                            .menuDetails!.isNotEmpty
+                                    ? orderDetails()
+                                    : Container(),
+                                billDetails(),
+                                Visibility(
+                                  visible: controller.orderStatus.value ==
+                                          'initiate' ||
+                                      controller.orderStatus.value == 'intiate',
+                                  child: GestureDetector(
+                                    onTap: _openCancelSummaryDialog,
+                                    child: Container(
+                                      margin: const EdgeInsets.only(
+                                          bottom: 8, left: 18, right: 18),
+                                      child: Column(
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                'Order Cancel'.tr,
+                                                style: semiBoldTextStyle(
+                                                    fontSize: dimen12,
+                                                    color:
+                                                        ColorsTheme.colBlack),
+                                              ),
+                                              Icon(
+                                                Icons
+                                                    .arrow_forward_ios_outlined,
+                                                size: 15,
+                                                color: ColorsTheme.colBlack,
+                                              )
+                                            ],
+                                          ),
+                                          Container(
+                                            margin:
+                                                const EdgeInsets.only(top: 8),
+                                            child: Divider(
+                                              color: ColorsTheme.colC4D9D4,
+                                              thickness: 1,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Visibility(
+                                    visible: controller.orderStatus.value ==
+                                        'order_cancel',
+                                    child: cancelOrder()),
+                                Visibility(
+                                  visible: controller.orderStatus.value !=
+                                      'pending_pick_up',
+                                  child: InkWell(
+                                    onTap: () {
+                                      Get.toNamed(Routes.appContents,
+                                          arguments: {
+                                            'title': 'Contact us'.tr,
+                                            'flag': 'contact'
+                                          });
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(30),
+                                          color: ColorsTheme.colPrimary),
+                                      margin: const EdgeInsets.only(
+                                          bottom: 15, left: 18, right: 18),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 10, horizontal: 18),
+                                      child: Text(
+                                        'Contact us'.tr,
+                                        style: regularTextStyle(
+                                            fontSize: dimen11,
+                                            color: ColorsTheme.colWhite),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                controller.orderDetailsModel!
+                                            .restaurantDetail !=
+                                        null
+                                    ? restaurantDetails()
+                                    : Container(),
+                                paymentType()
+                              ],
+                            ),
+                          ),
+                        ),
+            )),
+          ],
+        ));
   }
 
   getStatus() {
@@ -569,11 +596,10 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
               top: 15,
             ),
             padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
-            child: ListView.builder(
-                itemCount: controller.orderDetailsModel!.menuDetails!.length,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemBuilder: (context, index) {
+            child: Column(
+              children: List.generate(
+                controller.orderDetailsModel!.menuDetails!.length,
+                (index) {
                   return Container(
                     margin: const EdgeInsets.symmetric(vertical: 6),
                     child: Row(
@@ -616,13 +642,14 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                                           Text(
                                             '${controller.currency}${controller.orderDetailsModel!.menuDetails![index].offerPrice!}',
                                             style: TextStyle(
-                                                fontSize: dimen11,
-                                                color: ColorsTheme.col5dD6E68,
-                                                fontWeight: FontWeight.w500,
-                                                decorationColor:
-                                                    ColorsTheme.col5dD6E68,
-                                                decoration:
-                                                    TextDecoration.lineThrough),
+                                              fontSize: dimen11,
+                                              color: ColorsTheme.col5dD6E68,
+                                              fontWeight: FontWeight.w500,
+                                              decorationColor:
+                                                  ColorsTheme.col5dD6E68,
+                                              decoration:
+                                                  TextDecoration.lineThrough,
+                                            ),
                                             maxLines: 2,
                                           ),
                                           Container(
@@ -637,7 +664,7 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                                             ),
                                           ),
                                         ],
-                                      )
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -658,11 +685,13 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                             style: regularTextStyle(
                                 fontSize: dimen11, color: ColorsTheme.colBlack),
                           ),
-                        )
+                        ),
                       ],
                     ),
                   );
-                }),
+                },
+              ),
+            ),
           ),
         ],
       ),
@@ -1382,10 +1411,11 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
       final diffMinutes = controller.cancelDiffMinutes.value;
       final secondsLeft = controller.remainingSeconds.value;
 
+      // Show only during first 5 minutes (diffMinutes between 0 and 5) AND only while vendor confirmation is pending
       final bool show = (status == 'confirmation_pending' ||
               status == 'Confirmation Pending') &&
           secondsLeft > 0 &&
-          (diffMinutes <= 96 && diffMinutes >= 0);
+          (diffMinutes <= 5 && diffMinutes >= 0);
 
       debugPrint(
           "Cancel Diff Minutes in ODP $diffMinutes, secondsLeft=$secondsLeft, show=$show");
@@ -1394,52 +1424,105 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
 
       return SafeArea(
         top: false,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Top countdown progress bar (shrinks right->left) with tortoise and MM:SS
-            Padding(
-              padding: const EdgeInsets.fromLTRB(18, 8, 18, 6),
-              child: CountdownProgressBar(
-                diffMinutes: controller.cancelDiffMinutes.value,
-                remainingSecondsExternal: controller.remainingSeconds.value,
-                totalMinutes: 5,
-                onFinished: () {
-                  // Optionally react when finished (e.g., hide UI or update controller)
-                },
-                barHeight: 6,
-              ),
-            ),
-            // Existing cancel button
-            Container(
-              padding: const EdgeInsets.fromLTRB(18, 8, 18, 12),
-              decoration:
-                  BoxDecoration(color: ColorsTheme.colWhite, boxShadow: [
-                BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 8,
-                    offset: const Offset(0, -2))
-              ]),
-              child: SizedBox(
-                width: double.infinity,
-                child: OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: ColorsTheme.colFF4E4E, width: 1.5),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30)),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    foregroundColor: ColorsTheme.colFF4E4E,
+        child: Material(
+          type: MaterialType.transparency,
+          child: Container(
+            color: Colors.transparent,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                // Base: Cancel button area with white background and top shadow
+                Container(
+                  padding: const EdgeInsets.fromLTRB(18, 8, 18, 8),
+                  decoration: BoxDecoration(
+                    color: ColorsTheme.colWhite,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 8,
+                        offset: const Offset(0, -2),
+                      ),
+                    ],
                   ),
-                  onPressed: _openCancelSummaryDialog,
-                  child: Text(
-                    'Cancel Order'.tr,
-                    style: semiBoldTextStyle(
-                        fontSize: dimen12, color: ColorsTheme.colFF4E4E),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(
+                              color: ColorsTheme.colFF4E4E, width: 1.5),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30)),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          foregroundColor: ColorsTheme.colFF4E4E,
+                        ),
+                        onPressed: _openCancelSummaryDialog,
+                        child: Text(
+                          'Cancel Order'.tr,
+                          style: semiBoldTextStyle(
+                              fontSize: dimen12, color: ColorsTheme.colFF4E4E),
+                        ),
+                      ),
+                      // const SizedBox(height: 8),
+                      Container(
+                        padding: const EdgeInsets.all(8), // inner spacing
+                        margin: const EdgeInsets.symmetric(
+                            vertical: 6), // optional outer spacing
+                        decoration: BoxDecoration(
+                          color: ColorsTheme.colF5F5F5, // light gray background
+                          borderRadius: BorderRadius.circular(
+                              6), // optional rounded corners
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '* ',
+                              style: semiBoldTextStyle(
+                                fontSize: dimen10,
+                                color: ColorsTheme.colFF4E4E,
+                                
+                              ),
+                            ),
+                            Expanded(
+                              child: Text(
+                                'You can cancel within the first 5 minutes from order creation only if vendor confirmation is pending.',
+                                style: regularTextStyle(
+                                  fontSize: dimen10,
+                                  color: ColorsTheme.colBlack,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
                   ),
                 ),
-              ),
+                // Overlay: Transparent countdown bar floating above, not affecting layout
+                Positioned(
+                  top: -36,
+                  left: 0,
+                  right: 0,
+                  child: IgnorePointer(
+                    ignoring: true,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+                      child: CountdownProgressBar(
+                        diffMinutes: controller.cancelDiffMinutes.value,
+                        remainingSecondsExternal:
+                            controller.remainingSeconds.value,
+                        totalMinutes: 5,
+                        onFinished: () {},
+                        barHeight: 6,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       );
     });

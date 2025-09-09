@@ -760,10 +760,26 @@ class HomeView extends GetView<HomeController> {
                           return GestureDetector(
                             onTap: () async {
                               if (controller.isLoggedIn.value) {
-                                if (controller.homeList[index].totalQuantity !=
-                                        0 &&
-                                    controller.homeList[index].soldOutStatus !=
-                                        true) {
+                                if (controller.homeList[index].totalQuantity != 0 &&
+                                    controller.homeList[index].soldOutStatus != true &&
+                                    !(() {
+                                      final closeAt = controller.homeList[index].closeAt;
+                                      if (closeAt == null || closeAt.isEmpty) return false;
+                                      final now = DateTime.now();
+                                      try {
+                                        final t1 = DateFormat('HH:mm').parse(closeAt);
+                                        final close = DateTime(now.year, now.month, now.day, t1.hour, t1.minute);
+                                        return now.isAfter(close);
+                                      } catch (_) {
+                                        try {
+                                          final t2 = DateFormat('hh:mm a').parse(closeAt);
+                                          final close = DateTime(now.year, now.month, now.day, t2.hour, t2.minute);
+                                          return now.isAfter(close);
+                                        } catch (_) {
+                                          return false;
+                                        }
+                                      }
+                                    })()) {
                                   var result = await Get.toNamed(
                                       Routes.homeDetails,
                                       arguments: {
@@ -1128,20 +1144,35 @@ class HomeView extends GetView<HomeController> {
                                     top: 0,
                                     left: 0,
                                     right: 0,
-                                    child: controller.homeList[index]
-                                                    .totalQuantity ==
-                                                0 ||
-                                            controller.homeList[index]
-                                                    .soldOutStatus !=
-                                                false /*|| !controller.homeList[index].isTodayAvailable!*/
-                                        ? Container(
-                                            decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(16),
-                                                color: ColorsTheme.colWhite
-                                                    .withOpacity(0.5)),
-                                          )
-                                        : Container(),
+                                    child: (() {
+                                      final item = controller.homeList[index];
+                                      final bool isSoldOut = item.totalQuantity == 0 || item.soldOutStatus != false;
+                                      bool isClosedNow = false;
+                                      final closeAt = item.closeAt;
+                                      if (closeAt != null && closeAt.isNotEmpty) {
+                                        final now = DateTime.now();
+                                        try {
+                                          final t1 = DateFormat('HH:mm').parse(closeAt);
+                                          final close = DateTime(now.year, now.month, now.day, t1.hour, t1.minute);
+                                          isClosedNow = now.isAfter(close);
+                                        } catch (_) {
+                                          try {
+                                            final t2 = DateFormat('hh:mm a').parse(closeAt);
+                                            final close = DateTime(now.year, now.month, now.day, t2.hour, t2.minute);
+                                            isClosedNow = now.isAfter(close);
+                                          } catch (_) {}
+                                        }
+                                      }
+                                      if (isSoldOut || isClosedNow) {
+                                        return Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(16),
+                                            color: ColorsTheme.colWhite.withOpacity(0.5),
+                                          ),
+                                        );
+                                      }
+                                      return Container();
+                                    })(),
                                   ),
                                   Positioned(
                                     bottom: 0,
@@ -1152,54 +1183,68 @@ class HomeView extends GetView<HomeController> {
                                         minWidth: Get.width * 0.25,
                                         maxWidth: Get.width * 0.60,
                                       ),
-                                      child: controller.homeList[index]
-                                                      .totalQuantity ==
-                                                  0 ||
-                                              controller.homeList[index]
-                                                  .soldOutStatus!
-                                          ? Container(
-                                              decoration: BoxDecoration(
-                                                color: ColorsTheme.colD0F0BF,
-                                                borderRadius:
-                                                    const BorderRadius.only(
-                                                  topLeft: Radius.circular(12),
-                                                  topRight: Radius.circular(0),
-                                                  bottomLeft:
-                                                      Radius.circular(0),
-                                                  bottomRight:
-                                                      Radius.circular(0),
-                                                ),
+                                      child: (() {
+                                        final item = controller.homeList[index];
+                                        final bool isSoldOut = item.totalQuantity == 0 || (item.soldOutStatus ?? false);
+                                        bool isClosedNow = false;
+                                        final closeAt = item.closeAt;
+                                        if (closeAt != null && closeAt.isNotEmpty) {
+                                          final now = DateTime.now();
+                                          try {
+                                            final t1 = DateFormat('HH:mm').parse(closeAt);
+                                            final close = DateTime(now.year, now.month, now.day, t1.hour, t1.minute);
+                                            isClosedNow = now.isAfter(close);
+                                          } catch (_) {
+                                            try {
+                                              final t2 = DateFormat('hh:mm a').parse(closeAt);
+                                              final close = DateTime(now.year, now.month, now.day, t2.hour, t2.minute);
+                                              isClosedNow = now.isAfter(close);
+                                            } catch (_) {}
+                                          }
+                                        }
+                                          if (isClosedNow) {
+                                          return Container(
+                                            decoration: BoxDecoration(
+                                              color: ColorsTheme.colD0F0BF,
+                                              borderRadius: const BorderRadius.only(
+                                                topLeft: Radius.circular(12),
+                                                topRight: Radius.circular(0),
+                                                bottomLeft: Radius.circular(0),
+                                                bottomRight: Radius.circular(0),
                                               ),
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      vertical: 6,
-                                                      horizontal: 8),
-                                              child: Text.rich(
-                                                TextSpan(
-                                                  children: [
-                                                    TextSpan(
-                                                      text: controller
-                                                              .homeList[index]
-                                                              .soldOutStatus!
-                                                          ? controller
-                                                              .homeList[index]
-                                                              .soldOutTxt
-                                                          : 'sold_out'.tr,
-                                                      style: regularTextStyle(
-                                                        fontSize: dimen11,
-                                                        color: ColorsTheme
-                                                            .colBlack,
-                                                      ),
-                                                    ),
-                                                    // TextSpan(
-                                                    //   text: ' Tomorrow.',
-                                                    //   style: semiBoldTextStyle(fontSize: dimen11, color: ColorsTheme.colBlack),
-                                                    // )
-                                                  ],
-                                                ),
+                                            ),
+                                            padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+                                            child: Text(
+                                              'Closed Now. Will be back soon',
+                                              style: regularTextStyle(
+                                                fontSize: dimen11,
+                                                color: ColorsTheme.colBlack,
                                               ),
-                                            )
-                                          : Container(),
+                                            ),
+                                          );
+                                        }else if (isSoldOut) {
+                                          return Container(
+                                            decoration: BoxDecoration(
+                                              color: ColorsTheme.colD0F0BF,
+                                              borderRadius: const BorderRadius.only(
+                                                topLeft: Radius.circular(12),
+                                                topRight: Radius.circular(0),
+                                                bottomLeft: Radius.circular(0),
+                                                bottomRight: Radius.circular(0),
+                                              ),
+                                            ),
+                                            padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+                                            child: Text(
+                                              (item.soldOutStatus ?? false) ? (item.soldOutTxt ?? 'sold_out'.tr) : 'sold_out'.tr,
+                                              style: regularTextStyle(
+                                                fontSize: dimen11,
+                                                color: ColorsTheme.colBlack,
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                        return Container();
+                                      })(),
                                     ),
                                   )
                                 ],

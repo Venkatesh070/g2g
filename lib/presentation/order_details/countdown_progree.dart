@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:good_grab/infrastructure/theme/colors.theme.dart';
 import 'package:lottie/lottie.dart';
 
 /// Self-contained countdown progress bar widget
@@ -39,12 +40,12 @@ class CountdownProgressBar extends StatefulWidget {
     super.key,
     required this.diffMinutes,
     this.remainingSecondsExternal,
-    this.totalMinutes = 96,
+    this.totalMinutes = 5,
     this.onFinished,
     this.barHeight = 6,
     this.trackColor,
     this.fillColor,
-    this.lottieAssetPath = 'assets/tortoise_walk.json',
+    this.lottieAssetPath = 'assets/rabbit-running.json',
   });
 
   @override
@@ -128,8 +129,10 @@ class _CountdownProgressBarState extends State<CountdownProgressBar>
     }
 
     _remainingSeconds = newRemaining;
-    final double beginFraction = _totalSeconds == 0 ? 0.0 : newRemaining / _totalSeconds; // 1.0 -> 0.0
-    _buildController(beginFraction: beginFraction, durationSeconds: newRemaining);
+    final double beginFraction =
+        _totalSeconds == 0 ? 0.0 : newRemaining / _totalSeconds; // 1.0 -> 0.0
+    _buildController(
+        beginFraction: beginFraction, durationSeconds: newRemaining);
 
     // Start ticking for label
     _timer = Timer.periodic(const Duration(seconds: 1), (t) {
@@ -148,7 +151,8 @@ class _CountdownProgressBarState extends State<CountdownProgressBar>
     });
   }
 
-  void _buildController({required double beginFraction, required int durationSeconds}) {
+  void _buildController(
+      {required double beginFraction, required int durationSeconds}) {
     _controller = AnimationController(
       vsync: this,
       duration: Duration(seconds: durationSeconds),
@@ -191,7 +195,8 @@ class _CountdownProgressBarState extends State<CountdownProgressBar>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final Color track = widget.trackColor ?? theme.colorScheme.outlineVariant.withOpacity(0.5);
+    final Color track =
+        widget.trackColor ?? theme.colorScheme.outlineVariant.withOpacity(0.2);
     final Color fill = widget.fillColor ?? theme.colorScheme.primary;
 
     final double barVisualHeight = math.max(32, widget.barHeight + 20);
@@ -209,19 +214,37 @@ class _CountdownProgressBarState extends State<CountdownProgressBar>
       }
 
       final timeLabel = _formatMMSS(rs);
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 6),
-            child: Text(timeLabel, style: theme.textTheme.labelLarge),
-          ),
-          SizedBox(
-            height: barVisualHeight,
-            width: double.infinity,
-            child: _buildBar(track, fill, fraction),
-          ),
-        ],
+      return SizedBox(
+        height: barVisualHeight,
+        width: double.infinity,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Positioned(
+              right: 0,
+              bottom: (widget.barHeight) + 6,
+              child: Container(
+              
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: ColorsTheme.colFF4E4E.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(20),
+                  
+                ),
+                child: Text(
+                  timeLabel,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: ColorsTheme.colFF4E4E,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+            Positioned.fill(
+              child: _buildBar(track, fill, fraction),
+            ),
+          ],
+        ),
       );
     }
 
@@ -231,19 +254,35 @@ class _CountdownProgressBarState extends State<CountdownProgressBar>
       builder: (context, child) {
         final timeLabel = _formatMMSS(_remainingSeconds);
         final double fraction = _progress!.value.clamp(0.0, 1.0);
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: 6),
-              child: Text(timeLabel, style: theme.textTheme.labelLarge),
-            ),
-            SizedBox(
-              height: barVisualHeight,
-              width: double.infinity,
-              child: _buildBar(track, fill, fraction),
-            ),
-          ],
+        return SizedBox(
+          height: barVisualHeight,
+          width: double.infinity,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Positioned(
+                right: 0,
+                bottom: (widget.barHeight) + 6,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    timeLabel,
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: theme.colorScheme.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+              Positioned.fill(
+                child: _buildBar(track, fill, fraction),
+              ),
+            ],
+          ),
         );
       },
     );
@@ -256,8 +295,8 @@ class _CountdownProgressBarState extends State<CountdownProgressBar>
         final double clamped = fraction.clamp(0.0, 1.0);
 
         // Tortoise size and position
-        const double tortoiseW = 32;
-        const double tortoiseH = 32;
+        const double tortoiseW = 40;
+        const double tortoiseH = 40;
         double tortoiseLeft = barWidth * clamped - (tortoiseW / 2);
         tortoiseLeft = tortoiseLeft.clamp(0.0, barWidth - tortoiseW);
 
@@ -284,17 +323,21 @@ class _CountdownProgressBarState extends State<CountdownProgressBar>
               ),
             ),
             // Tortoise Lottie walking along the bar
+
             Positioned(
               left: tortoiseLeft,
               bottom: (widget.barHeight) - 2,
               child: IgnorePointer(
+                  child: Transform(
+                alignment: Alignment.center,
+                transform: Matrix4.identity()..scale(-1.0, 1.0, 1.0),
                 child: Lottie.asset(
                   widget.lottieAssetPath,
                   width: tortoiseW,
                   height: tortoiseH,
                   repeat: true,
                 ),
-              ),
+              )),
             ),
           ],
         );

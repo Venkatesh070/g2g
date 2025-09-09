@@ -28,7 +28,10 @@ class OrderStatusController extends GetxController {
         if (Get.isRegistered<CartController>()) {
           Get.delete<CartController>();
         }
-        Get.offNamed(Routes.home);
+        Get.offAllNamed(
+          Routes.home,
+          arguments: {"permission": 1}, // optional
+        );
       } else {
         seconds = seconds - 1;
       }
