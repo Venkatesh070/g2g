@@ -2,14 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 
 class ColorsTheme {
-
   static Color colPrimary = HexColor("#01563F");
   static Color colSecondary = HexColor("#C4D9D4");
   static Color colBackground = HexColor("#FFFFFF");
   static Color colBlack = HexColor("#000000");
   static Color colWhite = HexColor("#ffffff");
   static Color colHint = HexColor("#C4D9D4");
-
 
   static Color colF3FFFB = HexColor("#F3FFFB");
   static Color colF2FFFB = HexColor("#F2FFFB");
@@ -29,9 +27,7 @@ class ColorsTheme {
   static Color colF59E0B = HexColor("#F59E0B");
   static Color col475751 = HexColor("#475751");
 
-static Color colTransparent = Colors.transparent;
-  
-  
+  static Color colTransparent = Colors.transparent;
 
-
+  static Color colFBF09D = HexColor("#FBF09D");
 }

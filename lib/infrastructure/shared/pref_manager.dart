@@ -36,6 +36,16 @@ class PrefManager {
     return prefs.getInt(key) ?? 0;
   }
 
+  static putDouble(key, double value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble(key, value) ;
+  }
+
+  static getDouble(key) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getDouble(key) ?? 0.0;
+  }
+
   static remove(key) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.remove(key);

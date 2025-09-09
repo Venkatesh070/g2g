@@ -26,6 +26,7 @@ class OrderDetailsController extends GetxController {
   var orderId = 0;
   var resId = 0;
   var currency = '';
+  var pickupCode = 0000.obs;
 
 
   var backResult = false.obs;
@@ -79,9 +80,10 @@ class OrderDetailsController extends GetxController {
         subTotalPrice.value = double.parse(orderModel.data!.totalPaid.toString());
         subTotalOfferPrice.value = double.parse(orderModel.data!.price.toString());
         otherTotalPrice.value = double.parse(orderModel.data!.gstCharge.toString());
-        platformGst.value = double.parse(orderModel.data!.platformGst.toString());
+        pickupCode.value = orderModel.data!.pickupCode!;
+        platformFee.value= await PrefManager.getDouble(AppConstants.platformFee);
+        platformGst.value = await PrefManager.getDouble(AppConstants.platformGst);  
         combinedGst.value = otherTotalPrice.value + platformGst.value;
-        platformFee.value = orderModel.data!.platformFee!;
         totalPrice.value = subTotalPrice.value + combinedGst.value + platformFee.value;
         isRated.value = orderDetailsModel!.isRated!;
         getCancelTime();

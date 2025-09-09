@@ -4,7 +4,7 @@ class CartModel extends Serializable{
   CartDetails? cartDetails;
   String? callBackUrl;
   String? rApiKey;
-  double? platformFee;
+  // double? platformFee;
   CartModel({this.cartDetails});
 
   CartModel.fromJson(Map<String, dynamic> json) {
@@ -36,8 +36,8 @@ class CartDetails {
   double? offerPrice;
   double? finalPrice;
   double? gstCharge;
-  double? platformGst;
-  double? platformFee;
+  // double? platformGst;
+  // double? platformFee;
   bool? phonePe;
   bool? razorPay;
 
@@ -48,8 +48,8 @@ class CartDetails {
         this.offerPrice,
         this.finalPrice,
         this.gstCharge,
-        this.platformGst,
-        this.platformFee,
+        // this.platformGst,
+        // this.platformFee,
         this.phonePe,
         this.razorPay,
       });
@@ -66,8 +66,8 @@ class CartDetails {
     offerPrice = double.parse((json['offer_price']??0).toString());
     finalPrice = double.parse((json['final_price']??0).toString());
     gstCharge = double.parse((json['gst_charge']??0).toString());
-    platformGst = double.parse((json['platform_gst']??2).toString());
-    platformFee = double.parse((json['platform_fee']??0).toString());
+    // platformGst = double.parse((json['platform_gst']??2).toString());
+    // platformFee = double.parse((json['platform_fee']??0).toString());
     phonePe = json['phonepe'] ??  true;
     razorPay = json['razorpay'] ??  true;
   }
@@ -82,8 +82,8 @@ class CartDetails {
     data['offer_price'] = offerPrice;
     data['final_price'] = finalPrice;
     data['gst_charge'] = gstCharge;
-    data['platform_gst'] = platformGst;
-    data['platform_fee'] = platformFee;
+    // data['platform_gst'] = platformGst;
+    // data['platform_fee'] = platformFee;
     data['phonepe'] = phonePe;
     data['razorpay'] = razorPay;
     return data;

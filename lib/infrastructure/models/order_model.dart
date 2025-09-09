@@ -43,8 +43,6 @@ class OrdersList {
   var restaurantAddress;
   var createdAt;
   var totalPaid;
-  var platformGst;
-  var platformFee;
   var gst;
   var currency;
   var orderStatus;
@@ -59,8 +57,6 @@ class OrdersList {
       this.createdAt,
       this.totalPaid,
       this.gst,
-      this.platformFee,
-      this.platformGst,
       this.currency,
       this.orderStatus});
 
@@ -76,8 +72,6 @@ class OrdersList {
     createdAt = json['created_at'];
     totalPaid = (json['total_paid'] ?? 0).toString();
     gst = (json['gst_charge'] ?? 0).toString();
-    platformFee = (json['platform_fee'] ?? 0).toString();
-    platformGst = (json['platform_gst'] ?? 0).toString();
     currency = json['currency'];
     orderStatus = json['order_status'];
   }
@@ -93,8 +87,6 @@ class OrdersList {
     data['created_at'] = createdAt;
     data['total_paid'] = totalPaid;
     data['gst_charge'] = gst;
-    data['platform_fee'] = platformFee;
-    data['platform_gst'] = platformGst;
     data['currency'] = currency;
     data['order_status'] = orderStatus;
     return data;

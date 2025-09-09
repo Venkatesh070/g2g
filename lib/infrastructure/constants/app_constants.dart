@@ -7,6 +7,8 @@ class AppConstants {
   static String userId = "userId";
   static String cartId = "cartId";
   static String currency = "currency";
+  static String platformFee = "platformFee";
+  static String platformGst = "platformGst";
 
   static String fcmToken = "fcmToken";
   static String accessToken = "accessToken";
