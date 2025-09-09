@@ -303,12 +303,15 @@ showTakeawayReminderDialog() {
         subTotalOfferPrice.value = cartModel.data!.cartDetails!.offerPrice!;
         subTotalFinalPrice.value = cartModel.data!.cartDetails!.finalPrice!;
         totalGst.value = cartModel.data!.cartDetails!.gstCharge!;
-        platformGst.value = cartModel.data!.cartDetails!.platformGst!;
-        platformFee.value = cartModel.data!.cartDetails!.platformFee ?? 0.0;
+        // platformGst.value = cartModel.data!.cartDetails!.platformGst!;
+        // platformFee.value = cartModel.data!.cartDetails!.platformFee ?? 0.0;
+        //getting platformFee and platformGst from PrefManager
+        platformFee.value= await PrefManager.getDouble(AppConstants.platformFee);
+        platformGst.value = await PrefManager.getDouble(AppConstants.platformGst);
         combinedGst.value = totalGst.value + platformGst.value;
         menuList.addAll(cartModel.data!.cartDetails!.menuDetail!);
-        // totalPay.value = subTotalFinalPrice.value + combinedGst.value + platformFee.value;
-                  totalPay.value = 1;
+        totalPay.value = subTotalFinalPrice.value + combinedGst.value + platformFee.value;
+                  // totalPay.value = 1;
 
 
         print("sjkdfk ${menuList.length}");
@@ -393,11 +396,14 @@ showTakeawayReminderDialog() {
           subTotalOfferPrice.value = cartModel.data!.cartDetails!.offerPrice!;
           subTotalFinalPrice.value = cartModel.data!.cartDetails!.finalPrice!;
           totalGst.value = cartModel.data!.cartDetails!.gstCharge!;
-          platformGst.value = cartModel.data!.cartDetails!.platformGst!;
-          platformFee.value = cartModel.data!.cartDetails!.platformFee!;
+
+          // platformGst.value = cartModel.data!.cartDetails!.platformGst!;
+          // platformFee.value = cartModel.data!.cartDetails!.platformFee!;
+          platformFee.value= await PrefManager.getDouble(AppConstants.platformFee);
+          platformGst.value = await PrefManager.getDouble(AppConstants.platformGst);
           combinedGst.value = totalGst.value + platformGst.value;
-          // totalPay.value = subTotalFinalPrice.value + combinedGst.value + platformFee.value;
-          totalPay.value = 1;
+           totalPay.value = subTotalFinalPrice.value + combinedGst.value + platformFee.value;
+          // totalPay.value = 1;
 
           menuList.refresh();
         } else {

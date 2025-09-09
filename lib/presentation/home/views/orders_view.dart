@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:good_grab/infrastructure/navigation/routes.dart';
@@ -296,10 +294,10 @@ class OrdersView extends GetView<HomeController> {
                                                             bottom: 8),
                                                     child: Text(
                                                       '${controller.orderList[index].currency ?? '₹ '}'
-                                                      '${double.tryParse(controller.orderList[index].totalPaid ?? '0')! 
-                                                      + double.tryParse(controller.orderList[index].gst ?? '0')!
-                                                      + double.tryParse(controller.orderList[index].platformGst ?? '0')!
-                                                      + double.tryParse(controller.orderList[index].platformFee ?? '0')!
+                                                      '${(double.tryParse(controller.orderList[index].totalPaid ?? '0') ?? 0)
+                                                      + (double.tryParse(controller.orderList[index].gst ?? '0') ?? 0)
+                                                      + (controller.platformGst.value)
+                                                      + (controller.platformFee.value)
                                                       }'
                                                       ' | ${controller.orderList[index].createdAt ?? ''}',
                                                       style: regularTextStyle(
@@ -449,6 +447,5 @@ class OrdersView extends GetView<HomeController> {
         ],
       );
     }
-    return Container();
   }
 }

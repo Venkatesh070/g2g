@@ -136,6 +136,10 @@ class HomeController extends GetxController {
   var moneySaved = (0.0).obs;
   var money = '0'.obs;
 
+  // platform fee and gst
+  var platformFee = (0.0).obs;
+  var platformGst = (0.0).obs;
+
   // var moneySaved = (0.0).obs;
   var co2Saved = '0'.obs;
   var isLoggedIn = false.obs;
@@ -167,7 +171,6 @@ class HomeController extends GetxController {
       await getUserData();
       markerImage.value = await getBytesFromAsset(Res.icLocation, 100, 100);
     });
-
     // manager = _initClusterManager([PicCluster(name: 'Test_15', latLng: LatLng(0.0, 0.0))]);
     super.onInit();
   }
@@ -561,7 +564,7 @@ class HomeController extends GetxController {
     } else {
       userName.value = 'Guest';
     }
-    appVersion.value = await CommonFunction.getAppVersion();
+    appVersion.value = await CommonFunction.getAppVersion(); 
     homeList.clear();
     await setInitData();
   }
@@ -596,12 +599,17 @@ class HomeController extends GetxController {
   getAddress() async {
     var loc = await getUserLocation();
     if (isSearchLocation.value) {
-      var locationData = await getAddressLatLng(address.value);
-      if (locationData != null) {
-        lat.value = locationData['lat'];
-        lng.value = locationData['lng'];
+      // If lat/lng already supplied by search screen, skip geocoding
+      if (lat.value != 0.0 && lng.value != 0.0) {
+        // no-op, use existing values
       } else {
-        await geoCodingLatLongPlace(address.value);
+        var locationData = await getAddressLatLng(address.value);
+        if (locationData != null) {
+          lat.value = locationData['lat'];
+          lng.value = locationData['lng'];
+        } else {
+          await geoCodingLatLongPlace(address.value);
+        }
       }
     } else {
       if (loc != null) {
@@ -672,7 +680,8 @@ class HomeController extends GetxController {
         "location": address.value,
         "device_id": deviceId,
       };
-      await DioClient.base().funUpdateLocationApi(params);
+      // Fire-and-forget to avoid blocking UI before fetching home/map data
+      DioClient.base().funUpdateLocationApi(params).catchError((_) {});
       if (currentIndex.value == 0) {
         pagingListController.jumpTo(0);
         await getHomeData();
@@ -697,12 +706,27 @@ class HomeController extends GetxController {
       isSearchLocation.value = result[0];
       if (isSearchLocation.value) {
         address.value = result[1];
+        // If the search screen returned coordinates, use them immediately
+        if (result.length >= 4 && result[2] != null && result[3] != null) {
+          lat.value = double.tryParse(result[2].toString()) ?? 0.0;
+          lng.value = double.tryParse(result[3].toString()) ?? 0.0;
+        } else {
+          lat.value = 0.0;
+          lng.value = 0.0;
+        }
       } else {
         permissionAllow.value = result[1];
         address.value = '';
+        lat.value = 0.0;
+        lng.value = 0.0;
       }
       homeLoader.value = true;
-      await getAddress();
+      // If we already have coords, skip getAddress() and update immediately
+      if (lat.value != 0.0 && lng.value != 0.0) {
+        await updateLocation();
+      } else {
+        await getAddress();
+      }
     }
   }
 
@@ -710,7 +734,7 @@ class HomeController extends GetxController {
   setInitData() {
     if (permissionAllow.value == 1 || isSearchLocation.value) {
       Future.delayed(Duration.zero, () async {
-        await getFilterData();
+        // Defer filters to first getHomeData call to avoid initial delay
         currentPage.value = 1;
         homeLoader.value = true;
         await getAddress();
@@ -875,7 +899,8 @@ class HomeController extends GetxController {
     totalPage.value = 1;
     // homeList.clear();
     if (!isFilter.value) {
-      await getFilterData();
+      // Kick off filters fetch in background; don't block first render
+      getFilterData();
     }
 
     try {
@@ -889,14 +914,14 @@ class HomeController extends GetxController {
           homeList.addAll(homeModel.data!.restaurantList!);
           totalPage.value = homeModel.data!.totalPage!;
           currency.value = homeModel.data!.appCurrency!;
-          PrefManager.putString(AppConstants.currency, currency.value);
-          // var listItems = <PicCluster>[];
-          // for (int i = 0; i < homeList.value.length; i++) {
-          //   listItems.add(PicCluster(
-          //       name: homeList.value[i].restaurantName!,
-          //       latLng: LatLng(double.parse(homeList.value[i].latitude.toString()),
-          //           double.parse(homeList.value[i].longitude.toString()))));
-          // }
+          platformFee.value = homeModel.data!.platformFee!;
+          platformGst.value = homeModel.data!.platformGst!;
+          await PrefManager.putString(AppConstants.currency, currency.value);
+          
+          // Store platformFee and platformGst values in PrefManager as double
+
+          await PrefManager.putDouble(AppConstants.platformFee, platformFee.value);
+          await PrefManager.putDouble(AppConstants.platformGst, platformGst.value);
 
           homeList.refresh();
           // manager = _initClusterManager(listItems);
@@ -924,7 +949,8 @@ class HomeController extends GetxController {
           // print('cluster_items2: $homeList');
         }
       }
-      await getUserHomeData();
+      // Fetch user-specific home data in parallel to avoid blocking home list render
+      getUserHomeData();
     } on CustomHttpException catch (exception) {
       errorScreen(
           error: handleApiException(
@@ -941,7 +967,8 @@ class HomeController extends GetxController {
 
   getPHomeData() async {
     if (!isFilter.value) {
-      await getFilterData();
+      // Fetch filters in background to avoid delaying pagination fetch
+      getFilterData();
     }
     try {
       Map<String, dynamic> params = homeDataParams();
@@ -951,8 +978,11 @@ class HomeController extends GetxController {
         homeList.addAll(homeModel.data!.restaurantList!);
         totalPage.value = homeModel.data!.totalPage!;
         currency.value = homeModel.data!.appCurrency!;
+        platformFee.value = homeModel.data!.platformFee!;
+        platformGst.value = homeModel.data!.platformGst!;
 
         PrefManager.putString(AppConstants.currency, currency.value);
+        
         // var listItems = <PicCluster>[];
         // for (int i = 0; i < homeList.value.length; i++) {
         //   listItems.add(PicCluster(
@@ -1156,7 +1186,8 @@ class HomeController extends GetxController {
         homeLoader.value = false;
         isPageLoad.value = false;
       }
-      await getUserHomeData();
+      // Fetch user-specific home data in parallel to avoid blocking map render
+      getUserHomeData();
     } on CustomHttpException catch (exception) {
       errorScreen(
           error: handleApiException(
@@ -1172,7 +1203,7 @@ class HomeController extends GetxController {
   }
 
   getUserHomeData() async {
-    homeLoader.value = true;
+    // Do not toggle the main homeLoader here to avoid hiding the list
     bannerHomeList.clear();
     orderHomeList.clear();
     cartHomeList.clear();

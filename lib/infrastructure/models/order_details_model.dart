@@ -6,8 +6,6 @@ class OrderDetailsModel extends Serializable{
   String? totalPaid;
   String? price;
   String? gstCharge;
-  double? platformGst;
-  double? platformFee;
   RefundData? refundData;
   RestaurantDetail? restaurantDetail;
   bool? isRated;
@@ -18,6 +16,7 @@ class OrderDetailsModel extends Serializable{
   String? pickupTime;
   String? pickupEndTime;
   String? createdTime;
+  int? pickupCode;
 
   OrderDetailsModel(
       {this.orderId,
@@ -26,8 +25,6 @@ class OrderDetailsModel extends Serializable{
         this.totalPaid,
         this.price,
         this.gstCharge,
-        this.platformFee,
-        this.platformGst,
         this.refundData,
         this.restaurantDetail,
         this.isRated,
@@ -37,7 +34,9 @@ class OrderDetailsModel extends Serializable{
         this.pickupDate,
         this.pickupTime,
         this.pickupEndTime,
-        this.createdTime});
+        this.createdTime,
+        this.pickupCode,
+        });
 
   OrderDetailsModel.fromJson(Map<String, dynamic> json) {
     orderId = json['order_id'];
@@ -51,8 +50,6 @@ class OrderDetailsModel extends Serializable{
     totalPaid = json['total_paid'];
     price = json['price'];
     gstCharge = json['gst_charge'];
-    platformGst = double.parse((json['platform_gst']??0).toString());
-    platformFee = double.parse((json['platform_fee']??0).toString());
     refundData = json['refund_data'] != null
         ? RefundData.fromJson(json['refund_data'])
         : null;
@@ -67,6 +64,7 @@ class OrderDetailsModel extends Serializable{
     pickupDate = json['pickup_date'];
     pickupTime = json['pickup_time'];
     pickupEndTime = json['pickup_end_time'];
+    pickupCode = json['pickup_code']?? 5690;
   }
 
   @override
@@ -80,8 +78,6 @@ class OrderDetailsModel extends Serializable{
     data['total_paid'] = totalPaid;
     data['price'] = price;
     data['gst_charge'] = gstCharge;
-    data['platform_gst'] = platformGst; //json['platform_gst]
-    data['platform_fee'] = platformFee;
     data['refund_data'] = refundData;
     if (refundData != null) {
       data['refund_data'] = refundData!.toJson();
@@ -97,6 +93,7 @@ class OrderDetailsModel extends Serializable{
     data['pickup_date'] = pickupDate;
     data['pickup_time'] = pickupTime;
     data['pickup_end_time'] = pickupEndTime;
+    data['pickup_code'] = pickupCode;
     return data;
   }
 }

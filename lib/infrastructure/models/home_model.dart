@@ -5,8 +5,18 @@ class HomeModel extends Serializable{
   String? appCurrency;
   int? totalPage;
   int? totalItem;
+  double? platformFee;
+  double? platformGst;
 
-  HomeModel({this.restaurantList, this.currentPage, this.totalPage, this.totalItem});
+  HomeModel(
+    {
+      this.restaurantList,
+       this.currentPage,
+        this.totalPage,
+         this.totalItem,
+         this.platformFee,
+          this.platformGst
+         });
 
   HomeModel.fromJson(Map<String, dynamic> json) {
     if (json['restaurant_list'] != null) {
@@ -17,6 +27,8 @@ class HomeModel extends Serializable{
     }
     currentPage = json['current_page'];
     appCurrency = json['currency']??'';
+    platformGst = double.parse((json['platform_gst'] ?? 0).toString());
+    platformFee = double.parse((json['platform_fee'] ?? 0).toString());
     totalPage = json['total_page'];
     totalItem = json['total_item'];
   }
@@ -30,6 +42,8 @@ class HomeModel extends Serializable{
     }
     data['current_page'] = currentPage;
     data['currency'] = appCurrency;
+    data['platform_fee'] = platformFee;
+    data['platform_gst'] = platformGst;
     data['total_page'] = totalPage??1;
     data['total_item'] = totalItem;
     return data;

@@ -1,11 +1,10 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
 import 'package:good_grab/infrastructure/core/base/base_view.dart';
 import 'package:good_grab/infrastructure/shared/common_functions.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter/services.dart';
+import 'package:good_grab/presentation/widgets/pickup_code.dart';
 
 import '../../infrastructure/navigation/routes.dart';
 import '../../infrastructure/shared/custom_shimmer_widget.dart';
@@ -217,70 +216,76 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
   getStatus() {
     return Obx(() {
       if (controller.orderStatus.value == 'pending_pick_up') {
-        return Container(
-          width: Get.width,
-          decoration: BoxDecoration(
-              color: ColorsTheme.col007752,
-              borderRadius: BorderRadius.circular(16)),
-          padding: const EdgeInsets.symmetric(vertical: 15),
-          margin: const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                margin: const EdgeInsets.only(bottom: 12),
-                child: Text(
-                  'Order Status'.tr,
-                  style: regularTextStyle(
-                      fontSize: dimen11, color: ColorsTheme.colWhite),
-                ),
-              ),
-              Container(
-                margin: const EdgeInsets.only(bottom: 12),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                        width: 20,
-                        height: 20,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: ColorsTheme.col8FA19C,
-                        ),
-                        alignment: Alignment.center,
-                        margin: const EdgeInsets.only(right: 5),
-                        child: Image.asset(
-                          Res.icCheck,
-                          color: Colors.white,
-                          width: 10,
-                          height: 10,
-                        )),
-                    Text(
-                      'Pending pick-up',
-                      style: boldTextStyle(
+        return Column(
+          children: [
+            Container(
+              width: Get.width,
+              decoration: BoxDecoration(
+                  color: ColorsTheme.col007752,
+                  borderRadius: BorderRadius.circular(16)),
+              padding: const EdgeInsets.symmetric(vertical: 15),
+              margin: const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    child: Text(
+                      'Order Status'.tr,
+                      style: regularTextStyle(
                           fontSize: dimen11, color: ColorsTheme.colWhite),
                     ),
-                  ],
-                ),
-              ),
-              Container(
-                margin: const EdgeInsets.only(bottom: 2),
-                child: Text.rich(TextSpan(children: [
-                  TextSpan(
-                    text: '${'Order ID'.tr} : ',
-                    style: regularTextStyle(
-                        fontSize: dimen11, color: ColorsTheme.colWhite),
                   ),
-                  TextSpan(
-                    text: controller.orderId.toString(),
-                    style: boldTextStyle(
-                        fontSize: dimen14, color: ColorsTheme.colWhite),
-                  )
-                ])),
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                            width: 20,
+                            height: 20,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: ColorsTheme.col8FA19C,
+                            ),
+                            alignment: Alignment.center,
+                            margin: const EdgeInsets.only(right: 5),
+                            child: Image.asset(
+                              Res.icCheck,
+                              color: Colors.white,
+                              width: 10,
+                              height: 10,
+                            )),
+                        Text(
+                          'Pending pick-up',
+                          style: boldTextStyle(
+                              fontSize: dimen11, color: ColorsTheme.colWhite),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 2),
+                    child: Text.rich(TextSpan(children: [
+                      TextSpan(
+                        text: '${'Order ID'.tr} : ',
+                        style: regularTextStyle(
+                            fontSize: dimen11, color: ColorsTheme.colWhite),
+                      ),
+                      TextSpan(
+                        text: controller.orderId.toString(),
+                        style: boldTextStyle(
+                            fontSize: dimen14, color: ColorsTheme.colWhite),
+                      )
+                    ])),
+                  ),
+                ],
               ),
-            ],
-          ),
+              
+            ),
+            PickupCodeWidget(pickupCode: controller.orderDetailsModel!.pickupCode.toString())
+          ],
         );
       } else if (controller.orderStatus.value == 'completd_pick_up') {
         return Container(
@@ -685,7 +690,7 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                       ],
                     ),
                   ),
-                Container(
+                  Container(
                     margin: const EdgeInsets.only(bottom: 2),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -745,7 +750,8 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                                                 ),
                                               ),
                                               Text(
-                                            '${controller.currency}${controller.otherTotalPrice.value}',                                                style: semiBoldTextStyle(
+                                                '${controller.currency}${controller.otherTotalPrice.value}',
+                                                style: semiBoldTextStyle(
                                                   fontSize: dimen13,
                                                   color: ColorsTheme.colBlack,
                                                 ),
@@ -768,8 +774,8 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                                                 ),
                                               ),
                                               Text(
-
-                        '${controller.currency}${controller.platformGst.value}',                                                style: semiBoldTextStyle(
+                                                '${controller.currency}${controller.platformGst.value}',
+                                                style: semiBoldTextStyle(
                                                   fontSize: dimen13,
                                                   color: ColorsTheme.colBlack,
                                                 ),
@@ -819,8 +825,8 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                           ],
                         ),
                         Obx(() => Text(
-
-                        '${controller.currency}${controller.combinedGst.value}',                              style: regularTextStyle(
+                              '${controller.currency}${controller.combinedGst.value}',
+                              style: regularTextStyle(
                                   fontSize: dimen11,
                                   color: ColorsTheme.colBlack),
                             ))
@@ -838,38 +844,39 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                               fontSize: dimen11, color: ColorsTheme.colBlack),
                         ),
                         Obx(() => Text(
-
-                        '${controller.currency}${controller.platformFee.value}',                              style: regularTextStyle(
+                              '${controller.currency}${controller.platformFee.value}',
+                              style: regularTextStyle(
                                   fontSize: dimen11,
                                   color: ColorsTheme.colBlack),
                             ))
                       ],
                     ),
                   ),
-                Container(
-                  margin: const EdgeInsets.only(bottom: 2),
-                  child: Divider(
-                    color: ColorsTheme.colC4D9D4,
-                    thickness: 1,
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Total Pay'.tr,
-                      style: semiBoldTextStyle(fontSize: dimen12, color: ColorsTheme.colBlack),
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 2),
+                    child: Divider(
+                      color: ColorsTheme.colC4D9D4,
+                      thickness: 1,
                     ),
-                    Text(
-                      '${controller.currency}${controller.totalPrice.value}',
-                      style: semiBoldTextStyle(fontSize: dimen12, color: ColorsTheme.colBlack),
-                      maxLines: 2,
-                    )
-                  ],
-                ),
-              ],
-            )
-          ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Total Pay'.tr,
+                        style: semiBoldTextStyle(
+                            fontSize: dimen12, color: ColorsTheme.colBlack),
+                      ),
+                      Text(
+                        '${controller.currency}${controller.totalPrice.value}',
+                        style: semiBoldTextStyle(
+                            fontSize: dimen12, color: ColorsTheme.colBlack),
+                        maxLines: 2,
+                      )
+                    ],
+                  ),
+                ],
+              )),
         ],
       ),
     );
@@ -1339,10 +1346,10 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
       final status = controller.orderStatus.value;
       final diffMinutes = controller.cancelDiffMinutes.value;
 
-      bool showButton = (status == 'confirmation_pending') && (diffMinutes <= 5);
+      bool showButton =
+          (status == 'confirmation_pending') && (diffMinutes <= 5);
 
       debugPrint("Cancel Diff Minutes in ODP $diffMinutes ,$showButton");
-
 
       if (!showButton) return const SizedBox.shrink();
 
@@ -1373,11 +1380,11 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                     fontSize: dimen12, color: ColorsTheme.colFF4E4E),
               ),
             ),
+          ),
         ),
-      ),
-    );
-  });
-}
+      );
+    });
+  }
 
   void _openCancelSummaryDialog() {
     if (controller.orderDetailsModel == null) return;

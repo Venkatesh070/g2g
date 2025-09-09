@@ -55,7 +55,7 @@ dependencies:
   path: ^1.8.3
   flutter_image_compress: ^2.0.4
   carousel_slider: ^4.2.1
-  in_app_review: ^2.0.6
+  in_app_review: 2.0.6
   share_plus: ^7.1.0
 
   video_player: ^2.7.2
@@ -82,10 +82,9 @@ dependencies:
   geocoding: ^2.1.0
 #  geocoding: ^3.0.0
   custom_marker: ^1.0.0
-  google_maps_cluster_manager: ^3.1.0
   custom_map_markers: ^0.0.2+1
   google_maps_flutter: ^2.2.3
-
+  google_maps_cluster_manager: ^3.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
