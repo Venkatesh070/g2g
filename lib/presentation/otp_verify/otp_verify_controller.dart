@@ -7,6 +7,8 @@ import 'package:get/get.dart';
 import 'package:good_grab/infrastructure/models/user_model.dart';
 import 'package:good_grab/infrastructure/shared/app_exception_handle.dart';
 import 'package:good_grab/infrastructure/shared/progress_dialog.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 
 
 import '../../infrastructure/constants/app_constants.dart';
@@ -335,12 +337,25 @@ class OtpVerifyController extends GetxController {
   }
 
 
-  successLoginSignup(UserModel userModel){
+  successLoginSignup(UserModel userModel) async {
     PrefManager.putString(AppConstants.userProfile, json.encode(userModel.user));
     PrefManager.putString(AppConstants.deviceId, userModel.user!.deviceId.toString());
     PrefManager.putInt(AppConstants.userId, userModel.user!.id);
     PrefManager.putString(AppConstants.accessToken, userModel.user!.accessToken.toString());
     PrefManager.putBool(AppConstants.loggedIn, true);
+
+    // Analytics: log login or signup success
+    try {
+      final rawMethod = (params['login_type'] ?? 'mobile').toString().toLowerCase();
+      // Normalize to GA4-friendly values
+      final method = (rawMethod == 'google') ? 'Google' : 'phone';
+      if (screenType == 'login') {
+        await FirebaseAnalytics.instance.logLogin(loginMethod: method);
+      } else {
+        await FirebaseAnalytics.instance.logSignUp(signUpMethod: method);
+      }
+    } catch (_) {}
+
     navigateScreen();
   }
 

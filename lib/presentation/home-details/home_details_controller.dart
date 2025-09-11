@@ -22,6 +22,8 @@ import '../../infrastructure/shared/permission_fun.dart';
 import '../../infrastructure/shared/progress_dialog.dart';
 import '../../infrastructure/shared/snackbar.util.dart';
 import '../../infrastructure/theme/text.theme.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 
 class HomeDetailsController extends GetxController
     with GetTickerProviderStateMixin {
@@ -254,9 +256,33 @@ class HomeDetailsController extends GetxController
 
         totalQuantity.value = 0;
         totalAmount.value = 0;
+        final prevQty = menuData.selectedQuantity ?? 0;
         menuData.selectedQuantity = tempQuantity;
         funTotalQuantityAndAmount();
         homeData.refresh();
+        // Analytics: AddToCart when quantity increases on details page
+        try {
+          if (tempQuantity > prevQty) {
+            final item = AnalyticsEventItem(
+              itemId: (menuData.menuId ?? '').toString(),
+              itemName: menuData.menuName ?? 'menu_item',
+              itemBrand: homeData.value.restaurantName ?? '', // vendor_name mapped to GA4 item_brand
+              price: menuData.finalPrice ?? 0.0,
+              quantity: 1,
+            );
+            await FirebaseAnalytics.instance.logAddToCart(
+              currency: (currency.isNotEmpty ? currency : 'INR'),
+              value: (menuData.finalPrice ?? 0.0) * 1,
+              items: [item],
+              parameters: {
+                'vendor_name': homeData.value.restaurantName ?? '',
+                'item_id': (menuData.menuId ?? '').toString(),
+                'price': menuData.finalPrice ?? 0.0,
+                'quantity': 1,
+              },
+            );
+          }
+        } catch (_) {}
         if (cartId == 0) {
           if (cartModel.data!.cartDetails != null) {
             PrefManager.putInt(
@@ -366,7 +392,8 @@ class HomeDetailsController extends GetxController
       'resId': resId,
       'pickupStartTime': homeData.value.openTime,
       'pickupCloseTime': homeData.value.closeTime,
-      'pickupLocation': homeData.value.restaurantAddress
+      'pickupLocation': homeData.value.restaurantAddress,
+      'vendorName': homeData.value.restaurantName,
     });
     if (result != null && result) {
       isLoad.value = true;

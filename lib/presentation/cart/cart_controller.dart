@@ -16,6 +16,8 @@ import 'package:good_grab/infrastructure/theme/text.theme.dart';
 import 'package:intl/intl.dart';
 import 'package:phonepe_payment_sdk/phonepe_payment_sdk.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 
 import '../../infrastructure/constants/app_constants.dart';
 import '../../infrastructure/models/api_response_model.dart';
@@ -114,7 +116,9 @@ class CartController extends GetxController {
 
   @override
   void onInit() {
-    title.value = 'cart';
+    title.value = (Get.arguments['vendorName']?.toString() ?? '').isNotEmpty
+        ? Get.arguments['vendorName'].toString()
+        : 'cart';
     totalQuantity.value = int.parse(Get.arguments['total_quantity'].toString());
     resId.value = int.parse(Get.arguments['resId'].toString());
     pickupStartTime.value = Get.arguments['pickupStartTime'].toString();
@@ -309,8 +313,8 @@ class CartController extends GetxController {
         platformGst.value = await PrefManager.getDouble(AppConstants.platformGst);
         combinedGst.value = totalGst.value + platformGst.value;
         menuList.addAll(cartModel.data!.cartDetails!.menuDetail!);
-        totalPay.value = subTotalFinalPrice.value + combinedGst.value + platformFee.value;
-                  // totalPay.value = 1;
+        // totalPay.value = subTotalFinalPrice.value + combinedGst.value + platformFee.value;
+                  totalPay.value = 1;
 
 
         print("sjkdfk ${menuList.length}");
@@ -342,13 +346,36 @@ class CartController extends GetxController {
   }
 
 // remove and add cart
-  addCart(index) {
+  addCart(index) async {
     print("manue menuQuantity${menuList[index].menuQuantity}");
     if (menuList[index].menuSelectedQuantity! < menuList[index].menuQuantity!) {
       var tempQuantity = menuList[index].menuSelectedQuantity! + 1;
       menuList[index].menuSelectedQuantity =
           menuList[index].menuSelectedQuantity! + 1;
       menuList.refresh();
+
+      // Analytics: AddToCart at the moment user increments in cart UI
+      try {
+        final item = AnalyticsEventItem(
+          itemId: (menuList[index].menuId ?? '').toString(),
+          itemName: menuList[index].menuName ?? 'menu_item',
+          itemBrand: title.value, // vendor_name mapped to GA4 item_brand
+          price: menuList[index].menuFinalPrice ?? 0.0,
+          quantity: 1,
+        );
+        await FirebaseAnalytics.instance.logAddToCart(
+          currency: (currency.value.isNotEmpty ? currency.value : 'INR'),
+          value: (menuList[index].menuFinalPrice ?? 0.0) * 1,
+          items: [item],
+          parameters: {
+            'vendor_name': title.value,
+            'item_id': (menuList[index].menuId ?? '').toString(),
+            'price': menuList[index].menuFinalPrice ?? 0.0,
+            'quantity': 1,
+          },
+        );
+      } catch (_) {}
+
       addRemoveCartApi(index, tempQuantity);
     } else {
       SnackBarUtil.showError(
@@ -401,8 +428,8 @@ class CartController extends GetxController {
           platformFee.value= await PrefManager.getDouble(AppConstants.platformFee);
           platformGst.value = await PrefManager.getDouble(AppConstants.platformGst);
           combinedGst.value = totalGst.value + platformGst.value;
-           totalPay.value = subTotalFinalPrice.value + combinedGst.value + platformFee.value;
-          // totalPay.value = 1;
+          //  totalPay.value = subTotalFinalPrice.value + combinedGst.value + platformFee.value;
+          totalPay.value = 1;
 
           menuList.refresh();
         } else {
@@ -525,6 +552,28 @@ class CartController extends GetxController {
               .funPlaceOrderApi(params);
       progressDialog.dismiss();
       if (baseModel.success!) {
+        // Analytics: Purchase (legacy placeOrder path)
+        try {
+          final items = menuList.map((m) => AnalyticsEventItem(
+            itemId: (m.menuId ?? '').toString(),
+            itemName: m.menuName ?? 'menu_item',
+            itemBrand: title.value,
+            price: m.menuFinalPrice ?? 0.0,
+            quantity: m.menuSelectedQuantity ?? 1,
+          )).toList();
+          await FirebaseAnalytics.instance.logPurchase(
+            transactionId: (transactionId.value).toString(),
+            currency: 'INR',
+            value: totalPay.value,
+            items: items,
+            parameters: {
+              'transaction_id': (transactionId.value).toString(),
+              'value': totalPay.value,
+              'currency': 'INR',
+              'items': items.map((e) => e.asMap()).toList(),
+            },
+          );
+        } catch (_) {}
         PrefManager.remove(AppConstants.cartId);
         Get.toNamed(Routes.orderStatus,
             arguments: {'status': 'success', 'message': baseModel.message!});
@@ -853,6 +902,21 @@ class CartController extends GetxController {
               .funPlaceOrderPaymentApi(params);
       progressDialog.dismiss();
       if (baseModel.success!) {
+        // Analytics: Purchase (new flow with payment confirmation)
+        try {
+          final items = menuList.map((m) => AnalyticsEventItem(
+            itemId: (m.menuId ?? '').toString(),
+            itemName: m.menuName ?? 'menu_item',
+            price: m.menuFinalPrice ?? 0.0,
+            quantity: m.menuSelectedQuantity ?? 1,
+          )).toList();
+          await FirebaseAnalytics.instance.logPurchase(
+            transactionId: (transId ?? '').toString(),
+            currency: (currency.value.isNotEmpty ? currency.value : 'INR'),
+            value: totalPay.value,
+            items: items,
+          );
+        } catch (_) {}
         PrefManager.remove(AppConstants.cartId);
         Get.toNamed(Routes.orderStatus,
             arguments: {'status': 'success', 'message': baseModel.message!});
@@ -875,6 +939,28 @@ class CartController extends GetxController {
   /// new code
   placeOrderWithoutPayment(paymentMethodType) async {
     apiCalling.value = false;
+
+    // Analytics: BeginCheckout before creating pending order
+    try {
+      final items = menuList.map((m) => AnalyticsEventItem(
+        itemId: (m.menuId ?? '').toString(),
+        itemName: m.menuName ?? 'menu_item',
+        price: m.menuFinalPrice ?? 0.0,
+        quantity: m.menuSelectedQuantity ?? 1,
+      )).toList();
+      debugPrint("Begin Checkout Event Fire: $currency, $totalPay, $items $paymentMethodType");
+      await FirebaseAnalytics.instance.logBeginCheckout(
+        currency: (currency.value.isNotEmpty ? currency.value : 'INR'),
+        value: totalPay.value,
+        items: items,
+        parameters: {
+          'cart_value': totalPay.value,
+          'item_ids': menuList.map((m) => (m.menuId ?? '').toString()).join(','),
+          'payment_method': paymentMethodType ?? 'unknown',
+        },
+      );
+      debugPrint("Begin Checkout Event Fired");
+    } catch (_) {}
 
     var progressDialog = ProgressDialog();
     progressDialog.show();
@@ -943,6 +1029,21 @@ class CartController extends GetxController {
 
       progressDialog.dismiss();
       if (baseModel.success!) {
+        // Analytics: Purchase after completion callback
+        try {
+          final items = menuList.map((m) => AnalyticsEventItem(
+            itemId: (m.menuId ?? '').toString(),
+            itemName: m.menuName ?? 'menu_item',
+            price: m.menuFinalPrice ?? 0.0,
+            quantity: m.menuSelectedQuantity ?? 1,
+          )).toList();
+          await FirebaseAnalytics.instance.logPurchase(
+            transactionId: (transId ?? '').toString(),
+            currency: (currency.value.isNotEmpty ? currency.value : 'INR'),
+            value: totalPay.value,
+            items: items,
+          );
+        } catch (_) {}
         PrefManager.remove(AppConstants.cartId);
         Get.toNamed(Routes.orderStatus,
             arguments: {'status': 'success', 'message': baseModel.message!});
