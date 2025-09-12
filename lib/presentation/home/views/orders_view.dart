@@ -120,7 +120,7 @@ class OrdersView extends GetView<HomeController> {
                                             ),
                                           ),
                                           Text(
-                                            'Total Magical Bag',
+                                            'Total Orders',
                                             style: mediumTextStyle(
                                                 fontSize: dimen12,
                                                 color: ColorsTheme.colBlack),
@@ -140,7 +140,7 @@ class OrdersView extends GetView<HomeController> {
                               ),
                             ),
                             Expanded(
-                              child: ListView.separated(
+                              child: ListView.builder(
                                 controller: controller.pagingListController,
                                 itemCount: controller.orderList.length + 1,
                                 shrinkWrap: true,
@@ -152,30 +152,50 @@ class OrdersView extends GetView<HomeController> {
                                     return GestureDetector(
                                       onTap: () async {
                                         var result = await Get.toNamed(
-                                            Routes.orderDetails,
-                                            arguments: {
-                                              'orderId': controller
-                                                  .orderList[index].orderId,
-                                              'currency': controller
-                                                  .orderList[index].currency,
-                                              'resId': controller
-                                                  .orderList[index]
-                                                  .restaurantId,
-                                              'orderStatus': controller
-                                                  .orderList[index].orderStatus,
-                                            });
+                                          Routes.orderDetails,
+                                          arguments: {
+                                            'orderId': controller
+                                                .orderList[index].orderId,
+                                            'currency': controller
+                                                .orderList[index].currency,
+                                            'resId': controller
+                                                .orderList[index].restaurantId,
+                                            'orderStatus': controller
+                                                .orderList[index].orderStatus,
+                                          },
+                                        );
                                         if (result != null && result) {
                                           controller.currentPage.value = 1;
                                           controller.getOrdersList();
                                         }
                                       },
                                       child: Container(
-                                        margin: const EdgeInsets.only(
-                                            top: 4, bottom: 4),
+                                        margin: const EdgeInsets.symmetric(
+                                            vertical:
+                                                3), // spacing between items
+                                        padding: const EdgeInsets.all(12),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          border: Border.all(
+                                            color: ColorsTheme.colC4D9D4,
+                                            width: 0.5,
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black
+                                                  .withOpacity(0.05),
+                                              blurRadius: 4,
+                                              offset: const Offset(0, 2),
+                                            )
+                                          ],
+                                        ),
                                         child: Row(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
+                                            // --- Restaurant Image + Logo ---
                                             Stack(
                                               children: [
                                                 Container(
@@ -202,127 +222,119 @@ class OrdersView extends GetView<HomeController> {
                                                             errorBuilder:
                                                                 (context, obj,
                                                                     stackTrace) {
-                                                            return Image.asset(
-                                                              Res.icDummyBanner,
-                                                              fit: BoxFit.cover,
-                                                            );
-                                                          }),
+                                                              return Image
+                                                                  .asset(
+                                                                Res.icDummyBanner,
+                                                                fit: BoxFit
+                                                                    .cover,
+                                                              );
+                                                            },
+                                                          ),
                                                   ),
                                                 ),
                                                 Positioned(
-                                                    bottom: 5,
-                                                    left: 5,
-                                                    child: controller
+                                                  bottom: 5,
+                                                  left: 5,
+                                                  child: controller
+                                                              .orderList[index]
+                                                              .restaurantCoverProfile ==
+                                                          null
+                                                      ? Image.asset(
+                                                          Res.icDummyLogo,
+                                                          width: 25,
+                                                          height: 25,
+                                                        )
+                                                      : ClipOval(
+                                                          child: Image.network(
+                                                            controller
                                                                 .orderList[
                                                                     index]
-                                                                .restaurantCoverProfile ==
-                                                            null
-                                                        ? Image.asset(
-                                                            Res.icDummyLogo,
+                                                                .restaurantCoverProfile!,
                                                             width: 25,
                                                             height: 25,
-                                                          )
-                                                        : ClipOval(
-                                                            child: Image.network(
-                                                                controller
-                                                                    .orderList[
-                                                                        index]
-                                                                    .restaurantCoverProfile!,
-                                                                width: 25,
-                                                                height: 25,
-                                                                errorBuilder:
-                                                                    (context,
-                                                                        obj,
-                                                                        stackTrace) {
+                                                            errorBuilder:
+                                                                (context, obj,
+                                                                    stackTrace) {
                                                               return Image
                                                                   .asset(
                                                                 Res.icDummyLogo,
                                                                 width: 25,
                                                                 height: 25,
                                                               );
-                                                            }),
-                                                          ))
+                                                            },
+                                                          ),
+                                                        ),
+                                                )
                                               ],
                                             ),
+                                            // --- Order Details ---
                                             Expanded(
                                               child: Column(
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.start,
                                                 children: [
-                                                  Container(
-                                                    margin:
-                                                        const EdgeInsets.only(
-                                                            bottom: 3),
-                                                    child: Text(
-                                                      '${controller.orderList[index].restaurantName} - ${controller.orderList[index].restaurantAddress}',
-                                                      maxLines: 2,
-                                                      style: semiBoldTextStyle(
-                                                          fontSize: dimen13,
-                                                          color: ColorsTheme
-                                                              .colBlack),
+                                                  // Restaurant Name
+                                                  Text(
+                                                    '${controller.orderList[index].restaurantName} - ${controller.orderList[index].restaurantAddress}',
+                                                    maxLines: 2,
+                                                    style: semiBoldTextStyle(
+                                                      fontSize: dimen13,
+                                                      color:
+                                                          ColorsTheme.colBlack,
                                                     ),
                                                   ),
-                                                  Container(
-                                                    margin:
-                                                        const EdgeInsets.only(
-                                                            bottom: 3),
-                                                    child: Text.rich(
-                                                        TextSpan(children: [
-                                                      TextSpan(
-                                                        text:
-                                                            '${'Order ID'.tr} : ',
-                                                        style: regularTextStyle(
+                                                  const SizedBox(height: 4),
+                                                  // Order ID
+                                                  Text.rich(
+                                                    TextSpan(
+                                                      children: [
+                                                        TextSpan(
+                                                          text:
+                                                              '${'Order ID'.tr} : ',
+                                                          style:
+                                                              regularTextStyle(
                                                             fontSize: dimen11,
                                                             color: ColorsTheme
-                                                                .colBlack),
-                                                      ),
-                                                      TextSpan(
-                                                        text: controller
-                                                            .orderList[index]
-                                                            .orderId
-                                                            .toString(),
-                                                        style: boldTextStyle(
+                                                                .colBlack,
+                                                          ),
+                                                        ),
+                                                        TextSpan(
+                                                          text: controller
+                                                              .orderList[index]
+                                                              .orderId
+                                                              .toString(),
+                                                          style: boldTextStyle(
                                                             fontSize: dimen14,
                                                             color: ColorsTheme
-                                                                .colBlack),
-                                                      )
-                                                    ])),
-                                                  ),
-                                                  Container(
-                                                    margin:
-                                                        const EdgeInsets.only(
-                                                            bottom: 8),
-                                                    child: Text(
-                                                      '${controller.orderList[index].currency ?? '₹ '}'
-                                                      '${(double.tryParse(controller.orderList[index].totalPaid ?? '0') ?? 0)
-                                                      + (double.tryParse(controller.orderList[index].gst ?? '0') ?? 0)
-                                                      + (controller.platformGst.value)
-                                                      + (controller.platformFee.value)
-                                                      }'
-                                                      ' | ${controller.orderList[index].createdAt ?? ''}',
-                                                      style: regularTextStyle(
-                                                        fontSize: dimen11,
-                                                        color: ColorsTheme
-                                                            .colBlack,
-                                                      ),
+                                                                .colBlack,
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
                                                   ),
+                                                  const SizedBox(height: 4),
+                                                  // Price & Date
+                                                  Text(
+                                                    '${controller.orderList[index].currency ?? '₹ '}'
+                                                    '${(double.tryParse(controller.orderList[index].totalPaid ?? '0') ?? 0) + (double.tryParse(controller.orderList[index].gst ?? '0') ?? 0) + (controller.platformGst.value) + (controller.platformFee.value)}'
+                                                    ' | ${controller.orderList[index].createdAt ?? ''}',
+                                                    style: regularTextStyle(
+                                                      fontSize: dimen11,
+                                                      color:
+                                                          ColorsTheme.colBlack,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 6),
+                                                  // Status
                                                   getStatus(index),
                                                 ],
                                               ),
-                                            )
+                                            ),
                                           ],
                                         ),
                                       ),
                                     );
                                   }
-                                },
-                                separatorBuilder:
-                                    (BuildContext context, int index) {
-                                  return Divider(
-                                    color: ColorsTheme.colC4D9D4,
-                                    thickness: 1,
-                                  );
                                 },
                               ),
                             ),
@@ -346,7 +358,7 @@ class OrdersView extends GetView<HomeController> {
               height: 20,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: ColorsTheme.col8FA19C,
+                color: ColorsTheme.colf56a07,
               ),
               alignment: Alignment.center,
               margin: const EdgeInsets.only(right: 10),
@@ -359,7 +371,7 @@ class OrdersView extends GetView<HomeController> {
           Text(
             'Pending pick-up',
             style:
-                boldTextStyle(fontSize: dimen11, color: ColorsTheme.colBlack),
+                boldTextStyle(fontSize: dimen11, color: ColorsTheme.colf56a07),
           ),
         ],
       );
@@ -385,7 +397,7 @@ class OrdersView extends GetView<HomeController> {
           Text(
             'Completed pick-up',
             style:
-                boldTextStyle(fontSize: dimen11, color: ColorsTheme.colBlack),
+                boldTextStyle(fontSize: dimen11, color: ColorsTheme.colPrimary),
           ),
         ],
       );
@@ -399,7 +411,9 @@ class OrdersView extends GetView<HomeController> {
               height: 20,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: ColorsTheme.colFF4E4E,
+                color:controller.orderList[index].orderStatus == 'not_picked_up'
+                ? ColorsTheme.col475751
+                :  ColorsTheme.colFF4E4E
               ),
               alignment: Alignment.center,
               margin: const EdgeInsets.only(right: 10),
@@ -414,11 +428,16 @@ class OrdersView extends GetView<HomeController> {
                 ? 'Not pick-up'
                 : 'Order Cancelled',
             style:
-                boldTextStyle(fontSize: dimen11, color: ColorsTheme.colFF4E4E),
+                boldTextStyle(fontSize: dimen11,
+                 color: controller.orderList[index].orderStatus == 'not_picked_up'
+                ? ColorsTheme.col475751
+                :  ColorsTheme.colFF4E4E
+                 ),
           ),
         ],
       );
-    }else if (controller.orderList[index].orderStatus! == 'confirmation_pending' ||
+    } else if (controller.orderList[index].orderStatus! ==
+            'confirmation_pending' ||
         controller.orderList[index].orderStatus == 'confirmation_pending') {
       return Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -447,9 +466,7 @@ class OrdersView extends GetView<HomeController> {
           ),
         ],
       );
-    }  
-    
-    else {
+    } else {
       return Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [

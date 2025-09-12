@@ -26,8 +26,10 @@ class ColorsTheme {
   static Color colF5F5F5 = HexColor("#F5F5F5");
   static Color colF59E0B = HexColor("#F59E0B");
   static Color col475751 = HexColor("#475751");
-
-  static Color colTransparent = Colors.transparent;
+  static Color colf56a07 = HexColor("#f56a07");
+  static Color cold3d3d3 = HexColor("#d3d3d3");
+  
+  static Color colTransparent = const Color.fromARGB(0, 0, 0, 0);
 
   static Color colFBF09D = HexColor("#FBF09D");
 }

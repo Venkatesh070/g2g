@@ -121,12 +121,10 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                                         left: 18, right: 18, bottom: 15),
                                     padding: const EdgeInsets.all(12),
                                     decoration: BoxDecoration(
-                                      color: ColorsTheme.colPrimary
-                                          .withOpacity(0.08),
+                                      color: ColorsTheme.colF59E0B.withOpacity(0.1),
                                       borderRadius: BorderRadius.circular(10),
                                       border: Border.all(
-                                          color: ColorsTheme.colPrimary
-                                              .withOpacity(0.2)),
+                                          color: ColorsTheme.colF59E0B),
                                     ),
                                     child: Row(
                                       crossAxisAlignment:
@@ -143,7 +141,7 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                                                 (context, error, stackTrace) =>
                                                     Icon(
                                               Icons.hourglass_top_rounded,
-                                              color: ColorsTheme.colPrimary,
+                                              color: ColorsTheme.colF59E0B,
                                               size: 18,
                                             ),
                                           ),
@@ -288,7 +286,7 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
             Container(
               width: Get.width,
               decoration: BoxDecoration(
-                  color: ColorsTheme.col007752,
+                  color: ColorsTheme.colf56a07.withOpacity(0.9),
                   borderRadius: BorderRadius.circular(16)),
               padding: const EdgeInsets.symmetric(vertical: 15),
               margin: const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
@@ -314,13 +312,13 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                             height: 20,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: ColorsTheme.col8FA19C,
+                              color: ColorsTheme.colWhite,
                             ),
                             alignment: Alignment.center,
                             margin: const EdgeInsets.only(right: 5),
                             child: Image.asset(
                               Res.icCheck,
-                              color: Colors.white,
+                              color: ColorsTheme.colf56a07,
                               width: 10,
                               height: 10,
                             )),

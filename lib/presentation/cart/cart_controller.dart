@@ -129,82 +129,89 @@ class CartController extends GetxController {
     super.onInit();
   }
 
-  showTakeawayReminderDialog() {
-    Get.dialog(
-      AlertDialog(
-        shape: RoundedRectangleBorder(
+void showTakeawayReminderDialog() {
+  Get.dialog(
+    Center(
+      child: UnconstrainedBox(
+        child: Material(
+          color: Colors.white, // ✅ Force solid white background
           borderRadius: BorderRadius.circular(18),
-        ),
-        titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-        contentPadding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
-        title: Row(
-          children: [
-            Icon(Icons.shopping_bag_outlined,
-                color: ColorsTheme.colPrimary, size: 24),
-            const SizedBox(width: 8),
-            Text(
-              'Takeaway Reminder',
-              style: semiBoldTextStyle(
-                fontSize: dimen16,
-                color: ColorsTheme.colBlack,
+          elevation: 10,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(15, 15, 15, 15),
+            child: SizedBox(
+              width: Get.width * 0.65, // Adjust width
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Title
+                  Row(
+                    children: [
+                      Icon(Icons.shopping_bag_outlined,
+                          color: ColorsTheme.colPrimary, size: 24),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Takeaway Reminder',
+                        style: semiBoldTextStyle(
+                          fontSize: dimen16,
+                          color: ColorsTheme.colBlack,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 15),
+                  SizedBox(
+                    height: 80,
+                    child: Lottie.asset(
+                      Res.takeAway,
+                      repeat: false,
+                      animate: true,
+                    ),
+                  ),
+
+                  const SizedBox(height: 15),
+
+                  // Message
+                  Text(
+                    'Please collect your order directly from this outlet at mentioned pickup time.',
+                    textAlign: TextAlign.center,
+                    style: regularTextStyle(
+                      fontSize: dimen14,
+                      color: ColorsTheme.colBlack,
+                    ),
+                  ),
+
+                  const SizedBox(height: 15),
+
+                  // Button
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: ColorsTheme.colPrimary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 22, vertical: 10),
+                    ),
+                    onPressed: () => Get.back(),
+                    child: Text(
+                      'Got it',
+                      style: semiBoldTextStyle(
+                        fontSize: dimen13,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-        content: SizedBox(
-          width: Get.width * 0.75, // 👈 makes dialog ~75% of screen width
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(height: 20),
-              SizedBox(
-                height: 100,
-                child: Lottie.asset(
-                  Res.takeAway,
-                  repeat: false,
-                  animate: true,
-                ),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                'This is a takeaway order.\nPlease collect it directly from the restaurant.',
-                textAlign: TextAlign.center,
-                style: regularTextStyle(
-                  fontSize: dimen14,
-                  color: ColorsTheme.colBlack,
-                ),
-              ),
-            ],
           ),
         ),
-        actionsAlignment: MainAxisAlignment.center,
-        actions: [
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: ColorsTheme.colPrimary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 25, vertical: 12),
-              ),
-              onPressed: () => Get.back(), // then trigger payment
-              child: Text(
-                'Ok',
-                style: semiBoldTextStyle(
-                  fontSize: dimen13,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
-        ],
       ),
-      barrierDismissible: false,
-    );
-  }
+    ),
+    barrierDismissible: false,
+  );
+}
 
   getRandomNumber() {
     const ch = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
@@ -309,8 +316,8 @@ class CartController extends GetxController {
         platformGst.value = await PrefManager.getDouble(AppConstants.platformGst);
         combinedGst.value = totalGst.value + platformGst.value;
         menuList.addAll(cartModel.data!.cartDetails!.menuDetail!);
-        totalPay.value = subTotalFinalPrice.value + combinedGst.value + platformFee.value;
-                  // totalPay.value = 1;
+        // totalPay.value = subTotalFinalPrice.value + combinedGst.value + platformFee.value;
+                  totalPay.value = 1;
 
 
         print("sjkdfk ${menuList.length}");

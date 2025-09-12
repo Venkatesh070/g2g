@@ -10,8 +10,12 @@ import '../../res.dart';
 
 class OrderStatusController extends GetxController {
   var orderStatus = ''.obs;
+  var orderStatusTitle = ''.obs;
   var orderStatusSubtitle = ''.obs;
   var orderFile = ''.obs;
+  //  var orderId = 0;
+  // var resId = 0;
+  // var currency = '';
 
   Timer? timer;
 
@@ -28,10 +32,15 @@ class OrderStatusController extends GetxController {
         if (Get.isRegistered<CartController>()) {
           Get.delete<CartController>();
         }
-        Get.offAllNamed(
-          Routes.home,
-          arguments: {"permission": 1}, // optional
-        );
+        // print('$orderId $orderStatus $resId' );
+        // Get.offAllNamed(
+        //      Routes.orderDetails,
+        //                                   arguments: {
+        //                                     'orderId':orderId ,
+        //                                     'resId': resId,
+        //                                     'orderStatus': orderStatus,
+        //                                   },
+        // );
       } else {
         seconds = seconds - 1;
       }
@@ -43,7 +52,12 @@ class OrderStatusController extends GetxController {
     initTimer();
     orderStatus.value = Get.arguments['status'];
     if (orderStatus.value == 'success') {
-      orderStatusSubtitle.value = Get.arguments['message'];
+      // orderStatusSubtitle.value = Get.arguments['message'];
+      orderStatusTitle.value = "You’re a Sustainable Hero!";
+      orderStatusSubtitle.value = "Thanks for saving food and fight for a healthier planet. Every order you place makes a real difference. See you on the next mission! ";
+      // orderId = Get.arguments['orderId'];
+      // resId = Get.arguments['resId'];
+      // orderStatus.value = 'confirmation_pending';
       orderFile.value = Res.successOrder;
     } else if (orderStatus.value == 'failed') {
       orderStatusSubtitle.value = Get.arguments['message'];

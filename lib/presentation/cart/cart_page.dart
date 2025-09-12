@@ -116,7 +116,9 @@ class CartPage extends BaseView<CartController> {
                                   ),
                                   billDetails(),
                                   pickupDetails(),
+                                  cancellationWidget(),
                                   numberWidget(),
+                                  // cancellationWidget(),
                                   Obx(() => controller.userPhoneNumber.isEmpty
                                       ? proceedButton()
                                       : Container()),
@@ -124,6 +126,9 @@ class CartPage extends BaseView<CartController> {
                                       controller.userPhoneNumber.isNotEmpty
                                           ? codPayment()
                                           : Container()),
+                                          const SizedBox(height: 15,),
+                                  // cancellationWidget(),
+
                                 ],
                               ),
                       )))
@@ -371,120 +376,169 @@ class CartPage extends BaseView<CartController> {
                             Text(
                               'Total GST'.tr,
                               style: regularTextStyle(
-                                  fontSize: dimen11,
-                                  color: ColorsTheme.colBlack),
+                                fontSize: dimen11,
+                                color: ColorsTheme.colBlack,
+                              ),
                             ),
-                            SizedBox(width: 5),
+                            const SizedBox(width: 5),
                             GestureDetector(
                               onTap: () {
                                 Get.dialog(
-                                  Dialog(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    insetPadding: const EdgeInsets.symmetric(
-                                        horizontal: 30, vertical: 24),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(20),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          // Header with icon + title
-                                          Row(
-                                            children: [
-                                              Icon(Icons.receipt_long,
-                                                  color: ColorsTheme.colPrimary,
-                                                  size: 26),
-                                              const SizedBox(width: 8),
-                                              Text(
-                                                'GST Details'.tr,
-                                                style: semiBoldTextStyle(
-                                                  fontSize: dimen16,
-                                                  color: ColorsTheme.colBlack,
+                                  Center(
+                                    child: UnconstrainedBox(
+                                      child: Material(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(18),
+                                        elevation: 10,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(15),
+                                          child: SizedBox(
+                                            width: Get.width *
+                                                0.80, // Dialog width
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                // Title text
+                                                Text(
+                                                  "Taxes as per Government regulations and restaurant charges"
+                                                      .tr,
+                                                  style: lightTextStyle(
+                                                    fontSize: dimen13,
+                                                    color: ColorsTheme.colBlack,
+                                                  ),
                                                 ),
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 16),
+                                                const SizedBox(height: 10),
+                                                Divider(
+                                                  height: 1,
+                                                  color: ColorsTheme.colA3A8A4
+                                                      .withOpacity(0.2),
+                                                ), // compact divider
+                                                const SizedBox(height: 10),
+                                                // GST on item total
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Text(
+                                                      "GST on item total".tr,
+                                                      style: semiBoldTextStyle(
+                                                        fontSize: dimen12,
+                                                        color: ColorsTheme
+                                                            .colBlack,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      '${controller.currency.value}${controller.totalGst.value.toStringAsFixed(2)}',
+                                                      style: semiBoldTextStyle(
+                                                        fontSize: dimen12,
+                                                        color: ColorsTheme
+                                                            .colBlack,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                const SizedBox(height: 6),
 
-                                          // Item GST
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                'Item GST'.tr,
-                                                style: regularTextStyle(
-                                                  fontSize: dimen13,
-                                                  color: ColorsTheme.colBlack
-                                                      .withOpacity(0.7),
+                                                // GST on platform fee
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Text(
+                                                      "GST on platform fee".tr,
+                                                      style: semiBoldTextStyle(
+                                                        fontSize: dimen12,
+                                                        color: ColorsTheme
+                                                            .colBlack,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      '${controller.currency.value}${controller.platformGst.value.toStringAsFixed(2)}',
+                                                      style: semiBoldTextStyle(
+                                                        fontSize: dimen12,
+                                                        color: ColorsTheme
+                                                            .colBlack,
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
-                                              ),
-                                              Text(
-                                                '${controller.currency.value}${controller.totalGst.value.toStringAsFixed(2)}',
-                                                style: semiBoldTextStyle(
-                                                  fontSize: dimen13,
-                                                  color: ColorsTheme.colBlack,
+                                                const SizedBox(height: 6),
+                                                Divider(
+                                                  height: 1,
+                                                  color: ColorsTheme.colA3A8A4
+                                                      .withOpacity(0.2),
                                                 ),
-                                              ),
-                                            ],
-                                          ),
-                                          const Divider(height: 20),
+                                                const SizedBox(height: 6),
 
-                                          // Platform GST
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                'Platform GST'.tr,
-                                                style: regularTextStyle(
-                                                  fontSize: dimen13,
-                                                  color: ColorsTheme.colBlack
-                                                      .withOpacity(0.7),
+                                                // Total
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Text(
+                                                      "Total".tr,
+                                                      style: semiBoldTextStyle(
+                                                        fontSize: dimen12,
+                                                        color: ColorsTheme
+                                                            .colBlack,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      '${controller.currency.value}${controller.combinedGst.value.toStringAsFixed(2)}',
+                                                      style: semiBoldTextStyle(
+                                                        fontSize: dimen12,
+                                                        color: ColorsTheme
+                                                            .colBlack,
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
-                                              ),
-                                              Text(
-                                                '${controller.currency.value}${controller.platformGst.value.toStringAsFixed(2)}',
-                                                style: semiBoldTextStyle(
-                                                  fontSize: dimen13,
-                                                  color: ColorsTheme.colBlack,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
 
-                                          const SizedBox(height: 20),
+                                                const SizedBox(height: 16),
 
-                                          // Close Button
-                                          SizedBox(
-                                            width: double.infinity,
-                                            child: ElevatedButton(
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor:
-                                                    ColorsTheme.colPrimary,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(12),
+                                                // OK Button (full width)
+                                                SizedBox(
+                                                  width: double.infinity,
+                                                  child: ElevatedButton(
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      backgroundColor:
+                                                          ColorsTheme
+                                                              .colPrimary,
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(25),
+                                                      ),
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                        vertical: 10,
+                                                      ),
+                                                    ),
+                                                    onPressed: () => Get.back(),
+                                                    child: Text(
+                                                      'OKAY'.tr,
+                                                      style: semiBoldTextStyle(
+                                                        fontSize: dimen13,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ),
                                                 ),
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        vertical: 12),
-                                              ),
-                                              onPressed: () => Get.back(),
-                                              child: Text(
-                                                'Close'.tr,
-                                                style: semiBoldTextStyle(
-                                                  fontSize: dimen13,
-                                                  color: Colors.white,
-                                                ),
-                                              ),
+                                              ],
                                             ),
                                           ),
-                                        ],
+                                        ),
                                       ),
                                     ),
                                   ),
+                                  barrierDismissible: true,
                                 );
                               },
                               child: Icon(
@@ -495,12 +549,15 @@ class CartPage extends BaseView<CartController> {
                             ),
                           ],
                         ),
+
+                        // GST value beside info icon
                         Obx(() => Text(
                               '${controller.currency.value}${controller.combinedGst.value.toStringAsFixed(2)}',
                               style: regularTextStyle(
-                                  fontSize: dimen11,
-                                  color: ColorsTheme.colBlack),
-                            ))
+                                fontSize: dimen11,
+                                color: ColorsTheme.colBlack,
+                              ),
+                            )),
                       ],
                     ),
                   ),
@@ -508,18 +565,40 @@ class CartPage extends BaseView<CartController> {
                     margin: const EdgeInsets.only(bottom: 2),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Platform Fee'.tr,
-                          style: regularTextStyle(
-                              fontSize: dimen11, color: ColorsTheme.colBlack),
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Text(
+                                'Platform Fee'.tr,
+                                style: regularTextStyle(
+                                  fontSize: dimen11,
+                                  color: ColorsTheme.colBlack,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Flexible(
+                                child: Text(
+                                  "(This keeps us maintaining our service)",
+                                  style: regularTextStyle(
+                                    fontSize: dimen10,
+                                    color: ColorsTheme.colBlack,
+                                  ),
+                                  overflow: TextOverflow
+                                      .ellipsis, // ✅ avoids overflow
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                         Obx(() => Text(
-                              '${controller.currency.value}${controller.platformFee.value.toStringAsFixed(2)}', //change by krishna
+                              '${controller.currency.value}${controller.platformFee.value.toStringAsFixed(2)}',
                               style: regularTextStyle(
-                                  fontSize: dimen11,
-                                  color: ColorsTheme.colBlack),
-                            ))
+                                fontSize: dimen11,
+                                color: ColorsTheme.colBlack,
+                              ),
+                            )),
                       ],
                     ),
                   ),
@@ -1151,6 +1230,44 @@ class CartPage extends BaseView<CartController> {
               ),
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  cancellationWidget() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 20, left: 18, right: 18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Cancellation Policy'.tr,
+            style: semiBoldTextStyle(
+                fontSize: dimen12, color: ColorsTheme.colBlack),
+          ),
+          Container(
+              decoration: BoxDecoration(
+                  border: Border.all(color: ColorsTheme.colC4D9D4, width: 1),
+                  borderRadius: BorderRadius.circular(16)),
+              margin: const EdgeInsets.only(top: 15),
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+              child: Column(
+                children: [
+                  Container(
+                    // padding: const EdgeInsets.all(8),
+                    child: Text(
+                      'After Order has been placed: - Our goal is to minimize food waste and its environmental impact. To support this, a 100% fee will be charged if you cancel an order after it has been accepted. We understand that in case of unusual delays, the fee may not apply.'
+                          .tr,
+                      style: regularTextStyle(
+                        fontSize: dimen12,
+                        color: ColorsTheme.colBlack,
+                      ),
+                      softWrap: true,
+                    ),
+                  )
+                ],
+              )),
         ],
       ),
     );

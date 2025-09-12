@@ -1,5 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:good_grab/infrastructure/shared/custom_shimmer_widget.dart';
 import 'package:good_grab/infrastructure/theme/colors.theme.dart';
@@ -760,20 +761,36 @@ class HomeView extends GetView<HomeController> {
                           return GestureDetector(
                             onTap: () async {
                               if (controller.isLoggedIn.value) {
-                                if (controller.homeList[index].totalQuantity != 0 &&
-                                    controller.homeList[index].soldOutStatus != true &&
+                                if (controller.homeList[index].totalQuantity !=
+                                        0 &&
+                                    controller.homeList[index].soldOutStatus !=
+                                        true &&
                                     !(() {
-                                      final closeAt = controller.homeList[index].closeAt;
-                                      if (closeAt == null || closeAt.isEmpty) return false;
+                                      final closeAt =
+                                          controller.homeList[index].closeAt;
+                                      if (closeAt == null || closeAt.isEmpty)
+                                        return false;
                                       final now = DateTime.now();
                                       try {
-                                        final t1 = DateFormat('HH:mm').parse(closeAt);
-                                        final close = DateTime(now.year, now.month, now.day, t1.hour, t1.minute);
+                                        final t1 =
+                                            DateFormat('HH:mm').parse(closeAt);
+                                        final close = DateTime(
+                                            now.year,
+                                            now.month,
+                                            now.day,
+                                            t1.hour,
+                                            t1.minute);
                                         return now.isAfter(close);
                                       } catch (_) {
                                         try {
-                                          final t2 = DateFormat('hh:mm a').parse(closeAt);
-                                          final close = DateTime(now.year, now.month, now.day, t2.hour, t2.minute);
+                                          final t2 = DateFormat('hh:mm a')
+                                              .parse(closeAt);
+                                          final close = DateTime(
+                                              now.year,
+                                              now.month,
+                                              now.day,
+                                              t2.hour,
+                                              t2.minute);
                                           return now.isAfter(close);
                                         } catch (_) {
                                           return false;
@@ -800,344 +817,341 @@ class HomeView extends GetView<HomeController> {
                             },
                             child: Container(
                               margin: const EdgeInsets.only(top: 4, bottom: 4),
-                              // padding: const EdgeInsets.symmetric(
-                              //     vertical: 10, horizontal: 10),
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 10),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(16),
                                 color: ColorsTheme.colWhite,
                               ),
                               child: Stack(
                                 children: [
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Stack(
-                                          children: [
-                                            Container(
-                                              margin: const EdgeInsets.only(
-                                                  right: 15),
-                                              width: 100,
-                                              height: 100,
-                                              child: ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(16),
-                                                  child: controller
-                                                              .homeList[index]
-                                                              .restaurantImage ==
-                                                          null
-                                                      ? Image.asset(
-                                                          Res.icDummyBanner,
-                                                          fit: BoxFit.cover,
-                                                        )
-                                                      : Image.network(
-                                                          controller
-                                                              .homeList[index]
-                                                              .restaurantImage!,
-                                                          fit: BoxFit.cover,
-                                                          filterQuality:
-                                                              FilterQuality.low,
-                                                          errorBuilder: (context,
-                                                              obj, stackTrace) {
-                                                          return Image.asset(
-                                                            Res.icDummyBanner,
-                                                            fit: BoxFit.cover,
-                                                          );
-                                                        })),
-                                            ),
-                                            Positioned(
-                                                top: 5,
-                                                right: 20,
-                                                child: Visibility(
-                                                  visible: false,
-                                                  child: InkWell(
-                                                    onTap: () {
-                                                      if (controller
-                                                          .isLoggedIn.value) {
-                                                        controller.addFav(
-                                                            index, 'home');
-                                                      } else {
-                                                        controller
-                                                            .loginBottomSheet();
-                                                      }
-                                                    },
-                                                    child: controller
-                                                                .homeList[index]
-                                                                .isLiked ==
-                                                            "0"
-                                                        ? Container(
-                                                            decoration:
-                                                                const BoxDecoration(
-                                                                    color: Colors
-                                                                        .white,
-                                                                    shape: BoxShape
-                                                                        .circle),
-                                                            width: 30,
-                                                            height: 30,
-                                                            alignment:
-                                                                Alignment.center,
-                                                            child: Image.asset(
-                                                              Res.icHeart,
-                                                              width: 18,
-                                                              height: 18,
-                                                            ))
-                                                        : Image.asset(
-                                                            Res.icFillHeart,
-                                                            width: 30,
-                                                            height: 30,
-                                                          ),
-                                                  ),
-                                                )),
-                                            Positioned(
-                                                bottom: 5,
-                                                left: 5,
-                                                child: controller.homeList[index]
-                                                            .restaurantCoverImage ==
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Stack(
+                                        children: [
+                                          Container(
+                                            margin: const EdgeInsets.only(
+                                                right: 15),
+                                            width: 100,
+                                            height: 100,
+                                            child: ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(16),
+                                                child: controller
+                                                            .homeList[index]
+                                                            .restaurantImage ==
                                                         null
                                                     ? Image.asset(
-                                                        Res.icDummyLogo,
-                                                        width: 35,
-                                                        height: 35,
+                                                        Res.icDummyBanner,
+                                                        fit: BoxFit.cover,
                                                       )
-                                                    : ClipOval(
-                                                        child: Image.network(
-                                                            controller
-                                                                .homeList[index]
-                                                                .restaurantCoverImage!,
-                                                            width: 45,
-                                                            height: 45,
-                                                            filterQuality:
-                                                                FilterQuality.low,
-                                                            errorBuilder:
-                                                                (context, obj,
-                                                                    stackTrace) {
-                                                          return Image.asset(
-                                                            Res.icDummyLogo,
-                                                            width: 45,
-                                                            height: 45,
-                                                          );
-                                                        }),
-                                                      ))
-                                          ],
-                                        ),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                controller.homeList[index]
-                                                    .restaurantName!, //- ${controller.homeList[index].restaurantLocation!}
-                                                style: semiBoldTextStyle(
-                                                    fontSize: dimen13,
-                                                    color: ColorsTheme.colBlack),
-                                                maxLines: 2,
-                                              ),
-                                              Container(
-                                                margin:
-                                                    const EdgeInsets.only(top: 5),
-                                                child: Row(
-                                                  children: [
-                                                    Expanded(
-                                                      child: Container(
-                                                        margin:
-                                                            const EdgeInsets.only(
-                                                                right: 5),
-                                                        child: Text(
-                                                          '${controller.homeList[index].distance!} km',
-                                                          style: mediumTextStyle(
-                                                              fontSize: dimen12,
-                                                              color: ColorsTheme
-                                                                  .colBlack),
-                                                          maxLines: 2,
+                                                    : Image.network(
+                                                        controller
+                                                            .homeList[index]
+                                                            .restaurantImage!,
+                                                        fit: BoxFit.cover,
+                                                        filterQuality:
+                                                            FilterQuality.low,
+                                                        errorBuilder: (context,
+                                                            obj, stackTrace) {
+                                                        return Image.asset(
+                                                          Res.icDummyBanner,
+                                                          fit: BoxFit.cover,
+                                                        );
+                                                      })),
+                                          ),
+                                          Positioned(
+                                              top: 5,
+                                              right: 20,
+                                              child: Visibility(
+                                                visible: false,
+                                                child: InkWell(
+                                                  onTap: () {
+                                                    if (controller
+                                                        .isLoggedIn.value) {
+                                                      controller.addFav(
+                                                          index, 'home');
+                                                    } else {
+                                                      controller
+                                                          .loginBottomSheet();
+                                                    }
+                                                  },
+                                                  child: controller
+                                                              .homeList[index]
+                                                              .isLiked ==
+                                                          "0"
+                                                      ? Container(
+                                                          decoration:
+                                                              const BoxDecoration(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  shape: BoxShape
+                                                                      .circle),
+                                                          width: 30,
+                                                          height: 30,
+                                                          alignment:
+                                                              Alignment.center,
+                                                          child: Image.asset(
+                                                            Res.icHeart,
+                                                            width: 18,
+                                                            height: 18,
+                                                          ))
+                                                      : Image.asset(
+                                                          Res.icFillHeart,
+                                                          width: 30,
+                                                          height: 30,
                                                         ),
-                                                      ),
-                                                    ),
-                                                    Container(
+                                                ),
+                                              )),
+                                          // Positioned(
+                                          //     bottom: 5,
+                                          //     left: 5,
+                                          //     child: controller.homeList[index]
+                                          //                 .restaurantCoverImage ==
+                                          //             null
+                                          //         ? Image.asset(
+                                          //             Res.icDummyLogo,
+                                          //             width: 35,
+                                          //             height: 35,
+                                          //           )
+                                          //         : ClipOval(
+                                          //             child: Image.network(
+                                          //                 controller
+                                          //                     .homeList[index]
+                                          //                     .restaurantCoverImage!,
+                                          //                 width: 45,
+                                          //                 height: 45,
+                                          //                 filterQuality:
+                                          //                     FilterQuality.low,
+                                          //                 errorBuilder:
+                                          //                     (context, obj,
+                                          //                         stackTrace) {
+                                          //               return Image.asset(
+                                          //                 Res.icDummyLogo,
+                                          //                 width: 45,
+                                          //                 height: 45,
+                                          //               );
+                                          //             }),
+                                          //           ))
+                                        ],
+                                      ),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              controller.homeList[index]
+                                                  .restaurantName!, //- ${controller.homeList[index].restaurantLocation!}
+                                              style: semiBoldTextStyle(
+                                                  fontSize: dimen13,
+                                                  color: ColorsTheme.colBlack),
+                                              maxLines: 2,
+                                            ),
+                                            Container(
+                                              margin:
+                                                  const EdgeInsets.only(top: 5),
+                                              child: Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Container(
                                                       margin:
                                                           const EdgeInsets.only(
                                                               right: 5),
                                                       child: Text(
-                                                        '${controller.currency.value}${controller.homeList[index].finalPrice!}',
-                                                        style: boldTextStyle(
-                                                            fontSize: dimen15,
+                                                        '${controller.homeList[index].distance!} km',
+                                                        style: mediumTextStyle(
+                                                            fontSize: dimen12,
                                                             color: ColorsTheme
-                                                                .colPrimary),
+                                                                .colBlack),
                                                         maxLines: 2,
                                                       ),
                                                     ),
-                                                    Text(
-                                                      '${controller.currency.value}${controller.homeList[index].offerPrice!}',
-                                                      style: TextStyle(
-                                                          fontSize: dimen11,
+                                                  ),
+                                                  Container(
+                                                    margin:
+                                                        const EdgeInsets.only(
+                                                            right: 5),
+                                                    child: Text(
+                                                      '${controller.currency.value}${controller.homeList[index].finalPrice!}',
+                                                      style: boldTextStyle(
+                                                          fontSize: dimen15,
                                                           color: ColorsTheme
-                                                              .col8FA19C,
-                                                          fontWeight:
-                                                              FontWeight.w400,
-                                                          decorationColor:
-                                                              ColorsTheme
-                                                                  .col8FA19C,
-                                                          decoration:
-                                                              TextDecoration
-                                                                  .lineThrough),
+                                                              .colPrimary),
                                                       maxLines: 2,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    '${controller.currency.value}${controller.homeList[index].offerPrice!}',
+                                                    style: TextStyle(
+                                                        fontSize: dimen11,
+                                                        color: ColorsTheme
+                                                            .col8FA19C,
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                        decorationColor:
+                                                            ColorsTheme
+                                                                .col8FA19C,
+                                                        decoration:
+                                                            TextDecoration
+                                                                .lineThrough),
+                                                    maxLines: 2,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Container(
+                                              margin: const EdgeInsets.only(
+                                                  top: 10),
+                                              child: Row(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  // Expanded(
+                                                  //     child: Container(
+                                                  //   margin: const EdgeInsets.only(right: 2),
+                                                  //   child: Text(
+                                                  //     '${'Total Magic Bags'.tr}:\n${controller.homeList[index].totalQuantity!} ${'left'.tr}',
+                                                  //     style: regularTextStyle(fontSize: dimen11, color: ColorsTheme.colBlack),
+                                                  //     maxLines: 2,
+                                                  //   ),
+                                                  // )),
+                                                  Expanded(child: Container()),
+                                                  Row(
+                                                    children: [
+                                                      Visibility(
+                                                        visible: controller
+                                                                    .homeList[
+                                                                        index]
+                                                                    .isVeg ==
+                                                                2 ||
+                                                            controller
+                                                                    .homeList[
+                                                                        index]
+                                                                    .isVeg ==
+                                                                0,
+                                                        child: Image.asset(
+                                                          Res.icVeg,
+                                                          width: 20,
+                                                          height: 20,
+                                                        ),
+                                                      ),
+                                                      Visibility(
+                                                        visible: controller
+                                                                    .homeList[
+                                                                        index]
+                                                                    .isVeg ==
+                                                                1 ||
+                                                            controller
+                                                                    .homeList[
+                                                                        index]
+                                                                    .isVeg ==
+                                                                0,
+                                                        child: const SizedBox(
+                                                          width: 10,
+                                                        ),
+                                                      ),
+                                                      Visibility(
+                                                        visible: controller
+                                                                    .homeList[
+                                                                        index]
+                                                                    .isVeg ==
+                                                                1 ||
+                                                            controller
+                                                                    .homeList[
+                                                                        index]
+                                                                    .isVeg ==
+                                                                0,
+                                                        child: Image.asset(
+                                                          Res.icNonVeg,
+                                                          width: 20,
+                                                          height: 20,
+                                                        ),
+                                                      )
+                                                    ],
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                            Visibility(
+                                              visible: false,
+                                              child: Container(
+                                                margin: const EdgeInsets.only(
+                                                    top: 5),
+                                                child: Row(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    Container(
+                                                      decoration: BoxDecoration(
+                                                          color: ColorsTheme
+                                                              .colPrimary,
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      16)),
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          horizontal: 8,
+                                                          vertical: 6),
+                                                      margin:
+                                                          const EdgeInsets.only(
+                                                              right: 5),
+                                                      child: Row(
+                                                        children: [
+                                                          Container(
+                                                            margin:
+                                                                const EdgeInsets
+                                                                    .only(
+                                                                    right: 5),
+                                                            child: Icon(
+                                                              Icons.star,
+                                                              color: ColorsTheme
+                                                                  .colWhite,
+                                                              size: 14,
+                                                            ),
+                                                          ),
+                                                          Text(
+                                                            controller
+                                                                .homeList[index]
+                                                                .rating!
+                                                                .toStringAsFixed(
+                                                                    1),
+                                                            style: regularTextStyle(
+                                                                fontSize:
+                                                                    dimen10,
+                                                                color: ColorsTheme
+                                                                    .colWhite),
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      child: Text(
+                                                        '${CommonFunction.formatPickupTime(controller.homeList[index].openAt!)} to ${CommonFunction.formatPickupTime(controller.homeList[index].closeAt!)}',
+                                                        style: regularTextStyle(
+                                                            fontSize: dimen11,
+                                                            color: ColorsTheme
+                                                                .col8FA19C),
+                                                        maxLines: 2,
+                                                      ),
                                                     ),
                                                   ],
                                                 ),
                                               ),
-                                              Container(
-                                                margin: const EdgeInsets.only(
-                                                    top: 10),
-                                                child: Row(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    // Expanded(
-                                                    //     child: Container(
-                                                    //   margin: const EdgeInsets.only(right: 2),
-                                                    //   child: Text(
-                                                    //     '${'Total Magic Bags'.tr}:\n${controller.homeList[index].totalQuantity!} ${'left'.tr}',
-                                                    //     style: regularTextStyle(fontSize: dimen11, color: ColorsTheme.colBlack),
-                                                    //     maxLines: 2,
-                                                    //   ),
-                                                    // )),
-                                                    Expanded(child: Container()),
-                                                    Row(
-                                                      children: [
-                                                        Visibility(
-                                                          visible: controller
-                                                                      .homeList[
-                                                                          index]
-                                                                      .isVeg ==
-                                                                  2 ||
-                                                              controller
-                                                                      .homeList[
-                                                                          index]
-                                                                      .isVeg ==
-                                                                  0,
-                                                          child: Image.asset(
-                                                            Res.icVeg,
-                                                            width: 20,
-                                                            height: 20,
-                                                          ),
-                                                        ),
-                                                        Visibility(
-                                                          visible: controller
-                                                                      .homeList[
-                                                                          index]
-                                                                      .isVeg ==
-                                                                  1 ||
-                                                              controller
-                                                                      .homeList[
-                                                                          index]
-                                                                      .isVeg ==
-                                                                  0,
-                                                          child: const SizedBox(
-                                                            width: 10,
-                                                          ),
-                                                        ),
-                                                        Visibility(
-                                                          visible: controller
-                                                                      .homeList[
-                                                                          index]
-                                                                      .isVeg ==
-                                                                  1 ||
-                                                              controller
-                                                                      .homeList[
-                                                                          index]
-                                                                      .isVeg ==
-                                                                  0,
-                                                          child: Image.asset(
-                                                            Res.icNonVeg,
-                                                            width: 20,
-                                                            height: 20,
-                                                          ),
-                                                        )
-                                                      ],
-                                                    )
-                                                  ],
-                                                ),
-                                              ),
-                                              Visibility(
-                                                visible: false,
-                                                child: Container(
-                                                  margin: const EdgeInsets.only(
-                                                      top: 5),
-                                                  child: Row(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment.center,
-                                                    children: [
-                                                      Container(
-                                                        decoration: BoxDecoration(
-                                                            color: ColorsTheme
-                                                                .colPrimary,
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        16)),
-                                                        padding: const EdgeInsets
-                                                            .symmetric(
-                                                            horizontal: 8,
-                                                            vertical: 6),
-                                                        margin:
-                                                            const EdgeInsets.only(
-                                                                right: 5),
-                                                        child: Row(
-                                                          children: [
-                                                            Container(
-                                                              margin:
-                                                                  const EdgeInsets
-                                                                      .only(
-                                                                      right: 5),
-                                                              child: Icon(
-                                                                Icons.star,
-                                                                color: ColorsTheme
-                                                                    .colWhite,
-                                                                size: 14,
-                                                              ),
-                                                            ),
-                                                            Text(
-                                                              controller
-                                                                  .homeList[index]
-                                                                  .rating!
-                                                                  .toStringAsFixed(
-                                                                      1),
-                                                              style: regularTextStyle(
-                                                                  fontSize:
-                                                                      dimen10,
-                                                                  color: ColorsTheme
-                                                                      .colWhite),
-                                                              overflow:
-                                                                  TextOverflow
-                                                                      .ellipsis,
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      Expanded(
-                                                        child: Text(
-                                                          '${CommonFunction.formatPickupTime(controller.homeList[index].openAt!)} to ${CommonFunction.formatPickupTime(controller.homeList[index].closeAt!)}',
-                                                          style: regularTextStyle(
-                                                              fontSize: dimen11,
-                                                              color: ColorsTheme
-                                                                  .col8FA19C),
-                                                          maxLines: 2,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                        )
-                                      ],
-                                    ),
+                                            )
+                                          ],
+                                        ),
+                                      )
+                                    ],
                                   ),
                                   Positioned(
                                     bottom: 0,
@@ -1146,19 +1160,34 @@ class HomeView extends GetView<HomeController> {
                                     right: 0,
                                     child: (() {
                                       final item = controller.homeList[index];
-                                      final bool isSoldOut = item.totalQuantity == 0 || item.soldOutStatus != false;
+                                      final bool isSoldOut =
+                                          item.totalQuantity == 0 ||
+                                              item.soldOutStatus != false;
                                       bool isClosedNow = false;
                                       final closeAt = item.closeAt;
-                                      if (closeAt != null && closeAt.isNotEmpty) {
+                                      if (closeAt != null &&
+                                          closeAt.isNotEmpty) {
                                         final now = DateTime.now();
                                         try {
-                                          final t1 = DateFormat('HH:mm').parse(closeAt);
-                                          final close = DateTime(now.year, now.month, now.day, t1.hour, t1.minute);
+                                          final t1 = DateFormat('HH:mm')
+                                              .parse(closeAt);
+                                          final close = DateTime(
+                                              now.year,
+                                              now.month,
+                                              now.day,
+                                              t1.hour,
+                                              t1.minute);
                                           isClosedNow = now.isAfter(close);
                                         } catch (_) {
                                           try {
-                                            final t2 = DateFormat('hh:mm a').parse(closeAt);
-                                            final close = DateTime(now.year, now.month, now.day, t2.hour, t2.minute);
+                                            final t2 = DateFormat('hh:mm a')
+                                                .parse(closeAt);
+                                            final close = DateTime(
+                                                now.year,
+                                                now.month,
+                                                now.day,
+                                                t2.hour,
+                                                t2.minute);
                                             isClosedNow = now.isAfter(close);
                                           } catch (_) {}
                                         }
@@ -1166,8 +1195,10 @@ class HomeView extends GetView<HomeController> {
                                       if (isSoldOut || isClosedNow) {
                                         return Container(
                                           decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(16),
-                                            color: ColorsTheme.colWhite.withOpacity(0.5),
+                                            borderRadius:
+                                                BorderRadius.circular(16),
+                                            color: ColorsTheme.colWhite
+                                                .withOpacity(0.5),
                                           ),
                                         );
                                       }
@@ -1176,7 +1207,7 @@ class HomeView extends GetView<HomeController> {
                                   ),
                                   Positioned(
                                     bottom: 0,
-                                    right: 0,
+                                    left: 0,
                                     // top:0,
                                     child: ConstrainedBox(
                                       constraints: BoxConstraints(
@@ -1185,35 +1216,47 @@ class HomeView extends GetView<HomeController> {
                                       ),
                                       child: (() {
                                         final item = controller.homeList[index];
-                                        final bool isSoldOut = item.totalQuantity == 0 || (item.soldOutStatus ?? false);
+                                        final bool isSoldOut =
+                                            item.totalQuantity == 0 ||
+                                                (item.soldOutStatus ?? false);
                                         bool isClosedNow = false;
                                         final closeAt = item.closeAt;
-                                        if (closeAt != null && closeAt.isNotEmpty) {
+                                        if (closeAt != null &&
+                                            closeAt.isNotEmpty) {
                                           final now = DateTime.now();
                                           try {
-                                            final t1 = DateFormat('HH:mm').parse(closeAt);
-                                            final close = DateTime(now.year, now.month, now.day, t1.hour, t1.minute);
+                                            final t1 = DateFormat('HH:mm')
+                                                .parse(closeAt);
+                                            final close = DateTime(
+                                                now.year,
+                                                now.month,
+                                                now.day,
+                                                t1.hour,
+                                                t1.minute);
                                             isClosedNow = now.isAfter(close);
                                           } catch (_) {
                                             try {
-                                              final t2 = DateFormat('hh:mm a').parse(closeAt);
-                                              final close = DateTime(now.year, now.month, now.day, t2.hour, t2.minute);
+                                              final t2 = DateFormat('hh:mm a')
+                                                  .parse(closeAt);
+                                              final close = DateTime(
+                                                  now.year,
+                                                  now.month,
+                                                  now.day,
+                                                  t2.hour,
+                                                  t2.minute);
                                               isClosedNow = now.isAfter(close);
                                             } catch (_) {}
                                           }
                                         }
-                                          if (isClosedNow) {
+                                        if (isClosedNow) {
                                           return Container(
                                             decoration: BoxDecoration(
-                                              color: ColorsTheme.colD0F0BF,
-                                              borderRadius: const BorderRadius.only(
-                                                topLeft: Radius.circular(12),
-                                                topRight: Radius.circular(0),
-                                                bottomLeft: Radius.circular(0),
-                                                bottomRight: Radius.circular(0),
-                                              ),
-                                            ),
-                                            padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+                                                color: ColorsTheme.colD0F0BF,
+                                                borderRadius:
+                                                    const BorderRadius.all(
+                                                        Radius.circular(12))),
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 6, horizontal: 8),
                                             child: Text(
                                               'Closed Now. Will be back soon',
                                               style: regularTextStyle(
@@ -1222,20 +1265,20 @@ class HomeView extends GetView<HomeController> {
                                               ),
                                             ),
                                           );
-                                        }else if (isSoldOut) {
+                                        } else if (isSoldOut) {
                                           return Container(
                                             decoration: BoxDecoration(
-                                              color: ColorsTheme.colD0F0BF,
-                                              borderRadius: const BorderRadius.only(
-                                                topLeft: Radius.circular(12),
-                                                topRight: Radius.circular(0),
-                                                bottomLeft: Radius.circular(0),
-                                                bottomRight: Radius.circular(0),
-                                              ),
-                                            ),
-                                            padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+                                                color: ColorsTheme.colD0F0BF,
+                                                borderRadius:
+                                                    const BorderRadius.all(
+                                                        Radius.circular(12))),
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 6, horizontal: 8),
                                             child: Text(
-                                              (item.soldOutStatus ?? false) ? (item.soldOutTxt ?? 'sold_out'.tr) : 'sold_out'.tr,
+                                              (item.soldOutStatus ?? false)
+                                                  ? (item.soldOutTxt ??
+                                                      'sold_out'.tr)
+                                                  : 'sold_out'.tr,
                                               style: regularTextStyle(
                                                 fontSize: dimen11,
                                                 color: ColorsTheme.colBlack,

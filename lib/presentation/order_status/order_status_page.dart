@@ -22,23 +22,33 @@ class OrderStatusPage extends BaseView<OrderStatusController> {
   }
 
   paymentSuccess() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Center(
-          child: Lottie.asset(
-            controller.orderFile.value,
-            width: 150,
-            height: 150
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(25, 0, 25, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Center(
+            child: Lottie.asset(
+              controller.orderFile.value,
+              width: 150,
+              height: 150
+            ),
           ),
-        ),
-        Text(
-          controller.orderStatusSubtitle.value,
-          textAlign: TextAlign.center,
-          style: boldTextStyle(fontSize: dimen15, color: ColorsTheme.colBlack),
-        )
-      ],
+                  // const SizedBox(height: 10),
+          Text(
+            controller.orderStatusTitle.value,
+            textAlign: TextAlign.center,
+            style: boldTextStyle(fontSize: dimen17, color: ColorsTheme.colBlack),
+          ),
+          const SizedBox(height: 15),
+          Text(
+            controller.orderStatusSubtitle.value,
+            textAlign: TextAlign.center,
+            style: semiBoldTextStyle(fontSize: dimen14, color: ColorsTheme.colBlack.withOpacity(0.7)),
+          )
+        ],
+      ),
     );
   }
 }

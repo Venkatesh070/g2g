@@ -112,6 +112,8 @@ class HomeController extends GetxController {
   var pickupSelectMinTime = (0.0).obs;
   var pickupSelectMaxTime = (0.0).obs;
   var isPickupHoursList = false.obs;
+  // One-time override to force default pickup window after a location search
+  var forceDefaultPickup = false.obs;
 
   DateTime? hOnly;
   DateTime? pHOnly;
@@ -714,6 +716,8 @@ class HomeController extends GetxController {
           lat.value = 0.0;
           lng.value = 0.0;
         }
+        // Ensure first home API after search sends default pickup window
+        forceDefaultPickup.value = true;
       } else {
         permissionAllow.value = result[1];
         address.value = '';
@@ -725,6 +729,8 @@ class HomeController extends GetxController {
       if (lat.value != 0.0 && lng.value != 0.0) {
         await updateLocation();
       } else {
+        // Still ensure default window on first call after geocoding
+        forceDefaultPickup.value = true;
         await getAddress();
       }
     }
@@ -1060,23 +1066,30 @@ class HomeController extends GetxController {
       params['search_distance'] = selectedPickupDistance.value;
     }
 
-    var pickupStart = DateFormat('HH:mm:ss').format(
-        DateTime.fromMicrosecondsSinceEpoch(
-            pickupSelectMinTime.toInt() * 1000));
-    var pickupEnd = DateFormat('HH:mm:ss').format(
-        DateTime.fromMicrosecondsSinceEpoch(
-            pickupSelectMaxTime.toInt() * 1000));
+    if (forceDefaultPickup.value) {
+      // Force default window for the first call after a location search
+      params['pickup_start'] = '24:00:00';
+      params['pickup_end'] = '23:59:00';
+      forceDefaultPickup.value = false;
+    } else {
+      var pickupStart = DateFormat('HH:mm:ss').format(
+          DateTime.fromMicrosecondsSinceEpoch(
+              pickupSelectMinTime.toInt() * 1000));
+      var pickupEnd = DateFormat('HH:mm:ss').format(
+          DateTime.fromMicrosecondsSinceEpoch(
+              pickupSelectMaxTime.toInt() * 1000));
 
-    if ((pickupStart != '00:00:00' || pickupEnd != '00:00:00')) {
-      if (pickupStart == '00:00:00') {
-        params['pickup_start'] = '24:00:00';
-      } else {
-        params['pickup_start'] = pickupStart;
-      }
-      if (pickupEnd == '00:00:00') {
-        params['pickup_end'] = '24:00:00';
-      } else {
-        params['pickup_end'] = pickupEnd;
+      if ((pickupStart != '00:00:00' || pickupEnd != '00:00:00')) {
+        if (pickupStart == '00:00:00') {
+          params['pickup_start'] = '24:00:00';
+        } else {
+          params['pickup_start'] = pickupStart;
+        }
+        if (pickupEnd == '00:00:00') {
+          params['pickup_end'] = '24:00:00';
+        } else {
+          params['pickup_end'] = pickupEnd;
+        }
       }
     }
     if (searchText.isNotEmpty) {
