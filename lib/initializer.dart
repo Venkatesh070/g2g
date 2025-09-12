@@ -4,6 +4,7 @@ import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 
 import 'infrastructure/config/build_config.dart';
 import 'infrastructure/config/env_config.dart';
@@ -31,6 +32,11 @@ class Initializer {
       FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
       FlutterError.onError =
           FirebaseCrashlytics.instance.recordFlutterFatalError;
+
+      // Analytics: app_open
+      try {
+        await FirebaseAnalytics.instance.logAppOpen();
+      } catch (_) {}
 
       AppNotification().init();
     } catch (err) {
