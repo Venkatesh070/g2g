@@ -5,6 +5,7 @@ import 'package:crypto/crypto.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:good_grab/presentation/widgets/payment_failed.dart';
 import 'package:good_grab/res.dart';
 import 'package:lottie/lottie.dart';
 import 'package:good_grab/infrastructure/models/cart_model.dart';
@@ -17,10 +18,11 @@ import 'package:intl/intl.dart';
 import 'package:phonepe_payment_sdk/phonepe_payment_sdk.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_analytics/observer.dart';
+// import 'package:firebase_analytics/observer.dart';
 
 import '../../infrastructure/constants/app_constants.dart';
 import '../../infrastructure/models/api_response_model.dart';
+import '../../infrastructure/models/order_data.dart';
 import '../../infrastructure/models/create_intent_model.dart';
 import '../../infrastructure/navigation/routes.dart';
 import '../../infrastructure/network/dio_client.dart';
@@ -133,89 +135,89 @@ class CartController extends GetxController {
     super.onInit();
   }
 
-void showTakeawayReminderDialog() {
-  Get.dialog(
-    Center(
-      child: UnconstrainedBox(
-        child: Material(
-          color: Colors.white, // ✅ Force solid white background
-          borderRadius: BorderRadius.circular(18),
-          elevation: 10,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(15, 15, 15, 15),
-            child: SizedBox(
-              width: Get.width * 0.65, // Adjust width
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Title
-                  Row(
-                    children: [
-                      Icon(Icons.shopping_bag_outlined,
-                          color: ColorsTheme.colPrimary, size: 24),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Takeaway Reminder',
+  void showTakeawayReminderDialog() {
+    Get.dialog(
+      Center(
+        child: UnconstrainedBox(
+          child: Material(
+            color: Colors.white, // ✅ Force solid white background
+            borderRadius: BorderRadius.circular(18),
+            elevation: 10,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(15, 15, 15, 15),
+              child: SizedBox(
+                width: Get.width * 0.65, // Adjust width
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Title
+                    Row(
+                      children: [
+                        Icon(Icons.shopping_bag_outlined,
+                            color: ColorsTheme.colPrimary, size: 24),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Takeaway Reminder',
+                          style: semiBoldTextStyle(
+                            fontSize: dimen16,
+                            color: ColorsTheme.colBlack,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 15),
+                    SizedBox(
+                      height: 80,
+                      child: Lottie.asset(
+                        Res.takeAway,
+                        repeat: false,
+                        animate: true,
+                      ),
+                    ),
+
+                    const SizedBox(height: 15),
+
+                    // Message
+                    Text(
+                      'Please collect your order directly from this outlet at mentioned pickup time.',
+                      textAlign: TextAlign.center,
+                      style: regularTextStyle(
+                        fontSize: dimen14,
+                        color: ColorsTheme.colBlack,
+                      ),
+                    ),
+
+                    const SizedBox(height: 15),
+
+                    // Button
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: ColorsTheme.colPrimary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 22, vertical: 10),
+                      ),
+                      onPressed: () => Get.back(),
+                      child: Text(
+                        'Got it',
                         style: semiBoldTextStyle(
-                          fontSize: dimen16,
-                          color: ColorsTheme.colBlack,
+                          fontSize: dimen13,
+                          color: Colors.white,
                         ),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 15),
-                  SizedBox(
-                    height: 80,
-                    child: Lottie.asset(
-                      Res.takeAway,
-                      repeat: false,
-                      animate: true,
                     ),
-                  ),
-
-                  const SizedBox(height: 15),
-
-                  // Message
-                  Text(
-                    'Please collect your order directly from this outlet at mentioned pickup time.',
-                    textAlign: TextAlign.center,
-                    style: regularTextStyle(
-                      fontSize: dimen14,
-                      color: ColorsTheme.colBlack,
-                    ),
-                  ),
-
-                  const SizedBox(height: 15),
-
-                  // Button
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ColorsTheme.colPrimary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 22, vertical: 10),
-                    ),
-                    onPressed: () => Get.back(),
-                    child: Text(
-                      'Got it',
-                      style: semiBoldTextStyle(
-                        fontSize: dimen13,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
         ),
       ),
-    ),
-    barrierDismissible: false,
-  );
-}
+      barrierDismissible: false,
+    );
+  }
 
   getRandomNumber() {
     const ch = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
@@ -316,13 +318,14 @@ void showTakeawayReminderDialog() {
         // platformGst.value = cartModel.data!.cartDetails!.platformGst!;
         // platformFee.value = cartModel.data!.cartDetails!.platformFee ?? 0.0;
         //getting platformFee and platformGst from PrefManager
-        platformFee.value= await PrefManager.getDouble(AppConstants.platformFee);
-        platformGst.value = await PrefManager.getDouble(AppConstants.platformGst);
+        platformFee.value =
+            await PrefManager.getDouble(AppConstants.platformFee);
+        platformGst.value =
+            await PrefManager.getDouble(AppConstants.platformGst);
         combinedGst.value = totalGst.value + platformGst.value;
         menuList.addAll(cartModel.data!.cartDetails!.menuDetail!);
         // totalPay.value = subTotalFinalPrice.value + combinedGst.value + platformFee.value;
-                  totalPay.value = 1;
-
+        totalPay.value = 1;
 
         print("sjkdfk ${menuList.length}");
 
@@ -432,8 +435,10 @@ void showTakeawayReminderDialog() {
 
           // platformGst.value = cartModel.data!.cartDetails!.platformGst!;
           // platformFee.value = cartModel.data!.cartDetails!.platformFee!;
-          platformFee.value= await PrefManager.getDouble(AppConstants.platformFee);
-          platformGst.value = await PrefManager.getDouble(AppConstants.platformGst);
+          platformFee.value =
+              await PrefManager.getDouble(AppConstants.platformFee);
+          platformGst.value =
+              await PrefManager.getDouble(AppConstants.platformGst);
           combinedGst.value = totalGst.value + platformGst.value;
           //  totalPay.value = subTotalFinalPrice.value + combinedGst.value + platformFee.value;
           totalPay.value = 1;
@@ -561,13 +566,15 @@ void showTakeawayReminderDialog() {
       if (baseModel.success!) {
         // Analytics: Purchase (legacy placeOrder path)
         try {
-          final items = menuList.map((m) => AnalyticsEventItem(
-            itemId: (m.menuId ?? '').toString(),
-            itemName: m.menuName ?? 'menu_item',
-            itemBrand: title.value,
-            price: m.menuFinalPrice ?? 0.0,
-            quantity: m.menuSelectedQuantity ?? 1,
-          )).toList();
+          final items = menuList
+              .map((m) => AnalyticsEventItem(
+                    itemId: (m.menuId ?? '').toString(),
+                    itemName: m.menuName ?? 'menu_item',
+                    itemBrand: title.value,
+                    price: m.menuFinalPrice ?? 0.0,
+                    quantity: m.menuSelectedQuantity ?? 1,
+                  ))
+              .toList();
           await FirebaseAnalytics.instance.logPurchase(
             transactionId: (transactionId.value).toString(),
             currency: 'INR',
@@ -724,10 +731,24 @@ void showTakeawayReminderDialog() {
 
         //placeOrderComplementPayment(res.data['data']['transactionId']);
       } else {
-        SnackBarUtil.showError(
-            message: res.data != null && res.data['message'] != null
-                ? res.data['message']
-                : 'Something went wrong');
+        var msg = (res.data != null && res.data['message'] != null)
+            ? res.data['message']
+            : 'Something went wrong';
+
+        print('error in phonepay sdk $msg');
+
+        // SnackBarUtil.showPaymentError(message: msg);
+        showModalBottomSheet(
+          context: Get.context!,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          builder: (_) => PaymentFailedWidget(
+            onClose: () {
+              Navigator.pop(Get.context!);
+            },
+          ),
+        );
+
         await removeOrderData();
       }
     }).catchError((error) {
@@ -736,13 +757,13 @@ void showTakeawayReminderDialog() {
   }
 
   getPhonePeSign() async {
-    String? sign = await PhonePePaymentSdk.getPackageSignatureForAndroid();
+    await PhonePePaymentSdk.getPackageSignatureForAndroid();
   }
 
   /// razor pay create order
   Future<dynamic> rCreateOrder() async {
-    var progressDialog = ProgressDialog();
-    progressDialog.show();
+    // var progressDialog = ProgressDialog();
+    // progressDialog.show();
     try {
       var mapHeader = <String, String>{};
       mapHeader['Authorization'] =
@@ -764,16 +785,19 @@ void showTakeawayReminderDialog() {
       dioOptions.headers = mapHeader;
       var response = await dioNew.post("orders", data: json.encode(map));
       if (response.statusCode == 200) {
-        progressDialog.dismiss();
+        // progressDialog.dismiss();
+        print('razorpay 200');
         razorOption(response.data['id']);
       } else {
-        progressDialog.dismiss();
+        print('razorpay 200 error');
+        // progressDialog.dismiss();
         errorScreen(error: 'something_went_wrong'.tr);
       }
     } catch (exception) {
+              print('razorpay  error');
       print(exception);
       debugPrint('exception.toString()');
-      progressDialog.dismiss();
+      // progressDialog.dismiss();
       errorScreen(error: 'something_went_wrong'.tr);
     }
   }
@@ -809,21 +833,40 @@ void showTakeawayReminderDialog() {
           response.data!['razorpay_payment_id'], 'razorpay');
     }
   }
+bool _isPaymentSheetOpen = false;
 
   void _handlePaymentError(PaymentFailureResponse response) {
-    debugPrint(
-        '_handlePaymentError: code=${response.code}, message=${response.error}');
+    // debugPrint(
+    //     '_handlePaymentError: code=${response.code}, message=${response.error}');
 
-
-    if(response.error!['description'] == 'payment_error'){
-      errorScreen(error: 'Payment cancelled by user');
-      return;
-    }
+    // if (response.error!['description'] == 'payment_error') {
+    //   errorScreen(error: 'Payment cancelled by user');
+    //   return;
+    // }
+      if (_isPaymentSheetOpen) {
+    return; // ✅ Already open, do nothing
+  }
+  showModalBottomSheet(
+    context: Get.context!,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (_) => PaymentFailedWidget(
+      onClose: () {
+        Navigator.pop(Get.context!);
+      },
+    ),
+  ).whenComplete(() {
+    // ✅ Reset when sheet is dismissed
+    _isPaymentSheetOpen = false;
+  });
 
     var message = response.error == null
         ? 'something_went_wrong'.tr
         : response.error!['description'].toString();
-    // SnackBarUtil.showError(message: message);
+        print('razorpay failed message $message');
+    //  SnackBarUtil.showError(message: message);
+      // debugPrint(
+      //   '_handlePaymentError: code=${response.code}, message=${response.error}');
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {
@@ -904,19 +947,21 @@ void showTakeawayReminderDialog() {
         "transaction_payment_type": "online",
       };
 
-      ApiResponseModel baseModel =
+      ApiResponseModel<OrderSuccessData> baseModel =
           await DioClient.base(accessToken: accessToken)
               .funPlaceOrderPaymentApi(params);
       progressDialog.dismiss();
       if (baseModel.success!) {
         // Analytics: Purchase (new flow with payment confirmation)
         try {
-          final items = menuList.map((m) => AnalyticsEventItem(
-            itemId: (m.menuId ?? '').toString(),
-            itemName: m.menuName ?? 'menu_item',
-            price: m.menuFinalPrice ?? 0.0,
-            quantity: m.menuSelectedQuantity ?? 1,
-          )).toList();
+          final items = menuList
+              .map((m) => AnalyticsEventItem(
+                    itemId: (m.menuId ?? '').toString(),
+                    itemName: m.menuName ?? 'menu_item',
+                    price: m.menuFinalPrice ?? 0.0,
+                    quantity: m.menuSelectedQuantity ?? 1,
+                  ))
+              .toList();
           await FirebaseAnalytics.instance.logPurchase(
             transactionId: (transId ?? '').toString(),
             currency: (currency.value.isNotEmpty ? currency.value : 'INR'),
@@ -925,19 +970,31 @@ void showTakeawayReminderDialog() {
           );
         } catch (_) {}
         PrefManager.remove(AppConstants.cartId);
+        var message = baseModel.message;
+        var paymentOrderId = baseModel.data?.orderId;
+        print('$message $paymentOrderId');
         Get.toNamed(Routes.orderStatus,
-            arguments: {'status': 'success', 'message': baseModel.message!});
+            arguments: {
+              'status': 'success',
+              'message': baseModel.message!,
+              'orderId': paymentOrderId,
+              'resId': resId.value,
+              'orderStatus': 'confirmation_pending',
+            });
       } else {
+        print('phone pay failed cancelled2222');
         Get.toNamed(Routes.orderStatus,
             arguments: {'status': 'failed', 'message': baseModel.message!});
       }
     } on CustomHttpException catch (exception) {
       progressDialog.dismiss();
+      print('phone pay failed cancelled');
       errorScreen(
           error: handleApiException(
               exception.code, exception.response, exception.exception,
               type: exception.type));
     } catch (exception) {
+      print('phone pay failed cancelled11');
       progressDialog.dismiss();
       errorScreen(error: 'something_went_wrong'.tr);
     }
@@ -949,20 +1006,24 @@ void showTakeawayReminderDialog() {
 
     // Analytics: BeginCheckout before creating pending order
     try {
-      final items = menuList.map((m) => AnalyticsEventItem(
-        itemId: (m.menuId ?? '').toString(),
-        itemName: m.menuName ?? 'menu_item',
-        price: m.menuFinalPrice ?? 0.0,
-        quantity: m.menuSelectedQuantity ?? 1,
-      )).toList();
-      debugPrint("Begin Checkout Event Fire: $currency, $totalPay, $items $paymentMethodType");
+      final items = menuList
+          .map((m) => AnalyticsEventItem(
+                itemId: (m.menuId ?? '').toString(),
+                itemName: m.menuName ?? 'menu_item',
+                price: m.menuFinalPrice ?? 0.0,
+                quantity: m.menuSelectedQuantity ?? 1,
+              ))
+          .toList();
+      debugPrint(
+          "Begin Checkout Event Fire: $currency, $totalPay, $items $paymentMethodType");
       await FirebaseAnalytics.instance.logBeginCheckout(
         currency: (currency.value.isNotEmpty ? currency.value : 'INR'),
         value: totalPay.value,
         items: items,
         parameters: {
           'cart_value': totalPay.value,
-          'item_ids': menuList.map((m) => (m.menuId ?? '').toString()).join(','),
+          'item_ids':
+              menuList.map((m) => (m.menuId ?? '').toString()).join(','),
           'payment_method': paymentMethodType ?? 'unknown',
         },
       );
@@ -1038,12 +1099,14 @@ void showTakeawayReminderDialog() {
       if (baseModel.success!) {
         // Analytics: Purchase after completion callback
         try {
-          final items = menuList.map((m) => AnalyticsEventItem(
-            itemId: (m.menuId ?? '').toString(),
-            itemName: m.menuName ?? 'menu_item',
-            price: m.menuFinalPrice ?? 0.0,
-            quantity: m.menuSelectedQuantity ?? 1,
-          )).toList();
+          final items = menuList
+              .map((m) => AnalyticsEventItem(
+                    itemId: (m.menuId ?? '').toString(),
+                    itemName: m.menuName ?? 'menu_item',
+                    price: m.menuFinalPrice ?? 0.0,
+                    quantity: m.menuSelectedQuantity ?? 1,
+                  ))
+              .toList();
           await FirebaseAnalytics.instance.logPurchase(
             transactionId: (transId ?? '').toString(),
             currency: (currency.value.isNotEmpty ? currency.value : 'INR'),

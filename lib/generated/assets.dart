@@ -70,5 +70,6 @@ class Assets {
   static const String profileSavedImagesIcCo2Cup = 'assets/images/profileSavedImages/icCo2Cup.png';
   static const String profileSavedImagesIcCo2E = 'assets/images/profileSavedImages/icCo2E.png';
   static const String profileSavedImagesIcCo2Hot = 'assets/images/profileSavedImages/icCo2Hot.png';
+  static const String paymentCancelledImage = 'assets/images/payment_cancel.png';
 
 }

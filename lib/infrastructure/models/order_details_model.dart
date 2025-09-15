@@ -64,8 +64,8 @@ class OrderDetailsModel extends Serializable{
     pickupDate = json['pickup_date'];
     pickupTime = json['pickup_time'];
     pickupEndTime = json['pickup_end_time'];
-    // pickupCode = json['pickup_code']?? 5690;
-    pickupCode=5690;
+    pickupCode = json['pickup_code']?? 5690;
+    // pickupCode=5690;
   }
 
   @override

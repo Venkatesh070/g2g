@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:get/get.dart' as Get;
 import 'package:dio/dio.dart';
-import 'package:get/get_core/src/get_main.dart';
+// import 'package:get/get_core/src/get_main.dart';
 import 'package:good_grab/infrastructure/models/app_content_model.dart';
 import 'package:good_grab/infrastructure/models/cart_model.dart';
 import 'package:good_grab/infrastructure/models/country_model.dart';
@@ -24,11 +24,12 @@ import '../models/create_intent_model.dart';
 import '../models/earning_model.dart';
 import '../models/notification_model.dart';
 import '../models/restro_link_model.dart';
+import '../models/order_data.dart';
 import '../navigation/routes.dart';
-import '../shared/error_screen.dart';
+// import '../shared/error_screen.dart';
 import '../shared/http_exception.dart';
 import '../shared/pref_manager.dart';
-import '../shared/snackbar.util.dart';
+// import '../shared/snackbar.util.dart';
 import 'api_constants.dart';
 import 'interceptors/logging_interceptor.dart';
 
@@ -395,15 +396,16 @@ class DioClient {
   // }
 
 //new method
-  Future funPlaceOrderPaymentApi(params) async {
+  Future<ApiResponseModel<OrderSuccessData>> funPlaceOrderPaymentApi(params) async {
     try {
       Response response = await _dio.post(apiEndPoints.apiPaymentSuccess,
           data: json.encode(params));
-      return ApiResponseModel.fromJson(response.data!, (data) => null);
+      return ApiResponseModel<OrderSuccessData>.fromJson(
+          response.data!, (data) => OrderSuccessData.fromJson(data));
     } catch (error) {
       catchErrorHandler();
     }
-    return null;
+    return ApiResponseModel<OrderSuccessData>();
   }
 
   Future funPlaceOrderWithoutPaymentApi(params) async {

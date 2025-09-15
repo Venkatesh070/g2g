@@ -158,6 +158,8 @@ class HomeController extends GetxController {
   Timer? _debounce;
   var isVideoInitialize = false.obs;
 
+  int? _initialSelectedIndex; // apply desired tab after user state is known
+
   @override
   void onInit() {
     listScrollListener();
@@ -169,6 +171,11 @@ class HomeController extends GetxController {
       const MeView()
     ];
     permissionAllow.value = Get.arguments['permission'];
+    // Capture desired tab for later (after login state is known)
+    if (Get.arguments['selectedIndex'] != null) {
+      _initialSelectedIndex =
+          int.tryParse(Get.arguments['selectedIndex'].toString());
+    }
     Future.delayed(Duration.zero, () async {
       await getUserData();
       markerImage.value = await getBytesFromAsset(Res.icLocation, 100, 100);
@@ -569,6 +576,12 @@ class HomeController extends GetxController {
     appVersion.value = await CommonFunction.getAppVersion(); 
     homeList.clear();
     await setInitData();
+
+    // Apply pending selected tab (e.g., Orders tab) after user state resolved
+    if (_initialSelectedIndex != null) {
+      onSelectIndex(_initialSelectedIndex!);
+      _initialSelectedIndex = null;
+    }
   }
 
   getUpdatedUserData() async {
