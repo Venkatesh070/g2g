@@ -31,4 +31,15 @@ class SnackBarUtil {
       backgroundColor: Colors.redAccent.shade700,
     );
   }
+
+  static void showPaymentError({required String message}) {
+     Get.closeAllSnackbars();
+  Get.rawSnackbar(
+   title:'Failed',
+    message:message,
+    snackPosition: SnackPosition.BOTTOM,
+    duration: const Duration(seconds: 4),
+    backgroundColor: Colors.redAccent.shade700,
+  );
+}
 }

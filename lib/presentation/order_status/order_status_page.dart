@@ -6,7 +6,7 @@ import 'package:good_grab/infrastructure/theme/text.theme.dart';
 import 'package:good_grab/presentation/order_status/order_status_controller.dart';
 import 'package:lottie/lottie.dart';
 
-import '../../res.dart';
+// import '../../res.dart';
 
 class OrderStatusPage extends BaseView<OrderStatusController> {
   OrderStatusPage({super.key});
@@ -45,7 +45,7 @@ class OrderStatusPage extends BaseView<OrderStatusController> {
           Text(
             controller.orderStatusSubtitle.value,
             textAlign: TextAlign.center,
-            style: semiBoldTextStyle(fontSize: dimen14, color: ColorsTheme.colBlack.withOpacity(0.7)),
+            style: regularTextStyle(fontSize: dimen12, color: ColorsTheme.col475751),
           )
         ],
       ),

@@ -126,9 +126,10 @@ class CartPage extends BaseView<CartController> {
                                       controller.userPhoneNumber.isNotEmpty
                                           ? codPayment()
                                           : Container()),
-                                          const SizedBox(height: 15,),
+                                  const SizedBox(
+                                    height: 15,
+                                  ),
                                   // cancellationWidget(),
-
                                 ],
                               ),
                       )))
@@ -1257,10 +1258,10 @@ class CartPage extends BaseView<CartController> {
                   Container(
                     // padding: const EdgeInsets.all(8),
                     child: Text(
-                      'After Order has been placed: - Our goal is to minimize food waste and its environmental impact. To support this, a 100% fee will be charged if you cancel an order after it has been accepted. We understand that in case of unusual delays, the fee may not apply.'
+                      'Cancellation leads to food wastage. A 100% fee will be charged if orders are cancelled any time after they\'re accepted. However, in case of unusual delays you will not be charged any cancellation fees.'
                           .tr,
                       style: regularTextStyle(
-                        fontSize: dimen12,
+                        fontSize: dimen11,
                         color: ColorsTheme.colBlack,
                       ),
                       softWrap: true,

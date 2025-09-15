@@ -487,7 +487,7 @@ class OrdersView extends GetView<HomeController> {
               )),
           Text(
             controller.orderList[index].orderStatus == "payment_pending"
-                ? 'Payment Pending'
+                ? 'Payment Failed'
                 : controller.orderList[index].orderStatus,
             style:
                 boldTextStyle(fontSize: dimen11, color: ColorsTheme.colFF4E4E),

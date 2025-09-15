@@ -24,7 +24,10 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
 
   @override
   bool onBackPressed() {
-    Get.back(result: controller.backResult.value);
+    Get.offAllNamed(Routes.home, arguments: {
+      'permission': 1,
+      'selectedIndex': 2,
+    });
     return false;
   }
 
@@ -41,7 +44,10 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                 children: [
                   InkWell(
                     onTap: () {
-                      Get.back(result: controller.backResult.value);
+                      Get.offAllNamed(Routes.home, arguments: {
+                        'permission': 1,
+                        'selectedIndex': 2,
+                      });
                     },
                     child: Icon(
                       Icons.arrow_back,
@@ -121,7 +127,8 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                                         left: 18, right: 18, bottom: 15),
                                     padding: const EdgeInsets.all(12),
                                     decoration: BoxDecoration(
-                                      color: ColorsTheme.colF59E0B.withOpacity(0.1),
+                                      color: ColorsTheme.colF59E0B
+                                          .withOpacity(0.1),
                                       borderRadius: BorderRadius.circular(10),
                                       border: Border.all(
                                           color: ColorsTheme.colF59E0B),
@@ -268,7 +275,27 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                                         null
                                     ? restaurantDetails()
                                     : Container(),
-                                paymentType()
+                                paymentType(),
+                                controller.orderStatus.value !=
+                                            'order_cancel' &&
+                                        controller.orderStatus.value !=
+                                            'payment_pending'
+                                    ? cancellationWidget()
+                                    : Container(),
+                                    const SizedBox(height:15),
+                                // Show the former bottomNavigationBar section as an in-page widget
+                                Obx(() {
+                                  final status = controller.orderStatus.value;
+                                  final diffMinutes = controller.cancelDiffMinutes.value;
+                                  final secondsLeft = controller.remainingSeconds.value;
+                                  final bool show = (status == 'confirmation_pending' ||
+                                          status == 'Confirmation Pending') &&
+                                      secondsLeft > 0 &&
+                                      (diffMinutes <= 5 && diffMinutes >= 0);
+                                  return show ?
+                                   _cancelBottomActionSection() 
+                                   : const SizedBox.shrink();
+                                }),
                               ],
                             ),
                           ),
@@ -347,9 +374,9 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                   ),
                 ],
               ),
-              
             ),
-            PickupCodeWidget(pickupCode: controller.orderDetailsModel!.pickupCode.toString())
+            PickupCodeWidget(
+                pickupCode: controller.orderDetailsModel!.pickupCode.toString())
           ],
         );
       } else if (controller.orderStatus.value == 'completd_pick_up') {
@@ -419,7 +446,8 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
           ),
         );
       } else if (controller.orderStatus.value == 'order_cancel' ||
-          controller.orderStatus.value == 'not_picked_up') {
+          controller.orderStatus.value == 'not_picked_up' ||
+           controller.orderStatus.value =='payment_pending') {
         return Container(
           width: Get.width,
           decoration: BoxDecoration(
@@ -462,7 +490,9 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                     Text(
                       controller.orderStatus.value == 'not_picked_up'
                           ? 'Not pick-up'
-                          : 'Order Cancelled',
+                          :  controller.orderStatus.value == 'payment_pending'
+                          ? 'Payment Failed'
+                          :'Order Cancelled',
                       style: boldTextStyle(
                           fontSize: dimen11, color: ColorsTheme.colFF4E4E),
                     ),
@@ -767,120 +797,169 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                             Text(
                               'Total GST'.tr,
                               style: regularTextStyle(
-                                  fontSize: dimen11,
-                                  color: ColorsTheme.colBlack),
+                                fontSize: dimen11,
+                                color: ColorsTheme.colBlack,
+                              ),
                             ),
-                            SizedBox(width: 5),
+                            const SizedBox(width: 5),
                             GestureDetector(
                               onTap: () {
                                 Get.dialog(
-                                  Dialog(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    insetPadding: const EdgeInsets.symmetric(
-                                        horizontal: 30, vertical: 24),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(20),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          // Header with icon + title
-                                          Row(
-                                            children: [
-                                              Icon(Icons.receipt_long,
-                                                  color: ColorsTheme.colPrimary,
-                                                  size: 26),
-                                              const SizedBox(width: 8),
-                                              Text(
-                                                'GST Details'.tr,
-                                                style: semiBoldTextStyle(
-                                                  fontSize: dimen16,
-                                                  color: ColorsTheme.colBlack,
+                                  Center(
+                                    child: UnconstrainedBox(
+                                      child: Material(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(18),
+                                        elevation: 10,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(15),
+                                          child: SizedBox(
+                                            width: Get.width *
+                                                0.80, // Dialog width
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                // Title text
+                                                Text(
+                                                  "Taxes as per Government regulations and restaurant charges"
+                                                      .tr,
+                                                  style: lightTextStyle(
+                                                    fontSize: dimen13,
+                                                    color: ColorsTheme.colBlack,
+                                                  ),
                                                 ),
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 16),
+                                                const SizedBox(height: 10),
+                                                Divider(
+                                                  height: 1,
+                                                  color: ColorsTheme.colA3A8A4
+                                                      .withOpacity(0.2),
+                                                ), // compact divider
+                                                const SizedBox(height: 10),
+                                                // GST on item total
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Text(
+                                                      "GST on item total".tr,
+                                                      style: semiBoldTextStyle(
+                                                        fontSize: dimen12,
+                                                        color: ColorsTheme
+                                                            .colBlack,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      '${controller.currency}${controller.otherTotalPrice.value}',
+                                                      style: semiBoldTextStyle(
+                                                        fontSize: dimen13,
+                                                        color: ColorsTheme
+                                                            .colBlack,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                const SizedBox(height: 6),
 
-                                          // Item GST
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                'Item GST'.tr,
-                                                style: regularTextStyle(
-                                                  fontSize: dimen13,
-                                                  color: ColorsTheme.colBlack
-                                                      .withOpacity(0.7),
+                                                // GST on platform fee
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Text(
+                                                      "GST on platform fee".tr,
+                                                      style: semiBoldTextStyle(
+                                                        fontSize: dimen12,
+                                                        color: ColorsTheme
+                                                            .colBlack,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      '${controller.currency}${controller.platformGst.value}',
+                                                      style: semiBoldTextStyle(
+                                                        fontSize: dimen13,
+                                                        color: ColorsTheme
+                                                            .colBlack,
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
-                                              ),
-                                              Text(
-                                                '${controller.currency}${controller.otherTotalPrice.value}',
-                                                style: semiBoldTextStyle(
-                                                  fontSize: dimen13,
-                                                  color: ColorsTheme.colBlack,
+                                                const SizedBox(height: 6),
+                                                Divider(
+                                                  height: 1,
+                                                  color: ColorsTheme.colA3A8A4
+                                                      .withOpacity(0.2),
                                                 ),
-                                              ),
-                                            ],
-                                          ),
-                                          const Divider(height: 20),
+                                                const SizedBox(height: 6),
 
-                                          // Platform GST
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                'Platform GST'.tr,
-                                                style: regularTextStyle(
-                                                  fontSize: dimen13,
-                                                  color: ColorsTheme.colBlack
-                                                      .withOpacity(0.7),
+                                                // Total
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Text(
+                                                      "Total".tr,
+                                                      style: semiBoldTextStyle(
+                                                        fontSize: dimen12,
+                                                        color: ColorsTheme
+                                                            .colBlack,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      '${controller.currency}${controller.combinedGst.value}',
+                                                      style: semiBoldTextStyle(
+                                                        fontSize: dimen12,
+                                                        color: ColorsTheme
+                                                            .colBlack,
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
-                                              ),
-                                              Text(
-                                                '${controller.currency}${controller.platformGst.value}',
-                                                style: semiBoldTextStyle(
-                                                  fontSize: dimen13,
-                                                  color: ColorsTheme.colBlack,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
 
-                                          const SizedBox(height: 20),
+                                                const SizedBox(height: 16),
 
-                                          // Close Button
-                                          SizedBox(
-                                            width: double.infinity,
-                                            child: ElevatedButton(
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor:
-                                                    ColorsTheme.colPrimary,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(12),
+                                                // OK Button (full width)
+                                                SizedBox(
+                                                  width: double.infinity,
+                                                  child: ElevatedButton(
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      backgroundColor:
+                                                          ColorsTheme
+                                                              .colPrimary,
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(25),
+                                                      ),
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                        vertical: 10,
+                                                      ),
+                                                    ),
+                                                    onPressed: () => Get.back(),
+                                                    child: Text(
+                                                      'OKAY'.tr,
+                                                      style: semiBoldTextStyle(
+                                                        fontSize: dimen13,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ),
                                                 ),
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        vertical: 12),
-                                              ),
-                                              onPressed: () => Get.back(),
-                                              child: Text(
-                                                'Close'.tr,
-                                                style: semiBoldTextStyle(
-                                                  fontSize: dimen13,
-                                                  color: Colors.white,
-                                                ),
-                                              ),
+                                              ],
                                             ),
                                           ),
-                                        ],
+                                        ),
                                       ),
                                     ),
                                   ),
+                                  barrierDismissible: true,
                                 );
                               },
                               child: Icon(
@@ -891,12 +970,15 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                             ),
                           ],
                         ),
+
+                        // GST value beside info icon
                         Obx(() => Text(
                               '${controller.currency}${controller.combinedGst.value}',
                               style: regularTextStyle(
-                                  fontSize: dimen11,
-                                  color: ColorsTheme.colBlack),
-                            ))
+                                fontSize: dimen11,
+                                color: ColorsTheme.colBlack,
+                              ),
+                            )),
                       ],
                     ),
                   ),
@@ -904,11 +986,32 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                     margin: const EdgeInsets.only(bottom: 2),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Platform Fee'.tr,
-                          style: regularTextStyle(
-                              fontSize: dimen11, color: ColorsTheme.colBlack),
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Text(
+                                'Platform Fee'.tr,
+                                style: regularTextStyle(
+                                  fontSize: dimen11,
+                                  color: ColorsTheme.colBlack,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Flexible(
+                                child: Text(
+                                  "(This keeps us maintaining our service)",
+                                  style: regularTextStyle(
+                                    fontSize: dimen10,
+                                    color: ColorsTheme.colBlack,
+                                  ),
+                                  overflow: TextOverflow
+                                      .ellipsis, // ✅ avoids overflow
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                         Obx(() => Text(
                               '${controller.currency}${controller.platformFee.value}',
@@ -1406,129 +1509,153 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
     );
   }
 
-  // Bottom cancel button and cancel summary popup
+  cancellationWidget() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 20, left: 18, right: 18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Cancellation Policy'.tr,
+            style: semiBoldTextStyle(
+                fontSize: dimen12, color: ColorsTheme.colBlack),
+          ),
+          Container(
+              decoration: BoxDecoration(
+                  border: Border.all(color: ColorsTheme.colC4D9D4, width: 1),
+                  borderRadius: BorderRadius.circular(16)),
+              margin: const EdgeInsets.only(top: 15),
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+              child: Column(
+                children: [
+                  Container(
+                    // padding: const EdgeInsets.all(8),
+                    child: Text(
+                      controller.orderStatus.value == 'confirmation_pending' ||
+                              controller.orderStatus.value ==
+                                  'Confirmation Pending'
+                          ? 'Our goal is to minimize food waste and its environmental impact. To support this, a 100% fee will be charged if you cancel an order after it has been accepted. We understand that in case of unusual delays, the fee may not apply.'
+                              .tr
+                          : 'We understand you need to cancel your order. However, since the restaurant has already accepted it, a 100% cancellation fee will be applied. This helps us prevent food waste. '
+                              .tr,
+                      style: regularTextStyle(
+                        fontSize: dimen11,
+                        color: ColorsTheme.colBlack,
+                      ),
+                      softWrap: true,
+                    ),
+                  )
+                ],
+              )),
+        ],
+      ),
+    );
+  }
+
+  // Keep the base override empty now; we render it inline in the page content
   @override
-  Widget? bottomNavigationBar() {
-    return Obx(() {
-      final status = controller.orderStatus.value;
-      final diffMinutes = controller.cancelDiffMinutes.value;
-      final secondsLeft = controller.remainingSeconds.value;
+  Widget? bottomNavigationBar() => const SizedBox.shrink();
 
-      // Show only during first 5 minutes (diffMinutes between 0 and 5) AND only while vendor confirmation is pending
-      final bool show = (status == 'confirmation_pending' ||
-              status == 'Confirmation Pending') &&
-          secondsLeft > 0 &&
-          (diffMinutes <= 5 && diffMinutes >= 0);
-
-      debugPrint(
-          "Cancel Diff Minutes in ODP $diffMinutes, secondsLeft=$secondsLeft, show=$show");
-
-      if (!show) return const SizedBox.shrink();
-
-      return SafeArea(
-        top: false,
-        child: Material(
-          type: MaterialType.transparency,
-          child: Container(
-            color: Colors.transparent,
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                // Base: Cancel button area with white background and top shadow
-                Container(
-                  padding: const EdgeInsets.fromLTRB(18, 8, 18, 8),
-                  decoration: BoxDecoration(
-                    color: ColorsTheme.colWhite,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 8,
-                        offset: const Offset(0, -2),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(
-                              color: ColorsTheme.colFF4E4E, width: 1.5),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30)),
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          foregroundColor: ColorsTheme.colFF4E4E,
-                        ),
-                        onPressed: _openCancelSummaryDialog,
-                        child: Text(
-                          'Cancel Order'.tr,
-                          style: semiBoldTextStyle(
-                              fontSize: dimen12, color: ColorsTheme.colFF4E4E),
-                        ),
-                      ),
-                      // const SizedBox(height: 8),
-                      Container(
-                        padding: const EdgeInsets.all(8), // inner spacing
-                        margin: const EdgeInsets.symmetric(
-                            vertical: 6), // optional outer spacing
-                        decoration: BoxDecoration(
-                          color: ColorsTheme.colF5F5F5, // light gray background
-                          borderRadius: BorderRadius.circular(
-                              6), // optional rounded corners
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '* ',
-                              style: semiBoldTextStyle(
-                                fontSize: dimen10,
-                                color: ColorsTheme.colFF4E4E,
-                                
-                              ),
-                            ),
-                            Expanded(
-                              child: Text(
-                                'You can cancel within the first 5 minutes from order creation only if vendor confirmation is pending.',
-                                style: regularTextStyle(
-                                  fontSize: dimen10,
-                                  color: ColorsTheme.colBlack,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
+  // Former bottomNavigationBar content as a regular section inside the scroll view
+  Widget _cancelBottomActionSection() {
+    return SafeArea(
+      top: false,
+      child: Material(
+        type: MaterialType.transparency,
+        child: Container(
+          color: Colors.transparent,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Container(
+                padding: const EdgeInsets.fromLTRB(18, 8, 18, 8),
+                decoration: BoxDecoration(
+                  color: ColorsTheme.colWhite,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.06),
+                      blurRadius: 8,
+                      offset: const Offset(0, -2),
+                    ),
+                  ],
                 ),
-                // Overlay: Transparent countdown bar floating above, not affecting layout
-                Positioned(
-                  top: -36,
-                  left: 0,
-                  right: 0,
-                  child: IgnorePointer(
-                    ignoring: true,
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
-                      child: CountdownProgressBar(
-                        diffMinutes: controller.cancelDiffMinutes.value,
-                        remainingSecondsExternal:
-                            controller.remainingSeconds.value,
-                        totalMinutes: 5,
-                        onFinished: () {},
-                        barHeight: 6,
+                margin: const EdgeInsets.fromLTRB(18, 8, 18, 20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(
+                            color: ColorsTheme.colFF4E4E, width: 1.5),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30)),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        foregroundColor: ColorsTheme.colFF4E4E,
                       ),
+                      onPressed: _openCancelSummaryDialog,
+                      child: Text(
+                        'Cancel Order'.tr,
+                        style: semiBoldTextStyle(
+                            fontSize: dimen12, color: ColorsTheme.colFF4E4E),
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      margin: const EdgeInsets.symmetric(vertical: 6),
+                      decoration: BoxDecoration(
+                        color: ColorsTheme.colF5F5F5,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '* ',
+                            style: semiBoldTextStyle(
+                              fontSize: dimen10,
+                              color: ColorsTheme.colFF4E4E,
+                            ),
+                          ),
+                          Expanded(
+                            child: Text(
+                              'You can cancel within the first 5 minutes from order creation only if vendor confirmation is pending.',
+                              style: regularTextStyle(
+                                fontSize: dimen10,
+                                color: ColorsTheme.colBlack,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Positioned(
+                top: -28,
+                left: 18,
+                right: 18,
+                child: IgnorePointer(
+                  ignoring: true,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+                    child: CountdownProgressBar(
+                      diffMinutes: controller.cancelDiffMinutes.value,
+                      remainingSecondsExternal:
+                          controller.remainingSeconds.value,
+                      totalMinutes: 5,
+                      onFinished: () {},
+                      barHeight: 6,
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
-      );
-    });
+      ),
+    );
   }
 
   void _openCancelSummaryDialog() {
