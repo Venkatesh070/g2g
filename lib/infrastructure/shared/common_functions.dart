@@ -146,4 +146,43 @@ class CommonFunction {
   }
 }
 
+
+// common_functions.dart
+// Update the parsePickupDateTime method to handle the API format
+static DateTime parsePickupDateTime(String dateStr, String timeStr) {
+  try {
+    // Parse date (format: "2025-09-12")
+    final dateParts = dateStr.split('-');
+    final year = int.parse(dateParts[0]);
+    final month = int.parse(dateParts[1]);
+    final day = int.parse(dateParts[2]);
+    
+    // Parse time (format: "16:54:00")
+    final timeParts = timeStr.split(':');
+    final hour = int.parse(timeParts[0]);
+    final minute = int.parse(timeParts[1]);
+    
+    // Create DateTime object
+    return DateTime(year, month, day, hour, minute);
+  } catch (e) {
+    print('Error parsing pickup time: $e');
+    return DateTime.now(); // Fallback to current time
+  }
+}
+
+// Add this method to format time for display
+static String formatTimeForDisplay(String timeStr) {
+  try {
+    final timeParts = timeStr.split(':');
+    final hour = int.parse(timeParts[0]);
+    final minute = int.parse(timeParts[1]);
+    
+    final period = hour >= 12 ? 'PM' : 'AM';
+    final displayHour = hour % 12 == 0 ? 12 : hour % 12;
+    
+    return '${displayHour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')} $period';
+  } catch (e) {
+    return timeStr; // Return original if parsing fails
+  }
+}
 }

@@ -28,6 +28,11 @@ class OrderDetailsController extends GetxController {
   var currency = '';
   var pickupCode = 0000.obs;
 
+  //Pickup countdown Timer
+  var isCountingToStart = false.obs;
+  var pickupRemainingSeconds = 0.obs;
+  var pickupTotalSeconds = 0.obs;
+  Timer? pickupTimer;
 
   var backResult = false.obs;
 
@@ -77,14 +82,20 @@ class OrderDetailsController extends GetxController {
         isOrderData.value = true;
         orderStatus.value = orderModel.data!.orderStatus!;
         orderDetailsModel = orderModel.data!;
-        subTotalPrice.value = double.parse(orderModel.data!.totalPaid.toString());
-        subTotalOfferPrice.value = double.parse(orderModel.data!.price.toString());
-        otherTotalPrice.value = double.parse(orderModel.data!.gstCharge.toString());
+        subTotalPrice.value =
+            double.parse(orderModel.data!.totalPaid.toString());
+        subTotalOfferPrice.value =
+            double.parse(orderModel.data!.price.toString());
+        otherTotalPrice.value =
+            double.parse(orderModel.data!.gstCharge.toString());
         pickupCode.value = orderModel.data!.pickupCode!;
-        platformFee.value= await PrefManager.getDouble(AppConstants.platformFee);
-        platformGst.value = await PrefManager.getDouble(AppConstants.platformGst);  
+        platformFee.value =
+            await PrefManager.getDouble(AppConstants.platformFee);
+        platformGst.value =
+            await PrefManager.getDouble(AppConstants.platformGst);
         combinedGst.value = otherTotalPrice.value + platformGst.value;
-        totalPrice.value = subTotalPrice.value + combinedGst.value + platformFee.value;
+        totalPrice.value =
+            subTotalPrice.value + combinedGst.value + platformFee.value;
         isRated.value = orderDetailsModel!.isRated!;
         getCancelTime();
 
@@ -92,24 +103,32 @@ class OrderDetailsController extends GetxController {
         try {
           final createdDate = orderDetailsModel!.createdDate?.trim();
           final createdTime = orderDetailsModel!.createdTime?.trim();
-          if (createdDate != null && createdTime != null && createdDate.isNotEmpty && createdTime.isNotEmpty) {
+          if (createdDate != null &&
+              createdTime != null &&
+              createdDate.isNotEmpty &&
+              createdTime.isNotEmpty) {
             // Normalize cases like "16:04 PM" -> "04:04 PM" (API sometimes sends 24h with AM/PM)
             String timeStr = createdTime;
             final parts = timeStr.split(':');
             if (parts.isNotEmpty) {
               final hour = int.tryParse(parts[0]) ?? 0;
               if (hour > 12) {
-                timeStr = '${(hour - 12).toString().padLeft(2, '0')}:${parts[1]}';
+                timeStr =
+                    '${(hour - 12).toString().padLeft(2, '0')}:${parts[1]}';
               }
             }
-            debugPrint('Parsed timeStr: $timeStr');
             // Parse using expected format: e.g., "Sep 02,2025 04:04 PM"
-            final createdAt = DateFormat('MMM dd,yyyy hh:mm a').parse('$createdDate $timeStr');
-                        debugPrint('Parsed createdAt: $createdAt');
+            final createdAt = DateFormat('MMM dd,yyyy hh:mm a')
+                .parse('$createdDate $timeStr');
             startCancelTimer(createdAt, const Duration(minutes: 5));
           }
         } catch (_) {
           // ignore parsing issues
+        }
+
+        // Countdown timer Call
+        if (orderStatus.value == 'pending_pick_up') {
+          startPickupCountdown();
         }
       } else {
         loadingData.value = false;
@@ -218,11 +237,73 @@ class OrderDetailsController extends GetxController {
     scheduleTick();
   }
 
+// Countdown timer logic
+// Add this method to calculate pickup countdown
+// order_details_controller.dart
+// order_details_controller.dart
+void startPickupCountdown() {
+  final pickupDate = orderDetailsModel?.pickupDate;
+  final pickupTime = orderDetailsModel?.pickupTime;
+  final pickupEndTime = orderDetailsModel?.pickupEndTime;
+
+  if (pickupDate == null || pickupTime == null || pickupEndTime == null) return;
+
+  try {
+    // Parse dates using the new method
+    final now = DateTime.now();
+    final pickupDateTime = CommonFunction.parsePickupDateTime(pickupDate, pickupTime);
+    final pickupEndDateTime = CommonFunction.parsePickupDateTime(pickupDate, pickupEndTime);
+
+    // Determine which countdown to show
+    if (now.isBefore(pickupDateTime)) {
+      // Countdown to pickup start
+      isCountingToStart.value = true;
+      pickupTotalSeconds.value = pickupDateTime.difference(now).inSeconds;
+      pickupRemainingSeconds.value = pickupTotalSeconds.value.clamp(0, pickupTotalSeconds.value);
+    } else if (now.isBefore(pickupEndDateTime)) {
+      // Countdown to pickup end
+      isCountingToStart.value = false;
+      pickupTotalSeconds.value = pickupEndDateTime.difference(now).inSeconds;
+      pickupRemainingSeconds.value = pickupTotalSeconds.value.clamp(0, pickupTotalSeconds.value);
+    } else {
+      // Pickup time has passed
+      isCountingToStart.value = false;
+      pickupRemainingSeconds.value = 0;
+      pickupTotalSeconds.value = 1;
+    }
+
+    // Start timer to update countdown
+    pickupTimer?.cancel();
+    pickupTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (pickupRemainingSeconds.value > 0) {
+        pickupRemainingSeconds.value--;
+      } else {
+        // Check if we need to switch from start to end countdown
+        final now = DateTime.now();
+        if (now.isAfter(pickupDateTime) && now.isBefore(pickupEndDateTime)) {
+          isCountingToStart.value = false;
+          pickupTotalSeconds.value = pickupEndDateTime.difference(now).inSeconds;
+          pickupRemainingSeconds.value = pickupTotalSeconds.value.clamp(0, pickupTotalSeconds.value);
+        } else {
+          timer.cancel();
+        }
+      }
+    });
+  } catch (e) {
+    print('Error parsing pickup time: $e');
+  }
+}
+// Don't forget to cancel the timer in onClose()
+
+
   @override
   void onClose() {
     cancelTimer?.cancel();
+    pickupTimer?.cancel();
     super.onClose();
   }
+
+
 
   getCancelTime() {
     DateTime currentTime = DateTime.now();

@@ -6,6 +6,7 @@ import 'package:good_grab/infrastructure/core/base/base_view.dart';
 import 'package:good_grab/infrastructure/shared/common_functions.dart';
 import 'package:flutter/services.dart';
 import 'package:good_grab/presentation/widgets/pickup_code.dart';
+import 'circular_countdown_badge.dart';
 
 import '../../infrastructure/navigation/routes.dart';
 import '../../infrastructure/shared/custom_shimmer_widget.dart';
@@ -121,7 +122,8 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                                         left: 18, right: 18, bottom: 15),
                                     padding: const EdgeInsets.all(12),
                                     decoration: BoxDecoration(
-                                      color: ColorsTheme.colF59E0B.withOpacity(0.1),
+                                      color: ColorsTheme.colF59E0B
+                                          .withOpacity(0.1),
                                       borderRadius: BorderRadius.circular(10),
                                       border: Border.all(
                                           color: ColorsTheme.colF59E0B),
@@ -165,15 +167,51 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                                 Visibility(
                                   visible: controller.orderStatus.value ==
                                       'pending_pick_up',
-                                  child: Container(
-                                    margin: const EdgeInsets.only(
-                                        left: 18, right: 18, bottom: 15),
-                                    child: Text(
-                                      'pickup_note'.tr,
-                                      style: regularTextStyle(
-                                          fontSize: dimen10,
-                                          color: ColorsTheme.col8FA19C),
-                                    ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Obx(() => controller.pickupRemainingSeconds.value > 0
+                                          ? Container(
+                                              margin: const EdgeInsets.only(
+                                                  left: 18, right: 18, bottom: 10),
+                                              // child: Row(
+                                                // children: [
+                                                //   CircularCountdownBadge(
+                                                //     remainingSeconds: controller.pickupRemainingSeconds.value,
+                                                //     totalSeconds: controller.pickupTotalSeconds.value,
+                                                //     subtitle: controller.isCountingToStart.value ? 'Starts in' : 'Ends in',
+                                                //     size: 56,
+                                                //     strokeWidth: 6,
+                                                //     trackColor: ColorsTheme.colPrimary.withOpacity(0.25),
+                                                //     progressColor: ColorsTheme.colPrimary,
+                                                //   ),
+                                                //   const SizedBox(width: 12),
+                                                //   Expanded(
+                                                //     child: Text(
+                                                //       controller.isCountingToStart.value
+                                                //           ? 'Your pickup time starts in'
+                                                //           : 'Your pickup ends in',
+                                                //       style: semiBoldTextStyle(
+                                                //         fontSize: dimen12,
+                                                //         color: ColorsTheme.colBlack,
+                                                //       ),
+                                                //     ),
+                                                //   ),
+                                                // ],
+                                              // ),
+                                            )
+                                          : const SizedBox.shrink()),
+                                      Container(
+                                        margin: const EdgeInsets.only(
+                                            left: 18, right: 18, bottom: 15),
+                                        child: Text(
+                                          'pickup_note'.tr,
+                                          style: regularTextStyle(
+                                              fontSize: dimen10,
+                                              color: ColorsTheme.col8FA19C),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                                 Visibility(
@@ -279,8 +317,13 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
   }
 
   getStatus() {
+    debugPrint(
+        'Countdown values: ${controller.pickupRemainingSeconds.value}, ${controller.pickupTotalSeconds.value}, ${controller.isCountingToStart.value}');
+
     return Obx(() {
       if (controller.orderStatus.value == 'pending_pick_up') {
+        final subtitle =
+            controller.isCountingToStart.value ? 'Pickup Starts In' : 'PickupEnds In';
         return Column(
           children: [
             Container(
@@ -288,68 +331,102 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
               decoration: BoxDecoration(
                   color: ColorsTheme.colf56a07.withOpacity(0.9),
                   borderRadius: BorderRadius.circular(16)),
-              padding: const EdgeInsets.symmetric(vertical: 15),
+              padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 14),
               margin: const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
-              child: Column(
+              child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    child: Text(
-                      'Order Status'.tr,
-                      style: regularTextStyle(
-                          fontSize: dimen11, color: ColorsTheme.colWhite),
-                    ),
-                  ),
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                  // Left: Order status
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Container(
-                            width: 20,
-                            height: 20,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
+                          margin: const EdgeInsets.only(bottom: 8),
+                          child: Text(
+                            'Order Status'.tr,
+                            style: regularTextStyle(
+                              fontSize: dimen11,
                               color: ColorsTheme.colWhite,
                             ),
-                            alignment: Alignment.center,
-                            margin: const EdgeInsets.only(right: 5),
-                            child: Image.asset(
-                              Res.icCheck,
-                              color: ColorsTheme.colf56a07,
-                              width: 10,
-                              height: 10,
-                            )),
-                        Text(
-                          'Pending pick-up',
-                          style: boldTextStyle(
-                              fontSize: dimen11, color: ColorsTheme.colWhite),
+                          ),
+                        ),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: 20,
+                              height: 20,
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.white,
+                              ),
+                              alignment: Alignment.center,
+                              margin: const EdgeInsets.only(right: 6),
+                              child: Image.asset(
+                                Res.icCheck,
+                                color: ColorsTheme.colf56a07,
+                                width: 10,
+                                height: 10,
+                              ),
+                            ),
+                            Text(
+                              'Pending pick-up',
+                              style: boldTextStyle(
+                                fontSize: dimen11,
+                                color: ColorsTheme.colWhite,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(
+                                text: '${'Order ID'.tr} : ',
+                                style: regularTextStyle(
+                                  fontSize: dimen11,
+                                  color: ColorsTheme.colWhite,
+                                ),
+                              ),
+                              TextSpan(
+                                text: controller.orderId.toString(),
+                                style: boldTextStyle(
+                                  fontSize: dimen14,
+                                  color: ColorsTheme.colWhite,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
                   ),
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 2),
-                    child: Text.rich(TextSpan(children: [
-                      TextSpan(
-                        text: '${'Order ID'.tr} : ',
-                        style: regularTextStyle(
-                            fontSize: dimen11, color: ColorsTheme.colWhite),
-                      ),
-                      TextSpan(
-                        text: controller.orderId.toString(),
-                        style: boldTextStyle(
-                            fontSize: dimen14, color: ColorsTheme.colWhite),
-                      )
-                    ])),
-                  ),
+
+                  // Right: Countdown timer
+                  Obx(() {
+                    final showProgressArc = !controller.isCountingToStart.value; // show only after pickup starts
+                    return CircularCountdownBadge(
+                      remainingSeconds: controller.pickupRemainingSeconds.value,
+                      totalSeconds: controller.pickupTotalSeconds.value == 0
+                          ? 1
+                          : controller.pickupTotalSeconds.value,
+                      subtitle: controller.isCountingToStart.value ? 'Pickup Starts In' : 'Pickup Ends In',
+                      size: 90,
+                      strokeWidth: 6,
+                      progressColor: ColorsTheme.colWhite,
+                      trackColor: Colors.white.withOpacity(0.25),
+                      showProgressArc: showProgressArc,
+                    );
+                  }),
                 ],
               ),
-              
             ),
-            PickupCodeWidget(pickupCode: controller.orderDetailsModel!.pickupCode.toString())
+            PickupCodeWidget(
+                pickupCode: controller.orderDetailsModel!.pickupCode.toString())
           ],
         );
       } else if (controller.orderStatus.value == 'completd_pick_up') {
@@ -1485,7 +1562,6 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                               style: semiBoldTextStyle(
                                 fontSize: dimen10,
                                 color: ColorsTheme.colFF4E4E,
-                                
                               ),
                             ),
                             Expanded(
