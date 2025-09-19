@@ -14,6 +14,7 @@ import '../../../infrastructure/navigation/routes.dart';
 import '../../../infrastructure/shared/common_functions.dart';
 import '../../../infrastructure/shared/no_data_screen.dart';
 import '../../../res.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class HomeView extends GetView<HomeController> {
   const HomeView({super.key});
@@ -837,30 +838,36 @@ class HomeView extends GetView<HomeController> {
                                             width: 100,
                                             height: 100,
                                             child: ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(16),
-                                                child: controller
-                                                            .homeList[index]
-                                                            .restaurantImage ==
-                                                        null
-                                                    ? Image.asset(
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                              child: controller.homeList[index]
+                                                          .restaurantImage ==
+                                                      null
+                                                  ? Image.asset(
+                                                      Res.icDummyBanner,
+                                                      fit: BoxFit.cover,
+                                                    )
+                                                  : CachedNetworkImage(
+                                                      imageUrl: controller
+                                                          .homeList[index]
+                                                          .restaurantImage!,
+                                                      fit: BoxFit.cover,
+                                                      filterQuality:
+                                                          FilterQuality.low,
+                                                      placeholder:
+                                                          (context, url) =>
+                                                              Image.asset(
                                                         Res.icDummyBanner,
                                                         fit: BoxFit.cover,
-                                                      )
-                                                    : Image.network(
-                                                        controller
-                                                            .homeList[index]
-                                                            .restaurantImage!,
+                                                      ),
+                                                      errorWidget: (context,
+                                                              url, error) =>
+                                                          Image.asset(
+                                                        Res.icDummyBanner,
                                                         fit: BoxFit.cover,
-                                                        filterQuality:
-                                                            FilterQuality.low,
-                                                        errorBuilder: (context,
-                                                            obj, stackTrace) {
-                                                        return Image.asset(
-                                                          Res.icDummyBanner,
-                                                          fit: BoxFit.cover,
-                                                        );
-                                                      })),
+                                                      ),
+                                                    ),
+                                            ),
                                           ),
                                           Positioned(
                                               top: 5,
@@ -1781,20 +1788,21 @@ class HomeView extends GetView<HomeController> {
                                     return Builder(
                                       builder: (BuildContext context) {
                                         return Container(
-                                          width:
-                                              MediaQuery.of(context).size.width,
-                                          margin: EdgeInsets.symmetric(
-                                              horizontal: controller
-                                                          .bannerHomeList
-                                                          .length >
-                                                      1
-                                                  ? 5.0
-                                                  : 0),
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                          ),
-                                          child: ClipRRect(
+                                            width: MediaQuery.of(context)
+                                                .size
+                                                .width,
+                                            margin: EdgeInsets.symmetric(
+                                                horizontal: controller
+                                                            .bannerHomeList
+                                                            .length >
+                                                        1
+                                                    ? 5.0
+                                                    : 0),
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                            ),
+                                            child: ClipRRect(
                                               borderRadius:
                                                   BorderRadius.circular(12),
                                               child: banner == null
@@ -1876,18 +1884,39 @@ class HomeView extends GetView<HomeController> {
                                                               ],
                                                             )
                                                           : Container()
-                                                      : Image.network(
-                                                          banner.media!,
+                                                      : CachedNetworkImage(
+                                                          imageUrl:
+                                                              banner.media!,
                                                           fit: BoxFit.cover,
-                                                          errorBuilder:
-                                                              (context, obj,
-                                                                  stackTrace) {
-                                                          return Image.asset(
+                                                          filterQuality:
+                                                              FilterQuality.low,
+                                                          placeholder:
+                                                              (context, url) =>
+                                                                  Image.asset(
                                                             Res.icDummyBanner,
                                                             fit: BoxFit.cover,
-                                                          );
-                                                        })),
-                                        );
+                                                          ),
+                                                          errorWidget: (context,
+                                                                  url, error) =>
+                                                              Image.asset(
+                                                            Res.icDummyBanner,
+                                                            fit: BoxFit.cover,
+                                                          ),
+                                                        ),
+                                            )
+
+                                            // Image.network(
+                                            //     banner.media!,
+                                            //     fit: BoxFit.cover,
+                                            //     errorBuilder:
+                                            //         (context, obj,
+                                            //             stackTrace) {
+                                            //     return Image.asset(
+                                            //       Res.icDummyBanner,
+                                            //       fit: BoxFit.cover,
+                                            //     );
+                                            //   })),
+                                            );
                                       },
                                     );
                                   }).toList(),

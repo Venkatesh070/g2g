@@ -159,7 +159,7 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                                           child: Text(
                                             controller.cancelDiffMinutes.value >
                                                     5
-                                                ? 'It’s taking a little longer than expected. Please hold on for some more time.'
+                                                ? 'It’s taking a little longer than expected. Please hold on while we check with our outlet partner. '
                                                 : 'Waiting for restaurant partner acceptance. Please wait and do not start your journey until accepted.',
                                             style: regularTextStyle(
                                                 fontSize: dimen11,

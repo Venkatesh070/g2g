@@ -104,7 +104,7 @@ class PaymentStatusController extends GetxController {
           countdownTimer!.cancel();
           // Get.back(result: true);
           // Get.back(result: true);
-          Get.offNamed(Routes.home);
+          // Get.offNamed(Routes.home);
         } else if (paymentStatusCheck.data!.payment!.status == 'failed') {
           paymentStatus.value = 'Failed';
           pDescription.value =

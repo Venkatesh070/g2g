@@ -120,6 +120,7 @@ class HomeController extends GetxController {
 
   // orders
   var orderLoader = false.obs;
+  // var orderPageLoader = true.obs;
   var orderList = <OrdersList>[].obs;
   var orderCurrentPage = 1.obs;
   var orderTotalPage = 1.obs;
@@ -1584,13 +1585,12 @@ class HomeController extends GetxController {
       if (orderModel.success! &&
           orderModel.data != null &&
           orderModel.data!.ordersList != null) {
-        orderLoader.value = false;
         isPageLoad.value = false;
-        orderList.addAll(orderModel.data!.ordersList!);
+         orderList.addAll(orderModel.data!.ordersList!);
         // orderTotalPage.value = orderModel.data!.totalPage!;
         totalPage.value = orderModel.data!.totalPage!;
-
         totalOrderItem.value = orderModel.data!.totalItem!;
+        orderLoader.value = false;
       } else {
         orderLoader.value = false;
         isPageLoad.value = false;
