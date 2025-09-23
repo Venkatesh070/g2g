@@ -170,40 +170,47 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                                     ),
                                   ),
                                 ),
+                               
                                 Visibility(
                                   visible: controller.orderStatus.value ==
                                       'pending_pick_up',
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Obx(() => controller.pickupRemainingSeconds.value > 0
+                                      Obx(() => controller
+                                                  .pickupRemainingSeconds
+                                                  .value >
+                                              0
                                           ? Container(
                                               margin: const EdgeInsets.only(
-                                                  left: 18, right: 18, bottom: 10),
+                                                  left: 18,
+                                                  right: 18,
+                                                  bottom: 10),
                                               // child: Row(
-                                                // children: [
-                                                //   CircularCountdownBadge(
-                                                //     remainingSeconds: controller.pickupRemainingSeconds.value,
-                                                //     totalSeconds: controller.pickupTotalSeconds.value,
-                                                //     subtitle: controller.isCountingToStart.value ? 'Starts in' : 'Ends in',
-                                                //     size: 56,
-                                                //     strokeWidth: 6,
-                                                //     trackColor: ColorsTheme.colPrimary.withOpacity(0.25),
-                                                //     progressColor: ColorsTheme.colPrimary,
-                                                //   ),
-                                                //   const SizedBox(width: 12),
-                                                //   Expanded(
-                                                //     child: Text(
-                                                //       controller.isCountingToStart.value
-                                                //           ? 'Your pickup time starts in'
-                                                //           : 'Your pickup ends in',
-                                                //       style: semiBoldTextStyle(
-                                                //         fontSize: dimen12,
-                                                //         color: ColorsTheme.colBlack,
-                                                //       ),
-                                                //     ),
-                                                //   ),
-                                                // ],
+                                              // children: [
+                                              //   CircularCountdownBadge(
+                                              //     remainingSeconds: controller.pickupRemainingSeconds.value,
+                                              //     totalSeconds: controller.pickupTotalSeconds.value,
+                                              //     subtitle: controller.isCountingToStart.value ? 'Starts in' : 'Ends in',
+                                              //     size: 56,
+                                              //     strokeWidth: 6,
+                                              //     trackColor: ColorsTheme.colPrimary.withOpacity(0.25),
+                                              //     progressColor: ColorsTheme.colPrimary,
+                                              //   ),
+                                              //   const SizedBox(width: 12),
+                                              //   Expanded(
+                                              //     child: Text(
+                                              //       controller.isCountingToStart.value
+                                              //           ? 'Your pickup time starts in'
+                                              //           : 'Your pickup ends in',
+                                              //       style: semiBoldTextStyle(
+                                              //         fontSize: dimen12,
+                                              //         color: ColorsTheme.colBlack,
+                                              //       ),
+                                              //     ),
+                                              //   ),
+                                              // ],
                                               // ),
                                             )
                                           : const SizedBox.shrink()),
@@ -319,19 +326,89 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                                             'payment_pending'
                                     ? cancellationWidget()
                                     : Container(),
-                                    const SizedBox(height:15),
+                                const SizedBox(height: 15),
                                 // Show the former bottomNavigationBar section as an in-page widget
                                 Obx(() {
                                   final status = controller.orderStatus.value;
-                                  final diffMinutes = controller.cancelDiffMinutes.value;
-                                  final secondsLeft = controller.remainingSeconds.value;
-                                  final bool show = (status == 'confirmation_pending' ||
+                                  final diffMinutes =
+                                      controller.cancelDiffMinutes.value;
+                                  final secondsLeft =
+                                      controller.remainingSeconds.value;
+                                  final bool show = (status ==
+                                              'confirmation_pending' ||
                                           status == 'Confirmation Pending') &&
                                       secondsLeft > 0 &&
                                       (diffMinutes <= 5 && diffMinutes >= 0);
-                                  return show ?
-                                   _cancelBottomActionSection() 
-                                   : const SizedBox.shrink();
+                                  return show
+                                      ? _cancelBottomActionSection()
+                                      : const SizedBox.shrink();
+                                }),
+                                 // Need more help? card when user can no longer cancel with refund
+                                Obx(() {
+                                  final status = controller.orderStatus.value;
+                                  final diffMinutes =
+                                      controller.cancelDiffMinutes.value;
+                                  final bool showHelp = diffMinutes > 5 &&
+                                      (status == 'confirmation_pending' ||
+                                          status == 'Confirmation Pending' ||
+                                          status == 'pending_pick_up' ||
+                                          status == 'Pending Pick-up');
+                                  if (!showHelp) return const SizedBox.shrink();
+                                  return Container(
+                                    margin: const EdgeInsets.only(
+                                        left: 18, right: 18, bottom: 15),
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: ColorsTheme.colWhite,
+                                      borderRadius: BorderRadius.circular(10),
+                                      border: Border.all(color: ColorsTheme.colC4D9D4, width: 1),
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Need more help?'.tr,
+                                          style: semiBoldTextStyle(
+                                              fontSize: dimen12,
+                                              color: ColorsTheme.colBlack),
+                                        ),
+                                        const SizedBox(height: 5),
+                                        Text(
+                                          'We understand you need to cancel your order. However, since the restaurant has already accepted it, a 100% cancellation fee will be applied. This helps us prevent food waste.'.tr,
+                                          style: regularTextStyle(
+                                              fontSize: dimen10,
+                                              color: ColorsTheme.col404040
+                                              ),
+                                        ),
+                                        const SizedBox(height: 10),
+                                        SizedBox(
+                                          width: double.infinity,
+                                          child: OutlinedButton(
+                                            style: OutlinedButton.styleFrom(
+                                              backgroundColor: ColorsTheme.colF5F5F5,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(25),
+                                              ),
+                                              side: BorderSide(color: ColorsTheme.colF5F5F5, width: 1),
+                                              padding: const EdgeInsets.symmetric(vertical: 10),
+                                            ),
+                                            onPressed: () {
+                                              _openCancelSummaryDialog(
+                                                overrideNote:
+                                                    'We understand you need to cancel your order. However, since the restaurant has already accepted it, a 100% cancellation fee will be applied. This helps us prevent food waste.'.tr,
+                                              );
+                                            },
+                                            child: Text(
+                                              'Proceed with Cancellation but No Refund. '.tr,
+                                              style: semiBoldTextStyle(
+                                                  fontSize: dimen11,
+                                                  color: ColorsTheme.col475751),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
                                 }),
                               ],
                             ),
@@ -348,8 +425,9 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
 
     return Obx(() {
       if (controller.orderStatus.value == 'pending_pick_up') {
-        final subtitle =
-            controller.isCountingToStart.value ? 'Pickup Starts In' : 'PickupEnds In';
+        final subtitle = controller.isCountingToStart.value
+            ? 'Pickup Starts In'
+            : 'PickupEnds In';
         return Column(
           children: [
             Container(
@@ -434,13 +512,16 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
 
                   // Right: Countdown timer
                   Obx(() {
-                    final showProgressArc = !controller.isCountingToStart.value; // show only after pickup starts
+                    final showProgressArc = !controller.isCountingToStart
+                        .value; // show only after pickup starts
                     return CircularCountdownBadge(
                       remainingSeconds: controller.pickupRemainingSeconds.value,
                       totalSeconds: controller.pickupTotalSeconds.value == 0
                           ? 1
                           : controller.pickupTotalSeconds.value,
-                      subtitle: controller.isCountingToStart.value ? 'Pickup Starts In' : 'Pickup Ends In',
+                      subtitle: controller.isCountingToStart.value
+                          ? 'Pickup Starts In'
+                          : 'Pickup Ends In',
                       size: 90,
                       strokeWidth: 6,
                       progressColor: ColorsTheme.colWhite,
@@ -523,7 +604,7 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
         );
       } else if (controller.orderStatus.value == 'order_cancel' ||
           controller.orderStatus.value == 'not_picked_up' ||
-           controller.orderStatus.value =='payment_pending') {
+          controller.orderStatus.value == 'payment_pending') {
         return Container(
           width: Get.width,
           decoration: BoxDecoration(
@@ -566,9 +647,9 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                     Text(
                       controller.orderStatus.value == 'not_picked_up'
                           ? 'Not pick-up'
-                          :  controller.orderStatus.value == 'payment_pending'
-                          ? 'Payment Failed'
-                          :'Order Cancelled',
+                          : controller.orderStatus.value == 'payment_pending'
+                              ? 'Payment Failed'
+                              : 'Order Cancelled',
                       style: boldTextStyle(
                           fontSize: dimen11, color: ColorsTheme.colFF4E4E),
                     ),
@@ -1587,7 +1668,7 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
 
   cancellationWidget() {
     return Container(
-      margin: const EdgeInsets.only(bottom: 20, left: 18, right: 18),
+      margin: const EdgeInsets.only(bottom: 1, left: 18, right: 18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1644,26 +1725,26 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
             clipBehavior: Clip.none,
             children: [
               Container(
-                padding: const EdgeInsets.fromLTRB(18, 8, 18, 8),
+                padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
                 decoration: BoxDecoration(
                   color: ColorsTheme.colWhite,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.06),
-                      blurRadius: 8,
-                      offset: const Offset(0, -2),
-                    ),
-                  ],
+                  // boxShadow: [
+                  //   BoxShadow(
+                  //     color: Colors.black.withOpacity(0.06),
+                  //     blurRadius: 8,
+                  //     offset: const Offset(0, -2),
+                  //   ),
+                  // ],
                 ),
-                margin: const EdgeInsets.fromLTRB(18, 8, 18, 20),
+                margin: const EdgeInsets.fromLTRB(18, 0, 18, 0),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     OutlinedButton(
                       style: OutlinedButton.styleFrom(
-                        side: BorderSide(
-                            color: ColorsTheme.colFF4E4E, width: 1.5),
+                        side:
+                            BorderSide(color: ColorsTheme.cold3d3d3, width: 1),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30)),
                         padding: const EdgeInsets.symmetric(vertical: 14),
@@ -1673,7 +1754,7 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                       child: Text(
                         'Cancel Order'.tr,
                         style: semiBoldTextStyle(
-                            fontSize: dimen12, color: ColorsTheme.colFF4E4E),
+                            fontSize: dimen12, color: ColorsTheme.col404040),
                       ),
                     ),
                     Container(
@@ -1708,25 +1789,25 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                   ],
                 ),
               ),
-              Positioned(
-                top: -28,
-                left: 18,
-                right: 18,
-                child: IgnorePointer(
-                  ignoring: true,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
-                    child: CountdownProgressBar(
-                      diffMinutes: controller.cancelDiffMinutes.value,
-                      remainingSecondsExternal:
-                          controller.remainingSeconds.value,
-                      totalMinutes: 5,
-                      onFinished: () {},
-                      barHeight: 6,
-                    ),
-                  ),
-                ),
-              ),
+              // Positioned(
+              //   top: -28,
+              //   left: 18,
+              //   right: 18,
+              //   child: IgnorePointer(
+              //     ignoring: true,
+              //     child: Padding(
+              //       padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+              //       child: CountdownProgressBar(
+              //         diffMinutes: controller.cancelDiffMinutes.value,
+              //         remainingSecondsExternal:
+              //             controller.remainingSeconds.value,
+              //         totalMinutes: 5000,
+              //         onFinished: () {},
+              //         barHeight: 6,
+              //       ),
+              //     ),
+              //   ),
+              // ),
             ],
           ),
         ),
@@ -1734,13 +1815,20 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
     );
   }
 
-  void _openCancelSummaryDialog() {
+  void _openCancelSummaryDialog({String? overrideNote, Color? dialogBackgroundColor}) {
     if (controller.orderDetailsModel == null) return;
 
     final order = controller.orderDetailsModel!;
     final status = controller.orderStatus.value;
+    final bool noRefundCondition = controller.cancelDiffMinutes.value > 5 &&
+        (status == 'confirmation_pending' ||
+            status == 'Confirmation Pending' ||
+            status == 'pending_pick_up' ||
+            status == 'Pending Pick-up');
+    final String questionText = noRefundCondition
+        ? 'Would you like to cancel your order and proceed without a refund?'.tr
+        : 'Are you sure you want to cancel this order?'.tr;
 
-    debugPrint('message: confirmation: $status');
 
     // For confirmation_pending (and payment_pending), show the custom-styled popup matching the reference
     if (status == 'confirmation_pending' || status == 'Confirmation Pending') {
@@ -1755,11 +1843,15 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
         Dialog(
           insetPadding:
               const EdgeInsets.symmetric(horizontal: 18, vertical: 24),
+          backgroundColor: dialogBackgroundColor ?? ColorsTheme.colWhite,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          child: Container(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-            child: Column(
+          child: Material(
+            color: dialogBackgroundColor ?? ColorsTheme.colWhite,
+            borderRadius: BorderRadius.circular(16),
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+              child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -1776,12 +1868,12 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                       color: ColorsTheme.colFF4E4E, size: 22),
                 ),
                 const SizedBox(height: 10),
-                Text('Cancel order'.tr,
+                Text('Cancel Order'.tr,
                     style: semiBoldTextStyle(
                         fontSize: dimen16, color: ColorsTheme.colBlack)),
                 const SizedBox(height: 6),
                 Text(
-                  'Are you sure you want to cancel this order?'.tr,
+                  questionText,
                   textAlign: TextAlign.center,
                   style: regularTextStyle(
                       fontSize: dimen12, color: ColorsTheme.colBlack),
@@ -1875,24 +1967,26 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                   ],
                 ),
                 const SizedBox(height: 10),
-                // Note (do not remove)
-                Container(
-                  width: double.infinity,
-                  margin: const EdgeInsets.only(top: 4),
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: ColorsTheme.colFF4E4E.withOpacity(0.08),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    'You may not be eligible for full refund. Processing charges will be deducted.'
-                        .tr,
-                    style: semiBoldTextStyle(
-                        fontSize: dimen11, color: ColorsTheme.colFF4E4E),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
+                // Note hidden when no-refund condition is active
+                noRefundCondition
+                    ? const SizedBox.shrink()
+                    : Container(
+                        width: double.infinity,
+                        margin: const EdgeInsets.only(top: 4),
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: ColorsTheme.colFF4E4E.withOpacity(0.08),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          (overrideNote ?? 'You may not be eligible for full refund. Processing charges will be deducted.').tr,
+                          style: semiBoldTextStyle(
+                              fontSize: dimen11, color: ColorsTheme.colFF4E4E),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
               ],
+            ),
             ),
           ),
         ),
@@ -1904,6 +1998,8 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
     // Default confirmation dialog (with note)
     Get.dialog(
       AlertDialog(
+        backgroundColor: dialogBackgroundColor ?? ColorsTheme.colWhite,
+        surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text('Cancel Order'.tr,
             style: semiBoldTextStyle(
@@ -1913,26 +2009,29 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Are you sure you want to cancel this order?'.tr,
+              noRefundCondition
+                  ? 'Would you like to cancel your order and proceed without a refund?'.tr
+                  : 'Are you sure you want to cancel this order?'.tr,
               style: regularTextStyle(
                   fontSize: dimen12, color: ColorsTheme.colBlack),
             ),
             const SizedBox(height: 12),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: ColorsTheme.colFF4E4E.withOpacity(0.08),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                'You may not be eligible for full refund. Processing charges will be deducted.'
-                    .tr,
-                style: semiBoldTextStyle(
-                    fontSize: dimen11, color: ColorsTheme.colFF4E4E),
-                textAlign: TextAlign.center,
-              ),
-            ),
+            noRefundCondition
+                ? const SizedBox.shrink()
+                : Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: ColorsTheme.colFF4E4E.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                          (overrideNote ?? 'You may not be eligible for full refund. Processing charges will be deducted.').tr,
+                      style: semiBoldTextStyle(
+                          fontSize: dimen11, color: ColorsTheme.colFF4E4E),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
           ],
         ),
         actions: [
