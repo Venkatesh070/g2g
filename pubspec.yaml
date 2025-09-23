@@ -60,7 +60,7 @@ dependencies:
 
   video_player: ^2.7.2
   upgrader: ^6.5.0
-
+  facebook_app_events: ^0.19.4
 
 #firebase
   firebase_core:

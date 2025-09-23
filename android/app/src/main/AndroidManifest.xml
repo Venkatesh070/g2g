@@ -10,6 +10,13 @@
         android:icon="@drawable/ic_stat_ic_notification">
         <meta-data android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyCwosLydPkofKtiKCgoUGz7jx-g4uP_1b0"/>
+        <!-- Meta (Facebook) App Events configuration -->
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
+        <meta-data
+            android:name="com.facebook.sdk.ClientToken"
+            android:value="@string/facebook_client_token" />
         <activity
             android:name="com.good.grab.MainActivity"
             android:exported="true"

@@ -9,6 +9,7 @@ import 'package:good_grab/infrastructure/shared/app_exception_handle.dart';
 import 'package:good_grab/infrastructure/shared/progress_dialog.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
+import 'package:good_grab/infrastructure/analytics/meta_pixel.dart';
 
 
 import '../../infrastructure/constants/app_constants.dart';
@@ -353,6 +354,9 @@ class OtpVerifyController extends GetxController {
         await FirebaseAnalytics.instance.logLogin(loginMethod: method);
       } else {
         await FirebaseAnalytics.instance.logSignUp(signUpMethod: method);
+         try {
+          await AnalyticsService.logSignUp(method: method);
+        } catch (_) {}
       }
     } catch (_) {}
 

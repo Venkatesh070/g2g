@@ -18,6 +18,7 @@ import 'package:intl/intl.dart';
 import 'package:phonepe_payment_sdk/phonepe_payment_sdk.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:good_grab/infrastructure/analytics/meta_pixel.dart';
 // import 'package:firebase_analytics/observer.dart';
 
 import '../../infrastructure/constants/app_constants.dart';
@@ -384,6 +385,13 @@ class CartController extends GetxController {
             'quantity': 1,
           },
         );
+        // Mirror to Meta (Facebook)
+        await AnalyticsService.logAddToCart(
+          itemId: (menuList[index].menuId ?? '').toString(),
+          vendorName: title.value,
+          price: menuList[index].menuFinalPrice ?? 0.0,
+          quantity: 1,
+        );
       } catch (_) {}
 
       addRemoveCartApi(index, tempQuantity);
@@ -577,15 +585,29 @@ class CartController extends GetxController {
               .toList();
           await FirebaseAnalytics.instance.logPurchase(
             transactionId: (transactionId.value).toString(),
-            currency: 'INR',
+            currency: (currency.value.isNotEmpty ? currency.value : 'INR'),
             value: totalPay.value,
             items: items,
             parameters: {
               'transaction_id': (transactionId.value).toString(),
               'value': totalPay.value,
-              'currency': 'INR',
+              'currency': (currency.value.isNotEmpty ? currency.value : 'INR'),
               'items': items.map((e) => e.asMap()).toList(),
             },
+          );
+          // Mirror to Meta (Facebook)
+          await AnalyticsService.logPurchase(
+            transactionId: (transactionId.value).toString(),
+            value: totalPay.value,
+            currency: (currency.value.isNotEmpty ? currency.value : 'INR'),
+            items: menuList
+                .map((m) => {
+                      'item_id': (m.menuId ?? '').toString(),
+                      'vendor_name': title.value,
+                      'price': m.menuFinalPrice ?? 0.0,
+                      'quantity': m.menuSelectedQuantity ?? 1,
+                    })
+                .toList(),
           );
         } catch (_) {}
         PrefManager.remove(AppConstants.cartId);
@@ -1027,6 +1049,12 @@ bool _isPaymentSheetOpen = false;
           'payment_method': paymentMethodType ?? 'unknown',
         },
       );
+      // Mirror to Meta (Facebook)
+      await AnalyticsService.logBeginCheckout(
+        cartValue: totalPay.value,
+        itemIds: menuList.map((m) => (m.menuId ?? '').toString()).toList(),
+        paymentMethod: (paymentMethodType ?? 'unknown').toString(),
+      );
       debugPrint("Begin Checkout Event Fired");
     } catch (_) {}
 
@@ -1112,6 +1140,20 @@ bool _isPaymentSheetOpen = false;
             currency: (currency.value.isNotEmpty ? currency.value : 'INR'),
             value: totalPay.value,
             items: items,
+          );
+          // Mirror to Meta (Facebook)
+          await AnalyticsService.logPurchase(
+            transactionId: (transId ?? '').toString(),
+            value: totalPay.value,
+            currency: (currency.value.isNotEmpty ? currency.value : 'INR'),
+            items: menuList
+                .map((m) => {
+                      'item_id': (m.menuId ?? '').toString(),
+                      'vendor_name': title.value,
+                      'price': m.menuFinalPrice ?? 0.0,
+                      'quantity': m.menuSelectedQuantity ?? 1,
+                    })
+                .toList(),
           );
         } catch (_) {}
         PrefManager.remove(AppConstants.cartId);

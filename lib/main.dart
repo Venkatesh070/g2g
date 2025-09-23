@@ -10,6 +10,7 @@ import 'infrastructure/navigation/navigation.dart';
 import 'infrastructure/navigation/routes.dart';
 import 'infrastructure/theme/theme.dart';
 import 'initializer.dart';
+import 'infrastructure/analytics/meta_pixel.dart';
 
 // Apple ID saikishoremudhiraj2311@gmail.com
 // Password Subbu@8686
@@ -27,6 +28,11 @@ Future<void> main() async {
   // await Firebase.initializeApp();
 
   runApp(const Main());
+
+  // Log app_open after first frame
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    AnalyticsService.logAppOpen();
+  });
 }
 
 class Main extends StatelessWidget {
@@ -60,6 +66,3 @@ class Main extends StatelessWidget {
     });
   }
 }
-
-
-
