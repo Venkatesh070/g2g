@@ -108,6 +108,17 @@
         <string>ppemerchantsdkv3</string>
         <string>paytmmp</string>
         <string>gpay</string>
+        <!-- Facebook SDK common schemes -->
+        <string>fbapi</string>
+        <string>fbauth2</string>
+        <string>fb-messenger-share-api</string>
+        <string>fbshareextension</string>
     </array>
+    <key>FacebookAppID</key>
+    <string>1531333880759386</string>
+    <key>FacebookClientToken</key>
+    <string>e63f081dc4e3727b70ae462513551999</string>
+    <key>FacebookDisplayName</key>
+    <string>Good Grab</string>
 </dict>
 </plist>
