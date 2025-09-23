@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:good_grab/infrastructure/models/order_details_model.dart';
+import 'package:good_grab/infrastructure/models/app_content_model.dart';
 import 'package:good_grab/infrastructure/shared/common_functions.dart';
 import 'package:good_grab/infrastructure/shared/snackbar.util.dart';
 import 'package:in_app_review/in_app_review.dart';
@@ -38,6 +38,10 @@ class OrderDetailsController extends GetxController {
 
   OrderDetailsModel? orderDetailsModel;
 
+  // Support contact details
+  var supportEmail = ''.obs;
+  var supportPhone = ''.obs;
+
   var subTotalPrice = (0.0).obs;
   var subTotalOfferPrice = (0.0).obs;
   var otherTotalPrice = (0.0).obs;
@@ -64,6 +68,7 @@ class OrderDetailsController extends GetxController {
 
       await getOrderDetails();
       calculateCancelDiffMinutes();
+      await _loadSupportContact();
     });
     super.onInit();
   }
@@ -165,6 +170,44 @@ class OrderDetailsController extends GetxController {
       inAppReview.requestReview();
     } else {
       errorScreen(error: 'Could not find the app.'.tr);
+    }
+  }
+
+  Future<void> _loadSupportContact() async {
+    try {
+      ApiResponseModel<AppContentModel> appContentModel =
+          await DioClient.base().funAppContentApi();
+      final contact = appContentModel.data?.content?.contactUs;
+      if (appContentModel.success == true && contact != null) {
+        supportEmail.value = contact.email ?? '';
+        supportPhone.value = contact.mobile ?? '';
+      }
+    } catch (_) {
+      // no-op
+    }
+  }
+
+  Future<void> launchSupportEmail() async {
+    final email = supportEmail.value.trim();
+    final uri = email.isEmpty
+        ? Uri(scheme: 'mailto')
+        : Uri(scheme: 'mailto', path: email);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else {
+      errorScreen(error: 'Could not open the mail app.'.tr);
+    }
+  }
+
+  Future<void> launchSupportPhone() async {
+    final phone = supportPhone.value.trim();
+    final uri = phone.isEmpty
+        ? Uri(scheme: 'tel')
+        : Uri(scheme: 'tel', path: phone);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else {
+      errorScreen(error: 'Could not open the phone app.'.tr);
     }
   }
 

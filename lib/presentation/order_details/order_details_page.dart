@@ -174,36 +174,42 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                                   visible: controller.orderStatus.value ==
                                       'pending_pick_up',
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Obx(() => controller.pickupRemainingSeconds.value > 0
+                                      Obx(() => controller
+                                                  .pickupRemainingSeconds
+                                                  .value >
+                                              0
                                           ? Container(
                                               margin: const EdgeInsets.only(
-                                                  left: 18, right: 18, bottom: 10),
+                                                  left: 18,
+                                                  right: 18,
+                                                  bottom: 10),
                                               // child: Row(
-                                                // children: [
-                                                //   CircularCountdownBadge(
-                                                //     remainingSeconds: controller.pickupRemainingSeconds.value,
-                                                //     totalSeconds: controller.pickupTotalSeconds.value,
-                                                //     subtitle: controller.isCountingToStart.value ? 'Starts in' : 'Ends in',
-                                                //     size: 56,
-                                                //     strokeWidth: 6,
-                                                //     trackColor: ColorsTheme.colPrimary.withOpacity(0.25),
-                                                //     progressColor: ColorsTheme.colPrimary,
-                                                //   ),
-                                                //   const SizedBox(width: 12),
-                                                //   Expanded(
-                                                //     child: Text(
-                                                //       controller.isCountingToStart.value
-                                                //           ? 'Your pickup time starts in'
-                                                //           : 'Your pickup ends in',
-                                                //       style: semiBoldTextStyle(
-                                                //         fontSize: dimen12,
-                                                //         color: ColorsTheme.colBlack,
-                                                //       ),
-                                                //     ),
-                                                //   ),
-                                                // ],
+                                              // children: [
+                                              //   CircularCountdownBadge(
+                                              //     remainingSeconds: controller.pickupRemainingSeconds.value,
+                                              //     totalSeconds: controller.pickupTotalSeconds.value,
+                                              //     subtitle: controller.isCountingToStart.value ? 'Starts in' : 'Ends in',
+                                              //     size: 56,
+                                              //     strokeWidth: 6,
+                                              //     trackColor: ColorsTheme.colPrimary.withOpacity(0.25),
+                                              //     progressColor: ColorsTheme.colPrimary,
+                                              //   ),
+                                              //   const SizedBox(width: 12),
+                                              //   Expanded(
+                                              //     child: Text(
+                                              //       controller.isCountingToStart.value
+                                              //           ? 'Your pickup time starts in'
+                                              //           : 'Your pickup ends in',
+                                              //       style: semiBoldTextStyle(
+                                              //         fontSize: dimen12,
+                                              //         color: ColorsTheme.colBlack,
+                                              //       ),
+                                              //     ),
+                                              //   ),
+                                              // ],
                                               // ),
                                             )
                                           : const SizedBox.shrink()),
@@ -218,6 +224,35 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                                         ),
                                       ),
                                     ],
+                                  ),
+                                ),
+                                    Visibility(
+                                  visible: controller.orderStatus.value !=
+                                      'pending_pick_up',
+                                  child: InkWell(
+                                    onTap: () {
+                                      Get.toNamed(Routes.appContents,
+                                          arguments: {
+                                            'title': 'Contact us'.tr,
+                                            'flag': 'contact'
+                                          });
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(30),
+                                          color: ColorsTheme.colPrimary),
+                                      margin: const EdgeInsets.only(
+                                          bottom: 15, left: 18, right: 18),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 10, horizontal: 18),
+                                      child: Text(
+                                        'Contact us'.tr,
+                                        style: regularTextStyle(
+                                            fontSize: dimen11,
+                                            color: ColorsTheme.colWhite),
+                                      ),
+                                    ),
                                   ),
                                 ),
                                 Visibility(
@@ -278,35 +313,7 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                                     visible: controller.orderStatus.value ==
                                         'order_cancel',
                                     child: cancelOrder()),
-                                Visibility(
-                                  visible: controller.orderStatus.value !=
-                                      'pending_pick_up',
-                                  child: InkWell(
-                                    onTap: () {
-                                      Get.toNamed(Routes.appContents,
-                                          arguments: {
-                                            'title': 'Contact us'.tr,
-                                            'flag': 'contact'
-                                          });
-                                    },
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(30),
-                                          color: ColorsTheme.colPrimary),
-                                      margin: const EdgeInsets.only(
-                                          bottom: 15, left: 18, right: 18),
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 10, horizontal: 18),
-                                      child: Text(
-                                        'Contact us'.tr,
-                                        style: regularTextStyle(
-                                            fontSize: dimen11,
-                                            color: ColorsTheme.colWhite),
-                                      ),
-                                    ),
-                                  ),
-                                ),
+
                                 controller.orderDetailsModel!
                                             .restaurantDetail !=
                                         null
@@ -319,19 +326,23 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                                             'payment_pending'
                                     ? cancellationWidget()
                                     : Container(),
-                                    const SizedBox(height:15),
+                                      contactUs(),
+                                const SizedBox(height: 15),
                                 // Show the former bottomNavigationBar section as an in-page widget
                                 Obx(() {
                                   final status = controller.orderStatus.value;
-                                  final diffMinutes = controller.cancelDiffMinutes.value;
-                                  final secondsLeft = controller.remainingSeconds.value;
-                                  final bool show = (status == 'confirmation_pending' ||
+                                  final diffMinutes =
+                                      controller.cancelDiffMinutes.value;
+                                  final secondsLeft =
+                                      controller.remainingSeconds.value;
+                                  final bool show = (status ==
+                                              'confirmation_pending' ||
                                           status == 'Confirmation Pending') &&
                                       secondsLeft > 0 &&
                                       (diffMinutes <= 5 && diffMinutes >= 0);
-                                  return show ?
-                                   _cancelBottomActionSection() 
-                                   : const SizedBox.shrink();
+                                  return show
+                                      ? _cancelBottomActionSection()
+                                      : const SizedBox.shrink();
                                 }),
                               ],
                             ),
@@ -348,8 +359,6 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
 
     return Obx(() {
       if (controller.orderStatus.value == 'pending_pick_up') {
-        final subtitle =
-            controller.isCountingToStart.value ? 'Pickup Starts In' : 'PickupEnds In';
         return Column(
           children: [
             Container(
@@ -434,13 +443,16 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
 
                   // Right: Countdown timer
                   Obx(() {
-                    final showProgressArc = !controller.isCountingToStart.value; // show only after pickup starts
+                    final showProgressArc = !controller.isCountingToStart
+                        .value; // show only after pickup starts
                     return CircularCountdownBadge(
                       remainingSeconds: controller.pickupRemainingSeconds.value,
                       totalSeconds: controller.pickupTotalSeconds.value == 0
                           ? 1
                           : controller.pickupTotalSeconds.value,
-                      subtitle: controller.isCountingToStart.value ? 'Pickup Starts In' : 'Pickup Ends In',
+                      subtitle: controller.isCountingToStart.value
+                          ? 'Pickup Starts In'
+                          : 'Pickup Ends In',
                       size: 90,
                       strokeWidth: 6,
                       progressColor: ColorsTheme.colWhite,
@@ -523,7 +535,7 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
         );
       } else if (controller.orderStatus.value == 'order_cancel' ||
           controller.orderStatus.value == 'not_picked_up' ||
-           controller.orderStatus.value =='payment_pending') {
+          controller.orderStatus.value == 'payment_pending') {
         return Container(
           width: Get.width,
           decoration: BoxDecoration(
@@ -566,9 +578,9 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                     Text(
                       controller.orderStatus.value == 'not_picked_up'
                           ? 'Not pick-up'
-                          :  controller.orderStatus.value == 'payment_pending'
-                          ? 'Payment Failed'
-                          :'Order Cancelled',
+                          : controller.orderStatus.value == 'payment_pending'
+                              ? 'Payment Failed'
+                              : 'Order Cancelled',
                       style: boldTextStyle(
                           fontSize: dimen11, color: ColorsTheme.colFF4E4E),
                     ),
@@ -1621,6 +1633,127 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                       softWrap: true,
                     ),
                   )
+                ],
+              )),
+        ],
+      ),
+    );
+  }
+
+  contactUs() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 20, left: 18, right: 18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Text(
+          //   'Contact us'.tr,
+          //   style: semiBoldTextStyle(
+          //       fontSize: dimen12, color: ColorsTheme.colBlack),
+          // ),
+          Container(
+              decoration: BoxDecoration(
+                  border: Border.all(color: ColorsTheme.colC4D9D4, width: 1),
+                  borderRadius: BorderRadius.circular(16)),
+              // margin: const EdgeInsets.only(top: 15),
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          color: ColorsTheme.coldD0F0C0,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: ColorsTheme.colC4D9D4, width: 1),
+                        ),
+                        padding: const EdgeInsets.all(8),
+                        child: Icon(
+                          Icons.help_outline,
+                          color: ColorsTheme.colPrimary,
+                          size: 20,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Outlet related issues'.tr,
+                              style: semiBoldTextStyle(
+                                fontSize: dimen12,
+                                color: ColorsTheme.colBlack,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Text(
+                          'Call or mail customer support'.tr,
+                          style: regularTextStyle(
+                            fontSize: dimen12,
+                            color: ColorsTheme.colBlack,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Obx(() => Row(
+                            children: [
+                              Visibility(
+                                visible:
+                                    controller.supportEmail.value.isNotEmpty,
+                                child: GestureDetector(
+                                  onTap: controller.launchSupportEmail,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: ColorsTheme.colPrimary,
+                                      borderRadius: BorderRadius.circular(30),
+                                    ),
+                                    alignment: Alignment.center,
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 16),
+                                    child: Text(
+                                      'Email'.tr,
+                                      style: regularTextStyle(
+                                        fontSize: dimen11,
+                                        color: ColorsTheme.colWhite,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Visibility(
+                                visible:
+                                    controller.supportPhone.value.isNotEmpty,
+                                child: GestureDetector(
+                                  onTap: controller.launchSupportPhone,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: ColorsTheme.colPrimary,
+                                      borderRadius: BorderRadius.circular(30),
+                                    ),
+                                    alignment: Alignment.center,
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 16),
+                                    child: Text(
+                                      'Call'.tr,
+                                      style: regularTextStyle(
+                                        fontSize: dimen11,
+                                        color: ColorsTheme.colWhite,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          )),
+                    ],
+                  ),
                 ],
               )),
         ],
