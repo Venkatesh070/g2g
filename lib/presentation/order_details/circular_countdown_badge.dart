@@ -114,7 +114,7 @@ class CircularCountdownBadge extends StatelessWidget {
               if (!isCompleted)
                 Text(
                   _formatHMS(rem),
-                  style: theme.textTheme.labelMedium?.copyWith(
+                  style: theme.textTheme.labelSmall?.copyWith(
                     fontWeight: FontWeight.w700,
                     color: Colors.white,
                   ),

@@ -227,35 +227,35 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                                     ],
                                   ),
                                 ),
-                                    Visibility(
-                                  visible: controller.orderStatus.value !=
-                                      'pending_pick_up',
-                                  child: InkWell(
-                                    onTap: () {
-                                      Get.toNamed(Routes.appContents,
-                                          arguments: {
-                                            'title': 'Contact us'.tr,
-                                            'flag': 'contact'
-                                          });
-                                    },
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(30),
-                                          color: ColorsTheme.colPrimary),
-                                      margin: const EdgeInsets.only(
-                                          bottom: 15, left: 18, right: 18),
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 10, horizontal: 18),
-                                      child: Text(
-                                        'Contact us'.tr,
-                                        style: regularTextStyle(
-                                            fontSize: dimen11,
-                                            color: ColorsTheme.colWhite),
-                                      ),
-                                    ),
-                                  ),
-                                ),
+                                //     Visibility(
+                                //   visible: controller.orderStatus.value !=
+                                //       'pending_pick_up',
+                                //   child: InkWell(
+                                //     onTap: () {
+                                //       Get.toNamed(Routes.appContents,
+                                //           arguments: {
+                                //             'title': 'Contact us'.tr,
+                                //             'flag': 'contact'
+                                //           });
+                                //     },
+                                //     child: Container(
+                                //       decoration: BoxDecoration(
+                                //           borderRadius:
+                                //               BorderRadius.circular(30),
+                                //           color: ColorsTheme.colPrimary),
+                                //       margin: const EdgeInsets.only(
+                                //           bottom: 15, left: 18, right: 18),
+                                //       padding: const EdgeInsets.symmetric(
+                                //           vertical: 10, horizontal: 18),
+                                //       child: Text(
+                                //         'Contact us'.tr,
+                                //         style: regularTextStyle(
+                                //             fontSize: dimen11,
+                                //             color: ColorsTheme.colWhite),
+                                //       ),
+                                //     ),
+                                //   ),
+                                // ),
                                 Visibility(
                                     visible: controller.orderStatus.value ==
                                         'completd_pick_up',
@@ -328,7 +328,7 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                                     ? cancellationWidget()
                                     : Container(),
                                       contactUs(),
-                                const SizedBox(height: 15),
+                                // const SizedBox(height: 15),
                                 // Show the former bottomNavigationBar section as an in-page widget
                                 Obx(() {
                                   final status = controller.orderStatus.value;
@@ -354,7 +354,8 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                                       (status == 'confirmation_pending' ||
                                           status == 'Confirmation Pending' ||
                                           status == 'pending_pick_up' ||
-                                          status == 'Pending Pick-up');
+                                          status == 'Pending pick-up') || (status == 'pending_pick_up' ||
+                                          status == 'Pending pick-up') ;
                                   if (!showHelp) return const SizedBox.shrink();
                                   return Container(
                                     margin: const EdgeInsets.only(
@@ -437,7 +438,7 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
               decoration: BoxDecoration(
                   color: ColorsTheme.colf56a07.withOpacity(0.9),
                   borderRadius: BorderRadius.circular(16)),
-              padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 14),
+              padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 14),
               margin: const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -450,7 +451,7 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Container(
-                          margin: const EdgeInsets.only(bottom: 8),
+                          margin: const EdgeInsets.only(bottom: 8,top: 5),
                           child: Text(
                             'Order Status'.tr,
                             style: regularTextStyle(
@@ -464,7 +465,7 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                           children: [
                             Container(
                               width: 20,
-                              height: 20,
+                              height: 23,
                               decoration: const BoxDecoration(
                                 shape: BoxShape.circle,
                                 color: Colors.white,
@@ -1003,7 +1004,7 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                                                           .spaceBetween,
                                                   children: [
                                                     Text(
-                                                      "GST on item total".tr,
+                                                      "GST on Item Charges".tr,
                                                       style: semiBoldTextStyle(
                                                         fontSize: dimen12,
                                                         color: ColorsTheme
@@ -1029,7 +1030,7 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                                                           .spaceBetween,
                                                   children: [
                                                     Text(
-                                                      "GST on platform fee".tr,
+                                                      "GST on Platform Fee".tr,
                                                       style: semiBoldTextStyle(
                                                         fontSize: dimen12,
                                                         color: ColorsTheme
@@ -1061,7 +1062,7 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                                                           .spaceBetween,
                                                   children: [
                                                     Text(
-                                                      "Total".tr,
+                                                      "Total GST".tr,
                                                       style: semiBoldTextStyle(
                                                         fontSize: dimen12,
                                                         color: ColorsTheme
@@ -1726,7 +1727,7 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
               decoration: BoxDecoration(
                   border: Border.all(color: ColorsTheme.colC4D9D4, width: 1),
                   borderRadius: BorderRadius.circular(16)),
-              // margin: const EdgeInsets.only(top: 15),
+              margin: const EdgeInsets.only(top: 15),
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
               child: Column(
                 children: [
@@ -1762,10 +1763,10 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                             Text(
                           'Call or mail customer support'.tr,
                           style: regularTextStyle(
-                            fontSize: dimen12,
+                            fontSize: dimen10,
                             color: ColorsTheme.colBlack,
                           ),
-                          maxLines: 1,
+                          maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
                           ],
@@ -1954,7 +1955,7 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
 
 
     // For confirmation_pending (and payment_pending), show the custom-styled popup matching the reference
-    if (status == 'confirmation_pending' || status == 'Confirmation Pending') {
+    if (status == 'confirmation_pending' || status == 'Confirmation Pending' || status == 'pending_pick_up' || status == 'Pending Pick-up') {
       final String method = (order.paymentMethod ?? '').toUpperCase();
       final int totalQty = (order.menuDetails ?? [])
           .map((m) => m.quantity ?? 0)
@@ -2119,79 +2120,79 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
     }
 
     // Default confirmation dialog (with note)
-    Get.dialog(
-      AlertDialog(
-        backgroundColor: dialogBackgroundColor ?? ColorsTheme.colWhite,
-        surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text('Cancel Order'.tr,
-            style: semiBoldTextStyle(
-                fontSize: dimen14, color: ColorsTheme.colBlack)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              noRefundCondition
-                  ? 'Would you like to cancel your order and proceed without a refund?'.tr
-                  : 'Are you sure you want to cancel this order?'.tr,
-              style: regularTextStyle(
-                  fontSize: dimen12, color: ColorsTheme.colBlack),
-            ),
-            const SizedBox(height: 12),
-            noRefundCondition
-                ? const SizedBox.shrink()
-                : Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: ColorsTheme.colFF4E4E.withOpacity(0.08),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                          (overrideNote ?? 'You may not be eligible for full refund. Processing charges will be deducted.').tr,
-                      style: semiBoldTextStyle(
-                          fontSize: dimen11, color: ColorsTheme.colFF4E4E),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: Text('No'.tr,
-                style: semiBoldTextStyle(
-                    fontSize: dimen12, color: ColorsTheme.colBlack)),
-          ),
-          TextButton(
-            onPressed: () async {
-              Get.back();
-              var result = await Get.toNamed(
-                Routes.orderCancel,
-                arguments: {
-                  'orderId': controller.orderId,
-                  'amount': controller.totalPrice.value,
-                  'resId': controller.resId,
-                  'pickupDate': order.pickupDate ?? '',
-                  'pickupTime': order.pickupTime ?? '',
-                  'pickupEndTime': order.pickupEndTime ?? '',
-                  'orderStatus': status,
-                },
-              );
-              if (result != null && result) {
-                controller.backResult.value = true;
-                controller.getOrderDetails();
-              }
-            },
-            child: Text('Yes'.tr,
-                style: semiBoldTextStyle(
-                    fontSize: dimen12, color: ColorsTheme.colFF4E4E)),
-          ),
-        ],
-      ),
-      barrierDismissible: true,
-    );
+    // Get.dialog(
+    //   AlertDialog(
+    //     backgroundColor: dialogBackgroundColor ?? ColorsTheme.colWhite,
+    //     surfaceTintColor: Colors.transparent,
+    //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+    //     title: Text('Cancel Order'.tr,
+    //         style: semiBoldTextStyle(
+    //             fontSize: dimen14, color: ColorsTheme.colBlack)),
+    //     content: Column(
+    //       mainAxisSize: MainAxisSize.min,
+    //       crossAxisAlignment: CrossAxisAlignment.start,
+    //       children: [
+    //         Text(
+    //           noRefundCondition
+    //               ? 'Would you like to cancel your order and proceed without a refund?'.tr
+    //               : 'Are you sure you want to cancel this order?'.tr,
+    //           style: regularTextStyle(
+    //               fontSize: dimen12, color: ColorsTheme.colBlack),
+    //         ),
+    //         const SizedBox(height: 12),
+    //         noRefundCondition
+    //             ? const SizedBox.shrink()
+    //             : Container(
+    //                 width: double.infinity,
+    //                 padding: const EdgeInsets.all(10),
+    //                 decoration: BoxDecoration(
+    //                   color: ColorsTheme.colFF4E4E.withOpacity(0.08),
+    //                   borderRadius: BorderRadius.circular(8),
+    //                 ),
+    //                 child: Text(
+    //                       (overrideNote ?? 'You may not be eligible for full refund. Processing charges will be deducted.').tr,
+    //                   style: semiBoldTextStyle(
+    //                       fontSize: dimen11, color: ColorsTheme.colFF4E4E),
+    //                   textAlign: TextAlign.center,
+    //                 ),
+    //               ),
+    //       ],
+    //     ),
+    //     actions: [
+    //       TextButton(
+    //         onPressed: () => Get.back(),
+    //         child: Text('No'.tr,
+    //             style: semiBoldTextStyle(
+    //                 fontSize: dimen12, color: ColorsTheme.colBlack)),
+    //       ),
+    //       TextButton(
+    //         onPressed: () async {
+    //           Get.back();
+    //           var result = await Get.toNamed(
+    //             Routes.orderCancel,
+    //             arguments: {
+    //               'orderId': controller.orderId,
+    //               'amount': controller.totalPrice.value,
+    //               'resId': controller.resId,
+    //               'pickupDate': order.pickupDate ?? '',
+    //               'pickupTime': order.pickupTime ?? '',
+    //               'pickupEndTime': order.pickupEndTime ?? '',
+    //               'orderStatus': status,
+    //             },
+    //           );
+    //           if (result != null && result) {
+    //             controller.backResult.value = true;
+    //             controller.getOrderDetails();
+    //           }
+    //         },
+    //         child: Text('Yes'.tr,
+    //             style: semiBoldTextStyle(
+    //                 fontSize: dimen12, color: ColorsTheme.colFF4E4E)),
+    //       ),
+    //     ],
+    //   ),
+    //   barrierDismissible: true,
+    // );
   }
 
   Widget _cancelSummaryDialog({

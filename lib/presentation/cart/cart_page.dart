@@ -424,7 +424,7 @@ class CartPage extends BaseView<CartController> {
                                                           .spaceBetween,
                                                   children: [
                                                     Text(
-                                                      "GST on item total".tr,
+                                                      "GST on Item Charges".tr,
                                                       style: semiBoldTextStyle(
                                                         fontSize: dimen12,
                                                         color: ColorsTheme
@@ -450,7 +450,7 @@ class CartPage extends BaseView<CartController> {
                                                           .spaceBetween,
                                                   children: [
                                                     Text(
-                                                      "GST on platform fee".tr,
+                                                      "GST on Platform Fee".tr,
                                                       style: semiBoldTextStyle(
                                                         fontSize: dimen12,
                                                         color: ColorsTheme
@@ -482,7 +482,7 @@ class CartPage extends BaseView<CartController> {
                                                           .spaceBetween,
                                                   children: [
                                                     Text(
-                                                      "Total".tr,
+                                                      "Total GST".tr,
                                                       style: semiBoldTextStyle(
                                                         fontSize: dimen12,
                                                         color: ColorsTheme
