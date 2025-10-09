@@ -115,7 +115,7 @@ class CartController extends GetxController {
   var rApiKey = ''.obs;
   var rSecretApiKey = 'u3FtMReoFcKlpsWfPwVzHza8'.obs;
 
-  var newOrderId = 0.obs;
+  var newOrderId = Rx<dynamic>('');
 
   @override
   void onInit() {
