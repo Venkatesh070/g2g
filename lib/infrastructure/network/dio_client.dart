@@ -413,7 +413,6 @@ class DioClient {
       Response response = await _dio.post(apiEndPoints.apiPlaceOrder,
           data: json.encode(params));
       log("response  ${response.data!['data']['order_id']}");
-
       return response.data!['data']['order_id'];
     } catch (error) {
       catchErrorHandler();
@@ -490,6 +489,94 @@ class DioClient {
       catchErrorHandler();
     }
     return null;
+  }
+
+  Future<ApiResponseModel<InvoiceModel>> funDownloadInvoiceApi(params) async {
+    try {
+      Response response =
+          await _dio.post(apiEndPoints.apiDownloadInvoice, data: json.encode(params));
+      final raw = response.data as Map<String, dynamic>;
+      final success = raw['success'] == true;
+      final message = raw['message'];
+      final dynamic d = raw['data'];
+      Map<String, dynamic> dataMap = {};
+      if (d is String) {
+        dataMap = {
+          'order_id': null,
+          'file_name': null,
+          'pdf_base64': d,
+        };
+      } else if (d is Map<String, dynamic>) {
+        // normalize potential alternate keys
+        dataMap = {
+          'order_id': d['order_id'],
+          'file_name': d['file_name'] ?? d['filename'] ?? d['name'],
+          'pdf_base64': d['pdf_base64'] ?? d['pdf'] ?? d['base64'] ?? d['file'],
+        };
+      } else {
+        // Some backends return payload at root instead of under 'data'
+        if (raw.containsKey('pdf_base64') || raw.containsKey('pdf') || raw.containsKey('base64')) {
+          dataMap = {
+            'order_id': raw['order_id'],
+            'file_name': raw['file_name'] ?? raw['filename'] ?? raw['name'],
+            'pdf_base64': raw['pdf_base64'] ?? raw['pdf'] ?? raw['base64'] ?? raw['file'],
+          };
+        }
+      }
+
+      return ApiResponseModel<InvoiceModel>(
+        success: success,
+        message: message,
+        data: dataMap.isEmpty ? null : InvoiceModel.fromJson(dataMap),
+      );
+    } catch (error) {
+      catchErrorHandler();
+    }
+    return ApiResponseModel<InvoiceModel>();
+  }
+
+   Future<ApiResponseModel<InvoiceModel>> funDownloadRefundInvoiceApi(params) async {
+    try {
+      Response response =
+          await _dio.post(apiEndPoints.apiDownloadRefundInvoice, data: json.encode(params));
+      final raw = response.data as Map<String, dynamic>;
+      final success = raw['success'] == true;
+      final message = raw['message'];
+      final dynamic d = raw['data'];
+      Map<String, dynamic> dataMap = {};
+      if (d is String) {
+        dataMap = {
+          'order_id': null,
+          'file_name': null,
+          'pdf_base64': d,
+        };
+      } else if (d is Map<String, dynamic>) {
+        // normalize potential alternate keys
+        dataMap = {
+          'order_id': d['order_id'],
+          'file_name': d['file_name'] ?? d['filename'] ?? d['name'],
+          'pdf_base64': d['pdf_base64'] ?? d['pdf'] ?? d['base64'] ?? d['file'],
+        };
+      } else {
+        // Some backends return payload at root instead of under 'data'
+        if (raw.containsKey('pdf_base64') || raw.containsKey('pdf') || raw.containsKey('base64')) {
+          dataMap = {
+            'order_id': raw['order_id'],
+            'file_name': raw['file_name'] ?? raw['filename'] ?? raw['name'],
+            'pdf_base64': raw['pdf_base64'] ?? raw['pdf'] ?? raw['base64'] ?? raw['file'],
+          };
+        }
+      }
+
+      return ApiResponseModel<InvoiceModel>(
+        success: success,
+        message: message,
+        data: dataMap.isEmpty ? null : InvoiceModel.fromJson(dataMap),
+      );
+    } catch (error) {
+      catchErrorHandler();
+    }
+    return ApiResponseModel<InvoiceModel>();
   }
 
   Future funAddOrderRatingApi(params) async {

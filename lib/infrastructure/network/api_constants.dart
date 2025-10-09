@@ -74,6 +74,8 @@ class ApiConstants {
   var apiOrderCancelReasons = '/cancel-reasons';
   var apiOrderCancel = '/order-cancel';
   var apiOrderRating = '/add-rating';
+  var apiDownloadInvoice = '/download-invoice';
+  var apiDownloadRefundInvoice = '/download-refund-invoice';
 
   //fav
   var apiAddFavourites = '/add-favourites';

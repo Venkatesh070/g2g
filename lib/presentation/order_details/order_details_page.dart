@@ -170,7 +170,7 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                                     ),
                                   ),
                                 ),
-                               
+
                                 Visibility(
                                   visible: controller.orderStatus.value ==
                                       'pending_pick_up',
@@ -321,13 +321,13 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                                     ? restaurantDetails()
                                     : Container(),
                                 paymentType(),
-                                controller.orderStatus.value !=
-                                            'order_cancel' &&
-                                        controller.orderStatus.value !=
-                                            'payment_pending'
-                                    ? cancellationWidget()
-                                    : Container(),
-                                      contactUs(),
+                                // controller.orderStatus.value !=
+                                //             'order_cancel' &&
+                                //         controller.orderStatus.value !=
+                                //             'payment_pending'
+                                //     ? cancellationWidget()
+                                //     : Container(),
+                                contactUs(),
                                 // const SizedBox(height: 15),
                                 // Show the former bottomNavigationBar section as an in-page widget
                                 Obx(() {
@@ -345,17 +345,19 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                                       ? _cancelBottomActionSection()
                                       : const SizedBox.shrink();
                                 }),
-                                 // Need more help? card when user can no longer cancel with refund
+                                // Need more help? card when user can no longer cancel with refund
                                 Obx(() {
                                   final status = controller.orderStatus.value;
                                   final diffMinutes =
                                       controller.cancelDiffMinutes.value;
                                   final bool showHelp = diffMinutes > 5 &&
-                                      (status == 'confirmation_pending' ||
-                                          status == 'Confirmation Pending' ||
-                                          status == 'pending_pick_up' ||
-                                          status == 'Pending pick-up') || (status == 'pending_pick_up' ||
-                                          status == 'Pending pick-up') ;
+                                          (status == 'confirmation_pending' ||
+                                              status ==
+                                                  'Confirmation Pending' ||
+                                              status == 'pending_pick_up' ||
+                                              status == 'Pending pick-up') ||
+                                      (status == 'pending_pick_up' ||
+                                          status == 'Pending pick-up');
                                   if (!showHelp) return const SizedBox.shrink();
                                   return Container(
                                     margin: const EdgeInsets.only(
@@ -364,10 +366,13 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                                     decoration: BoxDecoration(
                                       color: ColorsTheme.colWhite,
                                       borderRadius: BorderRadius.circular(10),
-                                      border: Border.all(color: ColorsTheme.colC4D9D4, width: 1),
+                                      border: Border.all(
+                                          color: ColorsTheme.colC4D9D4,
+                                          width: 1),
                                     ),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           'Need more help?'.tr,
@@ -377,32 +382,40 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                                         ),
                                         const SizedBox(height: 5),
                                         Text(
-                                          'We understand you need to cancel your order. However, since the restaurant has already accepted it, a 100% cancellation fee will be applied. This helps us prevent food waste.'.tr,
+                                          'We understand you need to cancel your order. However, since the restaurant has already accepted it, a 100% cancellation fee will be applied. This helps us prevent food waste.'
+                                              .tr,
                                           style: regularTextStyle(
                                               fontSize: dimen10,
-                                              color: ColorsTheme.col404040
-                                              ),
+                                              color: ColorsTheme.col404040),
                                         ),
                                         const SizedBox(height: 10),
                                         SizedBox(
                                           width: double.infinity,
                                           child: OutlinedButton(
                                             style: OutlinedButton.styleFrom(
-                                              backgroundColor: ColorsTheme.colF5F5F5,
+                                              backgroundColor:
+                                                  ColorsTheme.colF5F5F5,
                                               shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(25),
+                                                borderRadius:
+                                                    BorderRadius.circular(25),
                                               ),
-                                              side: BorderSide(color: ColorsTheme.colF5F5F5, width: 1),
-                                              padding: const EdgeInsets.symmetric(vertical: 10),
+                                              side: BorderSide(
+                                                  color: ColorsTheme.colF5F5F5,
+                                                  width: 1),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 10),
                                             ),
                                             onPressed: () {
                                               _openCancelSummaryDialog(
                                                 overrideNote:
-                                                    'We understand you need to cancel your order. However, since the restaurant has already accepted it, a 100% cancellation fee will be applied. This helps us prevent food waste.'.tr,
+                                                    'We understand you need to cancel your order. However, since the restaurant has already accepted it, a 100% cancellation fee will be applied. This helps us prevent food waste.'
+                                                        .tr,
                                               );
                                             },
                                             child: Text(
-                                              'Proceed with Cancellation but No Refund. '.tr,
+                                              'Proceed with Cancellation but No Refund. '
+                                                  .tr,
                                               style: semiBoldTextStyle(
                                                   fontSize: dimen11,
                                                   color: ColorsTheme.col475751),
@@ -451,7 +464,7 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Container(
-                          margin: const EdgeInsets.only(bottom: 8,top: 5),
+                          margin: const EdgeInsets.only(bottom: 8, top: 5),
                           child: Text(
                             'Order Status'.tr,
                             style: regularTextStyle(
@@ -897,10 +910,51 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Bill Details'.tr,
-            style: semiBoldTextStyle(
-                fontSize: dimen12, color: ColorsTheme.colBlack),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Bill Details'.tr,
+                style: semiBoldTextStyle(
+                    fontSize: dimen12, color: ColorsTheme.colBlack),
+              ),
+          (controller.orderStatus.value == 'completd_pick_up'
+    ? Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: ColorsTheme.colC4D9D4, width: 1),
+          borderRadius: BorderRadius.circular(30),
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+        child: GestureDetector(
+          onTap: () {
+            if (controller.orderStatus.value == 'completd_pick_up') {
+              controller.funDownloadInvoice();
+            } 
+            // else if (controller.orderStatus.value == 'order_cancel') {
+            //   controller.funDownloadRefundInvoice();
+            // }
+          },
+          child: Row(
+            children: [
+              Text(
+                'Invoice'.tr,
+                style: semiBoldTextStyle(
+                  fontSize: dimen12,
+                  color: ColorsTheme.colBlack,
+                ),
+              ),
+              SizedBox(width: 5),
+              Icon(
+                Icons.download,
+                size: 16,
+                color: ColorsTheme.colPrimary,
+              ),
+            ],
+          ),
+        ),
+      )
+    : const SizedBox(width:0))
+            ],
           ),
           Container(
               decoration: BoxDecoration(
@@ -1012,7 +1066,7 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                                                       ),
                                                     ),
                                                     Text(
-                                                      '${controller.currency}${controller.otherTotalPrice.value}',
+                                                      '${controller.currency}${controller.otherTotalPrice.value.toStringAsFixed(2)}',
                                                       style: semiBoldTextStyle(
                                                         fontSize: dimen13,
                                                         color: ColorsTheme
@@ -1038,7 +1092,7 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                                                       ),
                                                     ),
                                                     Text(
-                                                      '${controller.currency}${controller.platformGst.value}',
+                                                      '${controller.currency}${controller.platformGst.value.toStringAsFixed(2)}',
                                                       style: semiBoldTextStyle(
                                                         fontSize: dimen13,
                                                         color: ColorsTheme
@@ -1070,7 +1124,7 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                                                       ),
                                                     ),
                                                     Text(
-                                                      '${controller.currency}${controller.combinedGst.value}',
+                                                      '${controller.currency}${controller.combinedGst.value.toStringAsFixed(2)}',
                                                       style: semiBoldTextStyle(
                                                         fontSize: dimen12,
                                                         color: ColorsTheme
@@ -1133,7 +1187,7 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
 
                         // GST value beside info icon
                         Obx(() => Text(
-                              '${controller.currency}${controller.combinedGst.value}',
+                              '${controller.currency}${controller.combinedGst.value.toStringAsFixed(2)}',
                               style: regularTextStyle(
                                 fontSize: dimen11,
                                 color: ColorsTheme.colBlack,
@@ -1737,7 +1791,8 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                         decoration: BoxDecoration(
                           color: ColorsTheme.coldD0F0C0,
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: ColorsTheme.colC4D9D4, width: 1),
+                          border: Border.all(
+                              color: ColorsTheme.colC4D9D4, width: 1),
                         ),
                         padding: const EdgeInsets.all(8),
                         child: Icon(
@@ -1761,14 +1816,14 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                               overflow: TextOverflow.ellipsis,
                             ),
                             Text(
-                          'Call or mail customer support'.tr,
-                          style: regularTextStyle(
-                            fontSize: dimen10,
-                            color: ColorsTheme.colBlack,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                              'Call or mail customer support'.tr,
+                              style: regularTextStyle(
+                                fontSize: dimen10,
+                                color: ColorsTheme.colBlack,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ],
                         ),
                       ),
@@ -1833,6 +1888,93 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
     );
   }
 
+  cancelOrderBottomSheet() {
+    final status = controller.orderStatus.value;
+    final bool noRefundCondition = controller.cancelDiffMinutes.value > 5 &&
+        (status == 'confirmation_pending' ||
+            status == 'Confirmation Pending' ||
+            status == 'pending_pick_up' ||
+            status == 'Pending Pick-up');
+    return Get.bottomSheet(
+        WillPopScope(
+          onWillPop: () {
+            return Future.value(false);
+          },
+          child: Container(
+            decoration: BoxDecoration(
+                color: ColorsTheme.colWhite,
+                borderRadius: const BorderRadius.only(
+                    topRight: Radius.circular(20),
+                    topLeft: Radius.circular(20))),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            child: Wrap(
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.only(top: 20, bottom: 20),
+                      child: Image.asset(
+                        Res.icCancelOrder,
+                        width: 70,
+                        height: 70,
+                      ),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 20),
+                      child: Text(
+                        'Cancelled order successfully'.tr,
+                        style: boldTextStyle(
+                            fontSize: dimen17, color: ColorsTheme.colBlack),
+                      ),
+                    ),
+                    noRefundCondition
+                        ? const SizedBox(
+                            height: 0,
+                          )
+                        : Container(
+                            margin: const EdgeInsets.only(bottom: 20),
+                            child: Text(
+                              'cancelled_order_refund'.tr,
+                              textAlign: TextAlign.center,
+                              style: regularTextStyle(
+                                  fontSize: dimen11,
+                                  color: ColorsTheme.colBlack,
+                                  height: 2.0),
+                            ),
+                          ),
+                    GestureDetector(
+                      onTap: () {
+                        Get.back();
+                        controller.getOrderDetails();
+                        // Get.back(result: true);
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: ColorsTheme.colPrimary,
+                            borderRadius: BorderRadius.circular(50)),
+                        alignment: Alignment.center,
+                        padding: const EdgeInsets.symmetric(vertical: 18),
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 10),
+                        child: Text(
+                          'Got It'.tr,
+                          style: semiBoldTextStyle(
+                              fontSize: dimen13, color: ColorsTheme.colWhite),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+        ignoreSafeArea: false,
+        isDismissible: false,
+        enableDrag: false);
+  }
+
   // Keep the base override empty now; we render it inline in the page content
   @override
   Widget? bottomNavigationBar() => const SizedBox.shrink();
@@ -1881,35 +2023,35 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                             fontSize: dimen12, color: ColorsTheme.col404040),
                       ),
                     ),
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      margin: const EdgeInsets.symmetric(vertical: 6),
-                      decoration: BoxDecoration(
-                        color: ColorsTheme.colF5F5F5,
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '* ',
-                            style: semiBoldTextStyle(
-                              fontSize: dimen10,
-                              color: ColorsTheme.colFF4E4E,
-                            ),
-                          ),
-                          Expanded(
-                            child: Text(
-                              'You can cancel within the first 5 minutes from order creation only if vendor confirmation is pending.',
-                              style: regularTextStyle(
-                                fontSize: dimen10,
-                                color: ColorsTheme.colBlack,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    // Container(
+                    //   padding: const EdgeInsets.all(8),
+                    //   margin: const EdgeInsets.symmetric(vertical: 6),
+                    //   decoration: BoxDecoration(
+                    //     color: ColorsTheme.colF5F5F5,
+                    //     borderRadius: BorderRadius.circular(6),
+                    //   ),
+                    //   child: Row(
+                    //     crossAxisAlignment: CrossAxisAlignment.start,
+                    //     children: [
+                    //       Text(
+                    //         '* ',
+                    //         style: semiBoldTextStyle(
+                    //           fontSize: dimen10,
+                    //           color: ColorsTheme.colFF4E4E,
+                    //         ),
+                    //       ),
+                    //       Expanded(
+                    //         child: Text(
+                    //           'You can cancel within the first 5 minutes from order creation only if vendor confirmation is pending.',
+                    //           style: regularTextStyle(
+                    //             fontSize: dimen10,
+                    //             color: ColorsTheme.colBlack,
+                    //           ),
+                    //         ),
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
                   ],
                 ),
               ),
@@ -1939,7 +2081,8 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
     );
   }
 
-  void _openCancelSummaryDialog({String? overrideNote, Color? dialogBackgroundColor}) {
+  void _openCancelSummaryDialog(
+      {String? overrideNote, Color? dialogBackgroundColor}) {
     if (controller.orderDetailsModel == null) return;
 
     final order = controller.orderDetailsModel!;
@@ -1953,9 +2096,11 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
         ? 'Would you like to cancel your order and proceed without a refund?'.tr
         : 'Are you sure you want to cancel this order?'.tr;
 
-
     // For confirmation_pending (and payment_pending), show the custom-styled popup matching the reference
-    if (status == 'confirmation_pending' || status == 'Confirmation Pending' || status == 'pending_pick_up' || status == 'Pending Pick-up') {
+    if (status == 'confirmation_pending' ||
+        status == 'Confirmation Pending' ||
+        status == 'pending_pick_up' ||
+        status == 'Pending Pick-up') {
       final String method = (order.paymentMethod ?? '').toUpperCase();
       final int totalQty = (order.menuDetails ?? [])
           .map((m) => m.quantity ?? 0)
@@ -1976,141 +2121,140 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
             child: Container(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
               child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // Warning icon inside a soft red circle
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: ColorsTheme.colFF4E4E.withOpacity(0.1),
-                    shape: BoxShape.circle,
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Warning icon inside a soft red circle
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: ColorsTheme.colFF4E4E.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    alignment: Alignment.center,
+                    child: Icon(Icons.report_rounded,
+                        color: ColorsTheme.colFF4E4E, size: 22),
                   ),
-                  alignment: Alignment.center,
-                  child: Icon(Icons.report_rounded,
-                      color: ColorsTheme.colFF4E4E, size: 22),
-                ),
-                const SizedBox(height: 10),
-                Text('Cancel Order'.tr,
-                    style: semiBoldTextStyle(
-                        fontSize: dimen16, color: ColorsTheme.colBlack)),
-                const SizedBox(height: 6),
-                Text(
-                  questionText,
-                  textAlign: TextAlign.center,
-                  style: regularTextStyle(
-                      fontSize: dimen12, color: ColorsTheme.colBlack),
-                ),
-                const SizedBox(height: 14),
-                // Payment method + qty + total amount pill
-                Container(
-                  width: double.infinity,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Colors.black.withOpacity(0.08)),
-                    color: Colors.white,
+                  const SizedBox(height: 10),
+                  Text('Cancel Order'.tr,
+                      style: semiBoldTextStyle(
+                          fontSize: dimen16, color: ColorsTheme.colBlack)),
+                  const SizedBox(height: 6),
+                  Text(
+                    questionText,
+                    textAlign: TextAlign.center,
+                    style: regularTextStyle(
+                        fontSize: dimen12, color: ColorsTheme.colBlack),
                   ),
-                  child: Row(
+                  const SizedBox(height: 14),
+                  // Note hidden when no-refund condition is active
+                  noRefundCondition
+                      ? const SizedBox.shrink()
+                      : Container(
+                          width: double.infinity,
+                          margin: const EdgeInsets.only(top: 4),
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: ColorsTheme.colFF4E4E.withOpacity(0.08),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            ('Note: You may not be eligible for full refund.')
+                                .tr,
+                            style: semiBoldTextStyle(
+                                fontSize: dimen11,
+                                color: ColorsTheme.colFF4E4E),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                  const SizedBox(height: 16),
+                  // Buttons row matching visual weight
+                  Row(
                     children: [
                       Expanded(
-                        child: Text(
-                          method.isEmpty ? '—' : method,
-                          style: semiBoldTextStyle(
-                              fontSize: dimen12, color: ColorsTheme.colBlack),
+                        child: OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(
+                                color: Colors.black.withOpacity(0.15),
+                                width: 1.2),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(26)),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            foregroundColor: ColorsTheme.colBlack,
+                            backgroundColor: Colors.white,
+                          ),
+                          onPressed: () => Get.back(),
+                          child: Text('Go back'.tr,
+                              style: semiBoldTextStyle(
+                                  fontSize: dimen12,
+                                  color: ColorsTheme.colBlack)),
                         ),
                       ),
-                      Text(
-                        '${totalQty} Qty at ${controller.currency}${fmt(orderTotal)}',
-                        style: regularTextStyle(
-                            fontSize: dimen11, color: ColorsTheme.colBlack),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(26)),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            backgroundColor: ColorsTheme.colPrimary,
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                          ),
+                          onPressed: () async {
+                            Get.back();
+                            // var result = await Get.toNamed(
+                            //   Routes.orderCancel,
+                            //   arguments: {
+                            //     'orderId': controller.orderId,
+                            //     'amount': controller.totalPrice.value,
+                            //     'resId': controller.resId,
+                            //     'pickupDate': order.pickupDate ?? '',
+                            //     'pickupTime': order.pickupTime ?? '',
+                            //     'pickupEndTime': order.pickupEndTime ?? '',
+                            //     'orderStatus': status,
+                            //   },
+                            // );
+
+                            var result = await controller.funCancelOrder();
+                            // var result = true;
+                            if (result) {
+                              cancelOrderBottomSheet();
+                            }
+                            // if (result != null && result) {
+                            //   controller.backResult.value = true;
+                            //   controller.getOrderDetails();
+                            // }
+                          },
+                          child: Text('Yes, Cancel'.tr,
+                              style: semiBoldTextStyle(
+                                  fontSize: dimen12, color: Colors.white)),
+                        ),
                       ),
                     ],
                   ),
-                ),
-                const SizedBox(height: 16),
-                // Buttons row matching visual weight
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(
-                              color: Colors.black.withOpacity(0.15),
-                              width: 1.2),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(26)),
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          foregroundColor: ColorsTheme.colBlack,
-                          backgroundColor: Colors.white,
-                        ),
-                        onPressed: () => Get.back(),
-                        child: Text('Go back'.tr,
-                            style: semiBoldTextStyle(
-                                fontSize: dimen12,
-                                color: ColorsTheme.colBlack)),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(26)),
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          backgroundColor: ColorsTheme.colPrimary,
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                        ),
-                        onPressed: () async {
-                          Get.back();
-                          var result = await Get.toNamed(
-                            Routes.orderCancel,
-                            arguments: {
-                              'orderId': controller.orderId,
-                              'amount': controller.totalPrice.value,
-                              'resId': controller.resId,
-                              'pickupDate': order.pickupDate ?? '',
-                              'pickupTime': order.pickupTime ?? '',
-                              'pickupEndTime': order.pickupEndTime ?? '',
-                              'orderStatus': status,
-                            },
-                          );
-                          if (result != null && result) {
-                            controller.backResult.value = true;
-                            controller.getOrderDetails();
-                          }
-                        },
-                        child: Text('Yes, Cancel'.tr,
-                            style: semiBoldTextStyle(
-                                fontSize: dimen12, color: Colors.white)),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                // Note hidden when no-refund condition is active
-                noRefundCondition
-                    ? const SizedBox.shrink()
-                    : Container(
-                        width: double.infinity,
-                        margin: const EdgeInsets.only(top: 4),
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: ColorsTheme.colFF4E4E.withOpacity(0.08),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          (overrideNote ?? 'You may not be eligible for full refund. Processing charges will be deducted.').tr,
-                          style: semiBoldTextStyle(
-                              fontSize: dimen11, color: ColorsTheme.colFF4E4E),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-              ],
-            ),
+                  const SizedBox(height: 10),
+                  // Note hidden when no-refund condition is active
+                  // noRefundCondition
+                  //     ? const SizedBox.shrink()
+                  //     : Container(
+                  //         width: double.infinity,
+                  //         margin: const EdgeInsets.only(top: 4),
+                  //         padding: const EdgeInsets.all(10),
+                  //         decoration: BoxDecoration(
+                  //           color: ColorsTheme.colFF4E4E.withOpacity(0.08),
+                  //           borderRadius: BorderRadius.circular(8),
+                  //         ),
+                  //         child: Text(
+                  //           (overrideNote ?? 'You may not be eligible for full refund. Processing charges will be deducted.').tr,
+                  //           style: semiBoldTextStyle(
+                  //               fontSize: dimen11, color: ColorsTheme.colFF4E4E),
+                  //           textAlign: TextAlign.center,
+                  //         ),
+                  //       ),
+                ],
+              ),
             ),
           ),
         ),

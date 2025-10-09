@@ -64,7 +64,7 @@ class OrderDetailsModel extends Serializable{
     pickupDate = json['pickup_date'];
     pickupTime = json['pickup_time'];
     pickupEndTime = json['pickup_end_time'];
-    pickupCode = json['pickup_code']?? 5690;
+    pickupCode = json['pickup_code']?? 0000;
     // pickupCode=5690;
   }
 
@@ -220,6 +220,29 @@ class RefundData {
     data['refund_status'] = refundStatus;
     data['refund_image'] = refundImage;
     return data;
+  }
+}
+
+class InvoiceModel extends Serializable {
+  int? orderId;
+  String? fileName;
+  String? pdfBase64;
+
+  InvoiceModel({this.orderId, this.fileName, this.pdfBase64});
+
+  InvoiceModel.fromJson(Map<String, dynamic> json) {
+    orderId = json['order_id'];
+    fileName = json['file_name'];
+    pdfBase64 = json['pdf_base64'];
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return {
+      'order_id': orderId,
+      'file_name': fileName,
+      'pdf_base64': pdfBase64,
+    };
   }
 }
 

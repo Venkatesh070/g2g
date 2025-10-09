@@ -168,10 +168,10 @@ class CartController extends GetxController {
                     ),
                     const SizedBox(height: 15),
                     SizedBox(
-                      height: 80,
+                      height: 100,
                       child: Lottie.asset(
                         Res.takeAway,
-                        repeat: false,
+                        repeat: true,
                         animate: true,
                       ),
                     ),
@@ -818,7 +818,6 @@ class CartController extends GetxController {
     } catch (exception) {
               print('razorpay  error');
       print(exception);
-      debugPrint('exception.toString()');
       // progressDialog.dismiss();
       errorScreen(error: 'something_went_wrong'.tr);
     }
@@ -840,7 +839,7 @@ class CartController extends GetxController {
       'description': 'New Order',
       'prefill': {"contact": userPhoneNumber.value, 'email': userEmail.value},
       'external': {
-        'wallets': ['paytm']
+      'wallets': ['paytm']
       }
     };
     razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
@@ -1084,12 +1083,31 @@ bool _isPaymentSheetOpen = false;
         params['country_code'] = countryCode.value;
         params['mobile'] = userPhoneNumber.value;
       }
-      newOrderId.value = await DioClient.base(accessToken: accessToken)
+      debugPrint('Calling funPlaceOrderWithoutPaymentApi with params: ');
+      final dynamic createdOrderId = await DioClient.base(accessToken: accessToken)
           .funPlaceOrderWithoutPaymentApi(params);
-      progressDialog.dismiss();
+      debugPrint('funPlaceOrderWithoutPaymentApi returned: $createdOrderId (type: ${createdOrderId.runtimeType})');
 
-      // print("newOrderId ${baseModel.data} ${order} ${newOrderId.value}");
+      if (createdOrderId == null) {
+        progressDialog.dismiss();
+        errorScreen(error: 'something_went_wrong'.tr);
+        return;
+      }
+      if (createdOrderId is int) {
+        newOrderId.value = createdOrderId;
+      } else if (createdOrderId is String) {
+        final parsed = int.tryParse(createdOrderId);
+        if (parsed == null) {
+          progressDialog.dismiss();
+          errorScreen(error: 'something_went_wrong'.tr);
+          return;
+        }
+        newOrderId.value = parsed;
+      } else {
+        newOrderId.value = int.tryParse(createdOrderId.toString()) ?? 0;
+      }
 
+      debugPrint('Starting to payment with orderId: ${newOrderId.value}');
       if (paymentMethodType == "phonePe") {
         startPgTransaction();
       } else {
@@ -1103,6 +1121,7 @@ bool _isPaymentSheetOpen = false;
               type: exception.type));
     } catch (exception) {
       progressDialog.dismiss();
+      print('getting error in fun');
       errorScreen(error: 'something_went_wrong'.tr);
     }
   }
