@@ -36,6 +36,9 @@ class OrderDetailsController extends GetxController {
   var currency = '';
   var pickupCode = 0000.obs;
 
+  //Quantity
+  var itemQty = 0.obs;
+
   //Pickup countdown Timer
   var isCountingToStart = false.obs;
   var pickupRemainingSeconds = 0.obs;
@@ -109,6 +112,9 @@ class OrderDetailsController extends GetxController {
         otherTotalPrice.value =
             double.parse(orderModel.data!.gstCharge.toString());
         pickupCode.value = orderModel.data!.pickupCode!;
+        //Quantity
+        itemQty.value = orderModel.data!.itemQty!;
+        //Platform Fee And GST
         platformFee.value =
             await PrefManager.getDouble(AppConstants.platformFee);
         platformGst.value =

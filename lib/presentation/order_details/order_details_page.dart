@@ -887,7 +887,7 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 9, vertical: 7),
                           child: Text(
-                            '${controller.orderDetailsModel!.menuDetails![index].quantity!}',
+                            '${controller.orderDetailsModel!.itemQty}',
                             style: regularTextStyle(
                                 fontSize: dimen11, color: ColorsTheme.colBlack),
                           ),

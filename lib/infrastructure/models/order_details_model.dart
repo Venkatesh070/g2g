@@ -1,10 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:good_grab/infrastructure/models/api_response_model.dart';
 class OrderDetailsModel extends Serializable{
   int? orderId;
   List<MenuDetails>? menuDetails;
   String? orderStatus;
   String? totalPaid;
-  String? price;
+  dynamic? price;
   String? gstCharge;
   RefundData? refundData;
   RestaurantDetail? restaurantDetail;
@@ -17,6 +18,7 @@ class OrderDetailsModel extends Serializable{
   String? pickupEndTime;
   String? createdTime;
   int? pickupCode;
+  int? itemQty;
 
   OrderDetailsModel(
       {this.orderId,
@@ -36,35 +38,48 @@ class OrderDetailsModel extends Serializable{
         this.pickupEndTime,
         this.createdTime,
         this.pickupCode,
+        this.itemQty
         });
 
   OrderDetailsModel.fromJson(Map<String, dynamic> json) {
     orderId = json['order_id'];
     if (json['menu_details'] != null) {
       menuDetails = <MenuDetails>[];
-      json['menu_details'].forEach((v) {
-        menuDetails!.add(MenuDetails.fromJson(v));
-      });
+      if (json['menu_details'] is Map<String, dynamic>) {
+        menuDetails!.add(MenuDetails.fromJson(json['menu_details']));
+      } else if (json['menu_details'] is List) {
+        json['menu_details'].forEach((v) {
+          menuDetails!.add(MenuDetails.fromJson(v));
+        });
+      }
     }
+
+    debugPrint('menuDetails ${menuDetails}');
+
     orderStatus = json['order_status'];
     totalPaid = json['total_paid'];
     price = json['price'];
-    gstCharge = json['gst_charge'];
-    refundData = json['refund_data'] != null
-        ? RefundData.fromJson(json['refund_data'])
-        : null;
+    gstCharge = json['gst_charge'].toString();
+   refundData = (json['refund_data'] != null && json['refund_data'] != "Null")
+    ? RefundData.fromJson(json['refund_data'])
+    : null;
     restaurantDetail = json['restaurant_detail'] != null
         ? RestaurantDetail.fromJson(json['restaurant_detail'])
         : null;
     isRated = json['is_rated']??false;
-    rating = double.parse((json['rating']??0).toString());
+
+    rating = (json['rating'] != null && json['rating'] != "Null")
+        ? double.parse(json['rating'].toString())
+        : 0.0;
+    
     paymentMethod = json['payment_method'];
     createdDate = json['created_date'];
     createdTime = json['created_time'];
     pickupDate = json['pickup_date'];
     pickupTime = json['pickup_time'];
     pickupEndTime = json['pickup_end_time'];
-    pickupCode = json['pickup_code']?? 0000;
+    pickupCode = double.parse(json['pickup_code']).round().toInt();
+    itemQty=json['item_quantity'];
     // pickupCode=5690;
   }
 
@@ -95,6 +110,7 @@ class OrderDetailsModel extends Serializable{
     data['pickup_time'] = pickupTime;
     data['pickup_end_time'] = pickupEndTime;
     data['pickup_code'] = pickupCode;
+    data['item_quantity']=itemQty;
     return data;
   }
 }
