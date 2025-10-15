@@ -6,7 +6,7 @@ class OrderSuccessData implements Serializable {
   OrderSuccessData({this.orderId});
 
   OrderSuccessData.fromJson(Map<String, dynamic> json) {
-    orderId = json['order_id']; // ✅ should match API field
+   orderId = int.parse(json['order_id'].toString());
   }
 
   @override

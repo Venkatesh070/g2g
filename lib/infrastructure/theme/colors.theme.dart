@@ -32,6 +32,7 @@ class ColorsTheme {
   static Color coldD0F0C0 = HexColor("#D0F0C0");
   static Color colD2D3D4 = HexColor("#D2D3D4");
   static Color colFCE8E8 = HexColor("#fce8e8");
+  static Color colFFF3F3 = HexColor("#FFF3F3");
   
   static Color colTransparent = const Color.fromARGB(0, 0, 0, 0);
 

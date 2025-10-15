@@ -803,100 +803,132 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
             ),
             padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
             child: Column(
-              children: List.generate(
-                controller.orderDetailsModel!.menuDetails!.length,
-                (index) {
-                  return Container(
-                    margin: const EdgeInsets.symmetric(vertical: 6),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Container(
-                            margin: const EdgeInsets.only(top: 2),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  margin: const EdgeInsets.only(right: 10),
-                                  child: Image.asset(
-                                    controller
-                                                .orderDetailsModel!
-                                                .menuDetails![index]
-                                                .foodPreference ==
-                                            'non-veg'
-                                        ? Res.icNonVeg
-                                        : Res.icVeg,
-                                    width: 16,
-                                    height: 16,
+              children: [
+                ...List.generate(
+                  controller.orderDetailsModel!.menuDetails!.length,
+                  (index) {
+                    return Container(
+                      margin: const EdgeInsets.symmetric(vertical: 6),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Container(
+                              margin: const EdgeInsets.only(top: 2),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    margin: const EdgeInsets.only(right: 10),
+                                    child: Image.asset(
+                                      controller
+                                                  .orderDetailsModel!
+                                                  .menuDetails![index]
+                                                  .foodPreference ==
+                                              'non-veg'
+                                          ? Res.icNonVeg
+                                          : Res.icVeg,
+                                      width: 16,
+                                      height: 16,
+                                    ),
                                   ),
-                                ),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        '${controller.orderDetailsModel!.menuDetails![index].menuName!} : ${controller.orderDetailsModel!.menuDetails![index].menuType!}',
-                                        maxLines: 2,
-                                        style: regularTextStyle(
-                                            fontSize: dimen11,
-                                            color: ColorsTheme.colBlack),
-                                      ),
-                                      Row(
-                                        children: [
-                                          Text(
-                                            '${controller.currency}${controller.orderDetailsModel!.menuDetails![index].offerPrice!}',
-                                            style: TextStyle(
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${controller.orderDetailsModel!.menuDetails![index].menuName!} : ${controller.orderDetailsModel!.menuDetails![index].menuType!}',
+                                          maxLines: 2,
+                                          style: regularTextStyle(
                                               fontSize: dimen11,
-                                              color: ColorsTheme.col5dD6E68,
-                                              fontWeight: FontWeight.w500,
-                                              decorationColor:
-                                                  ColorsTheme.col5dD6E68,
-                                              decoration:
-                                                  TextDecoration.lineThrough,
-                                            ),
-                                            maxLines: 2,
-                                          ),
-                                          Container(
-                                            margin:
-                                                const EdgeInsets.only(left: 5),
-                                            child: Text(
-                                              '${controller.currency}${controller.orderDetailsModel!.menuDetails![index].finalPrice!}',
-                                              style: semiBoldTextStyle(
-                                                  fontSize: dimen12,
-                                                  color: ColorsTheme.colBlack),
+                                              color: ColorsTheme.colBlack),
+                                        ),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              '${controller.currency}${controller.orderDetailsModel!.menuDetails![index].offerPrice!}',
+                                              style: TextStyle(
+                                                fontSize: dimen11,
+                                                color: ColorsTheme.col5dD6E68,
+                                                fontWeight: FontWeight.w500,
+                                                decorationColor:
+                                                    ColorsTheme.col5dD6E68,
+                                                decoration:
+                                                    TextDecoration.lineThrough,
+                                              ),
                                               maxLines: 2,
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
+                                            Container(
+                                              margin: const EdgeInsets.only(left: 5),
+                                              child: Text(
+                                                '${controller.currency}${controller.orderDetailsModel!.menuDetails![index].finalPrice!}',
+                                                style: semiBoldTextStyle(
+                                                    fontSize: dimen12,
+                                                    color: ColorsTheme.colBlack),
+                                                maxLines: 2,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: ColorsTheme.colD0F0BF,
+                          Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: ColorsTheme.colD0F0BF,
+                            ),
+                            alignment: Alignment.center,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 9, vertical: 7),
+                            child: Text(
+                              '${controller.orderDetailsModel!.itemQty}',
+                              style: regularTextStyle(
+                                  fontSize: dimen11, color: ColorsTheme.colBlack),
+                            ),
                           ),
-                          alignment: Alignment.center,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 9, vertical: 7),
-                          child: Text(
-                            '${controller.orderDetailsModel!.itemQty}',
-                            style: regularTextStyle(
-                                fontSize: dimen11, color: ColorsTheme.colBlack),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+                // if ((controller.orderDetailsModel!.orderCancelReason ?? '').isNotEmpty)
+                //   Container(
+                //     margin: const EdgeInsets.only(top: 10),
+                //     padding: const EdgeInsets.all(5),
+                //     width: Get.width * 0.9,
+                //     decoration: BoxDecoration(
+                //       color: ColorsTheme.colFFF3F3,
+                //       borderRadius: BorderRadius.circular(5),
+                //       border: Border.all(color: ColorsTheme.colFF4E4E.withOpacity(0.3)),
+                //     ),
+                //     child: Row(
+                //       crossAxisAlignment: CrossAxisAlignment.center,
+                //       children: [
+                //         Text(
+                //           'Cancel Reason : '.tr,
+                //           style: regularTextStyle(
+                //             fontSize: dimen10,
+                //             color: ColorsTheme.col404040,
+                //           ),
+                //         ),
+                //         const SizedBox(height: 6),
+                //         Text(
+                //           controller.orderDetailsModel!.orderCancelReason!,
+                //           style: regularTextStyle(
+                //             fontSize: dimen10,
+                //             color: ColorsTheme.colBlack,
+                //           ),
+                //         ),
+                //       ],
+                //     ),
+                //   ),
+              ],
             ),
           ),
         ],
@@ -918,42 +950,47 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                 style: semiBoldTextStyle(
                     fontSize: dimen12, color: ColorsTheme.colBlack),
               ),
-          (controller.orderStatus.value == 'completd_pick_up'
-    ? Container(
-        decoration: BoxDecoration(
-          border: Border.all(color: ColorsTheme.colC4D9D4, width: 1),
-          borderRadius: BorderRadius.circular(30),
-        ),
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-        child: GestureDetector(
-          onTap: () {
-            if (controller.orderStatus.value == 'completd_pick_up') {
-              controller.funDownloadInvoice();
-            } 
-            // else if (controller.orderStatus.value == 'order_cancel') {
-            //   controller.funDownloadRefundInvoice();
-            // }
-          },
-          child: Row(
-            children: [
-              Text(
-                'Invoice'.tr,
-                style: semiBoldTextStyle(
-                  fontSize: dimen12,
-                  color: ColorsTheme.colBlack,
-                ),
-              ),
-              SizedBox(width: 5),
-              Icon(
-                Icons.download,
-                size: 16,
-                color: ColorsTheme.colPrimary,
-              ),
-            ],
-          ),
-        ),
-      )
-    : const SizedBox(width:0))
+              (controller.orderStatus.value == 'completd_pick_up'
+                  ? Container(
+                      decoration: BoxDecoration(
+                        border:
+                            Border.all(color: ColorsTheme.colC4D9D4, width: 1),
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 5, horizontal: 10),
+                      child: GestureDetector(
+                        onTap: () {
+                          if (controller.orderStatus.value ==
+                              'completd_pick_up') {
+                            controller.funDownloadInvoice();
+                          }
+                          // else if (controller.orderStatus.value == 'order_cancel') {
+                          //   controller.funDownloadRefundInvoice();
+                          // }
+                        },
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Invoice'.tr,
+                              style: semiBoldTextStyle(
+                                fontSize: dimen12,
+                                color: ColorsTheme.colBlack,
+                              ),
+                            ),
+                            SizedBox(width: 5),
+                            Icon(
+                              Icons.download,
+                              size: 16,
+                              color: ColorsTheme.colPrimary,
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  : const SizedBox(width: 0))
             ],
           ),
           Container(

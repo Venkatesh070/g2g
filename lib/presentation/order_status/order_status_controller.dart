@@ -33,17 +33,28 @@ class OrderStatusController extends GetxController {
         if (Get.isRegistered<CartController>()) {
           Get.delete<CartController>();
         }
+        print('redirecting');
         print('$orderId $orderStatus $resId');
-        Get.offAllNamed(
-          Routes.orderDetails,
-          arguments: {
-            'orderId': orderId,
-            'resId': resId,
-            'orderStatus': redirectStatus.value.isNotEmpty
-                ? redirectStatus.value
-                : 'confirmation_pending',
-          },
-        );
+
+        //Redirect to order details page
+
+        // Get.offAllNamed(
+        //   Routes.orderDetails,
+        //   arguments: {
+        //     'orderId': orderId,
+        //     'resId': resId,
+        //     'orderStatus': redirectStatus.value.isNotEmpty
+        //         ? redirectStatus.value
+        //         : 'confirmation_pending',
+        //   },
+        // );
+
+        //Redirect to home page(In Orders Tab)
+
+        Get.offAllNamed(Routes.home, arguments: {
+          'permission': 1,
+          'selectedIndex': 2,
+        });
       } else {
         seconds = seconds - 1;
       }

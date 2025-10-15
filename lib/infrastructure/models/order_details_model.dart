@@ -19,6 +19,8 @@ class OrderDetailsModel extends Serializable{
   String? createdTime;
   int? pickupCode;
   int? itemQty;
+  String? orderCancelReason;
+  
 
   OrderDetailsModel(
       {this.orderId,
@@ -38,7 +40,8 @@ class OrderDetailsModel extends Serializable{
         this.pickupEndTime,
         this.createdTime,
         this.pickupCode,
-        this.itemQty
+        this.itemQty,
+        this.orderCancelReason
         });
 
   OrderDetailsModel.fromJson(Map<String, dynamic> json) {
@@ -79,7 +82,8 @@ class OrderDetailsModel extends Serializable{
     pickupTime = json['pickup_time'];
     pickupEndTime = json['pickup_end_time'];
     pickupCode = double.parse(json['pickup_code']).round().toInt();
-    itemQty=json['item_quantity'];
+    itemQty = json['item_quantity'];
+    orderCancelReason = json['order_cancel_reason'];
     // pickupCode=5690;
   }
 
@@ -110,7 +114,8 @@ class OrderDetailsModel extends Serializable{
     data['pickup_time'] = pickupTime;
     data['pickup_end_time'] = pickupEndTime;
     data['pickup_code'] = pickupCode;
-    data['item_quantity']=itemQty;
+    data['item_quantity'] = itemQty;
+    data['order_cancel_reason'] = orderCancelReason;
     return data;
   }
 }

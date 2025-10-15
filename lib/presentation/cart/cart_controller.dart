@@ -392,6 +392,7 @@ class CartController extends GetxController {
           price: menuList[index].menuFinalPrice ?? 0.0,
           quantity: 1,
         );
+        debugPrint('Meta AddToCart logged');
       } catch (_) {}
 
       addRemoveCartApi(index, tempQuantity);
@@ -974,7 +975,8 @@ bool _isPaymentSheetOpen = false;
       progressDialog.dismiss();
       if (baseModel.success!) {
         // Analytics: Purchase (new flow with payment confirmation)
-        try {
+               print('payment success api hitted');
+       try {
           final items = menuList
               .map((m) => AnalyticsEventItem(
                     itemId: (m.menuId ?? '').toString(),
@@ -993,7 +995,7 @@ bool _isPaymentSheetOpen = false;
         PrefManager.remove(AppConstants.cartId);
         var message = baseModel.message;
         var paymentOrderId = baseModel.data?.orderId;
-        print('$message $paymentOrderId');
+        print('paymentOrderId $paymentOrderId');
         Get.toNamed(Routes.orderStatus,
             arguments: {
               'status': 'success',
@@ -1007,7 +1009,7 @@ bool _isPaymentSheetOpen = false;
         Get.toNamed(Routes.orderStatus,
             arguments: {'status': 'failed', 'message': baseModel.message!});
       }
-    } on CustomHttpException catch (exception) {
+     } on CustomHttpException catch (exception) {
       progressDialog.dismiss();
       print('phone pay failed cancelled');
       errorScreen(

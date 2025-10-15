@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:good_grab/infrastructure/analytics/meta_pixel.dart';
 import 'package:good_grab/infrastructure/constants/app_constants.dart';
 import 'package:good_grab/infrastructure/navigation/routes.dart';
 import 'package:good_grab/infrastructure/shared/pref_manager.dart';
@@ -93,7 +94,7 @@ class HomeDetailsController extends GetxController
           homeDetailsModel.data!.restroDetail != null) {
         /*  print("rstweafhsdfh");
         print(jsonEncode(homeDetailsModel.data));*/
-        log("response ${homeDetailsModel.data?.restroDetail?.restaurantStatus}"); 
+        log("response ${homeDetailsModel.data?.restroDetail?.restaurantStatus}");
         homeData.value = homeDetailsModel.data!.restroDetail!;
         totalQuantity.value = 0;
         totalAmount.value = 0;
@@ -266,7 +267,8 @@ class HomeDetailsController extends GetxController
             final item = AnalyticsEventItem(
               itemId: (menuData.menuId ?? '').toString(),
               itemName: menuData.menuName ?? 'menu_item',
-              itemBrand: homeData.value.restaurantName ?? '', // vendor_name mapped to GA4 item_brand
+              itemBrand: homeData.value.restaurantName ??
+                  '', // vendor_name mapped to GA4 item_brand
               price: menuData.finalPrice ?? 0.0,
               quantity: 1,
             );
@@ -281,6 +283,15 @@ class HomeDetailsController extends GetxController
                 'quantity': 1,
               },
             );
+
+            // Mirror to Meta (Facebook)
+            await AnalyticsService.logAddToCart(
+              itemId: (menuData.menuId ?? '').toString(),
+              vendorName: homeData.value.restaurantName ?? '',
+              price: menuData.finalPrice ?? 0.0,
+              quantity: 1,
+            );
+            
           }
         } catch (_) {}
         if (cartId == 0) {
