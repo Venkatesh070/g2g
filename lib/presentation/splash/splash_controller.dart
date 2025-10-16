@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:good_grab/infrastructure/constants/app_constants.dart';
 import 'package:good_grab/infrastructure/shared/pref_manager.dart';
 import '../../infrastructure/firebase/dynamic_link_service.dart';
+import '../../infrastructure/update/update_checker.dart';
 import '../../infrastructure/navigation/routes.dart';
 import '../../infrastructure/shared/permission_fun.dart';
 
@@ -39,6 +40,12 @@ class SplashController extends GetxController with GetTickerProviderStateMixin{
 
 
     final PendingDynamicLinkData? initialLink = await FirebaseDynamicLinks.instance.getInitialLink();
+
+    // Mandatory update check before proceeding
+    final bool updateDialogShown = await UpdateCheckerService().checkAndShowMandatoryUpdate();
+    if (updateDialogShown) {
+      return;
+    }
     if(initialLink != null){
       DynamicLinkService().initDynamicLinks(initialLink);
     }

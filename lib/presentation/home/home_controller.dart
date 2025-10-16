@@ -1092,6 +1092,8 @@ class HomeController extends GetxController {
       var pickupEnd = DateFormat('HH:mm:ss').format(
           DateTime.fromMicrosecondsSinceEpoch(
               pickupSelectMaxTime.toInt() * 1000));
+      // var pickupStart = '24:00:00';
+      // var pickupEnd = '23:59:00';
 
       if ((pickupStart != '00:00:00' || pickupEnd != '00:00:00')) {
         if (pickupStart == '00:00:00') {
