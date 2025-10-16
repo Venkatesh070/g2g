@@ -44,6 +44,7 @@ class SplashController extends GetxController with GetTickerProviderStateMixin{
     }
     else{
       var  isLoggedIn = await PrefManager.getBool(AppConstants.loggedIn);
+      print('checking logged in $isLoggedIn');
       if(isLoggedIn){
         navigateScreen();
       }else{

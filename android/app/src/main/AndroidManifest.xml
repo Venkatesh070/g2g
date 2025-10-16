@@ -9,6 +9,7 @@
     <application
         android:label="Good To Grab"
         android:name="${applicationName}"
+        android:allowBackup="false"
         android:usesCleartextTraffic="true"
         android:icon="@drawable/ic_stat_ic_notification">
         <meta-data android:name="com.google.android.geo.API_KEY"
