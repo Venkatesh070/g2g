@@ -425,6 +425,18 @@ class DioClient {
     return ApiResponseModel<OrderSuccessData>();
   }
 
+  Future<ApiResponseModel<OrderSuccessData>> funPlaceOrderPaymentFailApi(params) async {
+    try {
+      Response response = await _dio.post(apiEndPoints.apiPaymentFail,
+          data: json.encode(params));
+      return ApiResponseModel<OrderSuccessData>.fromJson(
+          response.data!, (data) => OrderSuccessData.fromJson(data));
+    } catch (error) {
+      catchErrorHandler();
+    }
+    return ApiResponseModel<OrderSuccessData>();
+  }
+
   Future funPlaceOrderWithoutPaymentApi(params) async {
     try {
       Response response = await _dio.post(apiEndPoints.apiPlaceOrder,

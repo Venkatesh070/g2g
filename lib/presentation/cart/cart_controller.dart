@@ -760,6 +760,12 @@ class CartController extends GetxController {
 
         print('error in phonepay sdk $msg');
 
+        // Fire-and-forget: notify backend of payment failure/cancel
+        _reportPaymentFailure(
+          paymentMethodType: 'phonePe',
+          explicitStatus: _derivePaymentStatusFromMessage(msg),
+        );
+
         // SnackBarUtil.showPaymentError(message: msg);
         showModalBottomSheet(
           context: Get.context!,
@@ -857,7 +863,29 @@ class CartController extends GetxController {
   }
 bool _isPaymentSheetOpen = false;
 
+
   void _handlePaymentError(PaymentFailureResponse response) {
+
+
+    // order_id': newOrderId.value,
+    //     "payment_status": 'paid',
+    //     "original_transaction_id": transId,
+    //     'cart_id': cartId.value,
+    //     "payment_id": phonePeTId.value,
+    //     'payment_type': "ONLINE",
+    //     "transaction_status": "success",
+    //     "payment_method": paymentMethodType,
+    //     "transaction_payment_type": "online",
+
+        debugPrint('order_id: ${newOrderId.value}');
+        debugPrint('payment_status: paid');
+        debugPrint('cart_id: ${cartId.value}');
+        debugPrint('payment_id: ${phonePeTId.value}');
+        debugPrint('payment_type: ONLINE');
+        debugPrint('transaction_status: success');
+        debugPrint('payment_method: razorpay');
+        debugPrint('transaction_payment_type: online');
+    
     // debugPrint(
     //     '_handlePaymentError: code=${response.code}, message=${response.error}');
 
@@ -886,6 +914,11 @@ bool _isPaymentSheetOpen = false;
         ? 'something_went_wrong'.tr
         : response.error!['description'].toString();
         print('razorpay failed message $message');
+    // Fire-and-forget: notify backend of payment failure/cancel
+    _reportPaymentFailure(
+      paymentMethodType: 'razorpay',
+      explicitStatus: _derivePaymentStatusFromRazorpay(response),
+    );
     //  SnackBarUtil.showError(message: message);
       // debugPrint(
       //   '_handlePaymentError: code=${response.code}, message=${response.error}');
@@ -1023,6 +1056,45 @@ bool _isPaymentSheetOpen = false;
     }
   }
 
+  String _derivePaymentStatusFromRazorpay(PaymentFailureResponse response) {
+    try {
+      final desc = response.error == null
+          ? ''
+          : (response.error!['description']?.toString() ?? '').toLowerCase();
+      final reason = response.error == null
+          ? ''
+          : (response.error!['reason']?.toString() ?? '').toLowerCase();
+      if (desc.contains('cancel') || reason.contains('cancel')) {
+        return 'Cancelled';
+      }
+    } catch (_) {}
+    return 'Failed';
+  }
+
+  String _derivePaymentStatusFromMessage(dynamic message) {
+    final m = (message?.toString() ?? '').toLowerCase();
+    return m.contains('cancel') ? 'Cancelled' : 'Failed';
+  }
+
+  // Notify backend that user cancelled or payment failed (minimal payload)
+  Future<void> _reportPaymentFailure({
+    required String paymentMethodType,
+    String? originalTransactionId,
+    String? reason,
+    String? explicitStatus,
+  }) async {
+    try {
+      var accessToken = await PrefManager.getString(AppConstants.accessToken);
+      final Map<String, dynamic> params = {
+        'order_id': newOrderId.value,
+        'payment_status': explicitStatus ?? 'Failed',
+      };
+
+      await DioClient.base(accessToken: accessToken)
+          .funPlaceOrderPaymentFailApi(params);
+    } catch (_) {}
+  }
+
   /// new code
   placeOrderWithoutPayment(paymentMethodType) async {
     apiCalling.value = false;
@@ -1109,7 +1181,8 @@ bool _isPaymentSheetOpen = false;
         newOrderId.value = int.tryParse(createdOrderId.toString()) ?? 0;
       }
 
-      debugPrint('Starting to payment with orderId: ${newOrderId.value}');
+      // debugPrint('Starting to payment with orderId: ${newOrderId.value}');
+      progressDialog.dismiss();
       if (paymentMethodType == "phonePe") {
         startPgTransaction();
       } else {

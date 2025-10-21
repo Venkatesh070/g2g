@@ -65,6 +65,7 @@ class ApiConstants {
   var apiPlaceOrderPayment = '/place-order-payment';
 
   var apiPaymentSuccess = '/order-payment-success';
+  var apiPaymentFail = '/order-payment-failed';
 
   var apiPlaceOrderWithoutPayment = '/place-order-without-payment';
   var apiPlaceOrderWithTransaction = '/place-order-with-transaction';
