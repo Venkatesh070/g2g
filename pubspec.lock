@@ -984,6 +984,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.6"
+  new_version_plus:
+    dependency: "direct main"
+    description:
+      name: new_version_plus
+      sha256: "136cd6368ef96eae5ee3efb59f284c6ff61a06c3c08fb6a49f451ac5fa635e1d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.10"
   octo_image:
     dependency: transitive
     description:

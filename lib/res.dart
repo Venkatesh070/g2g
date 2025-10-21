@@ -69,6 +69,8 @@ class Res {
   static const String splashLogoJson = "assets/splashLogoJson.json";
   static const String splashLogoJson1 = "assets/splashLogoJson1.json";
   static const String successOrder = "assets/successOrder.json";
+  static const String appstore = "assets/appstore.json";
+  static const String playstore = "assets/playstore.json";
   static const String takeAway = "assets/takeAway.json";
 
   //Added Later

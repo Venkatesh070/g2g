@@ -19,6 +19,7 @@ import 'package:good_grab/infrastructure/models/restaurant_availability_model.da
 import 'package:good_grab/infrastructure/models/user_home_model.dart';
 import 'package:good_grab/infrastructure/models/user_model.dart';
 import '../constants/app_constants.dart';
+import 'package:good_grab/infrastructure/shared/common_functions.dart';
 import '../models/api_response_model.dart';
 import '../models/create_intent_model.dart';
 import '../models/earning_model.dart';
@@ -53,7 +54,7 @@ class DioClient {
     if (accessToken != null && accessToken.toString().isNotEmpty) {
       _dio.options.headers = {
         'Authorization': 'Bearer $accessToken',
-        'content-type': 'application/json'
+        'content-type': 'application/json',
       };
     } else {
       _dio.options.headers = {'content-type': 'application/json'};
@@ -61,7 +62,11 @@ class DioClient {
 
     _dio.interceptors.addAll([
       LoggerInterceptor(),
-      QueuedInterceptorsWrapper(onRequest: (RequestOptions options, handler) {
+      QueuedInterceptorsWrapper(onRequest: (RequestOptions options, handler) async {
+        try {
+          final version = await CommonFunction.getAppVersion();
+          options.headers['X-App-Version'] = version;
+        } catch (_) {}
         return handler.next(options);
       }, onResponse: (Response response, handler) {
         return handler.next(response);
@@ -111,7 +116,11 @@ class DioClient {
     }
     _dio.interceptors.addAll([
       LoggerInterceptor(),
-      QueuedInterceptorsWrapper(onRequest: (RequestOptions options, handler) {
+      QueuedInterceptorsWrapper(onRequest: (RequestOptions options, handler) async {
+        try {
+          final version = await CommonFunction.getAppVersion();
+          options.headers['X-App-Version'] = version;
+        } catch (_) {}
         return handler.next(options);
       }, onResponse: (Response response, handler) {
         return handler.next(response);
@@ -151,8 +160,16 @@ class DioClient {
     _dio = Dio(dioOptions);
     _dio.interceptors.addAll([
       LoggerInterceptor(),
-      QueuedInterceptorsWrapper(onRequest: (RequestOptions options, handler) {
-        options.headers = {'content-type': 'application/json'};
+      QueuedInterceptorsWrapper(onRequest: (RequestOptions options, handler) async {
+        try {
+          final version = await CommonFunction.getAppVersion();
+          options.headers = {
+            'content-type': 'application/json',
+            'X-App-Version': version,
+          };
+        } catch (_) {
+          options.headers = {'content-type': 'application/json'};
+        }
         return handler.next(options);
       }, onResponse: (Response response, handler) {
         return handler.next(response);

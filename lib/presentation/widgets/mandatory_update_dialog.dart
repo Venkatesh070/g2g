@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
@@ -28,24 +30,31 @@ class MandatoryUpdateDialog extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.system_update, color: ColorsTheme.colPrimary, size: 24),
+                      Icon(Icons.system_update,
+                          color: ColorsTheme.colPrimary, size: 24),
                       const SizedBox(width: 8),
                       Text(
                         'Update Required',
-                        style: semiBoldTextStyle(fontSize: dimen16, color: ColorsTheme.colBlack),
+                        style: semiBoldTextStyle(
+                            fontSize: dimen16, color: ColorsTheme.colBlack),
                       ),
                     ],
                   ),
                   const SizedBox(height: 12),
                   SizedBox(
-                    height: 110,
-                    child: Lottie.asset(Res.successOrder, repeat: true, animate: true),
+                    height: 60,
+                    child: Lottie.asset(
+                      Platform.isIOS ? Res.appstore : Res.playstore,
+                      repeat: true,
+                      animate: true,
+                    ),
                   ),
                   const SizedBox(height: 12),
                   Text(
                     'A newer version of the app is available. Please update to continue using the app.',
                     textAlign: TextAlign.center,
-                    style: regularTextStyle(fontSize: dimen14, color: ColorsTheme.colBlack),
+                    style: regularTextStyle(
+                        fontSize: dimen14, color: ColorsTheme.colBlack),
                   ),
                   const SizedBox(height: 16),
                   Row(
@@ -63,7 +72,9 @@ class MandatoryUpdateDialog extends StatelessWidget {
                             alignment: Alignment.center,
                             child: Text(
                               'Update Now',
-                              style: mediumTextStyle(fontSize: dimen15, color: ColorsTheme.colWhite),
+                              style: mediumTextStyle(
+                                  fontSize: dimen15,
+                                  color: ColorsTheme.colWhite),
                             ),
                           ),
                         ),
@@ -79,5 +90,3 @@ class MandatoryUpdateDialog extends StatelessWidget {
     );
   }
 }
-
-
