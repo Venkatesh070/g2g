@@ -32,36 +32,39 @@
 				<string>com.googleusercontent.apps.4519581228-h2f5cfh78fh5ahukvt0ntdk75gnmscg7</string>
 			</array>
 		</dict>
-        <dict>
-         <key>CFBundleTypeRole</key>
-         <string>Editor</string>
-         <key>CFBundleURLName</key>
-            <string>goodtograb.page.link</string>
-         <key>CFBundleURLSchemes</key>
-         <array>
-          <string>https</string>
-         </array>
-        </dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>goodtograb.page.link</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>https</string>
+			</array>
+		</dict>
 	</array>
-    <key>NSAppTransportSecurity</key>
-    <dict>
-        <key>NSAllowsArbitraryLoads</key>
-        <true/>
-        <key>NSExceptionDomains</key>
-        <dict>
-            <key>example.com</key>
-            <dict>
-                <key>NSIncludesSubdomains</key>
-                <true/>
-                <key>NSExceptionAllowsInsecureHTTPLoads</key>
-                <true/>
-            </dict>
-        </dict>
-    </dict>
-    <key>FirebaseAppDelegateProxyEnabled</key>
-        <false/>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>FacebookAppID</key>
+	<string>1531333880759386</string>
+	<key>FacebookClientToken</key>
+	<string>e63f081dc4e3727b70ae462513551999</string>
+	<key>FacebookDisplayName</key>
+	<string>Good Grab</string>
+	<key>FirebaseAppDelegateProxyEnabled</key>
+	<false/>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>ppemerchantsdkv1</string>
+		<string>ppemerchantsdkv2</string>
+		<string>ppemerchantsdkv3</string>
+		<string>paytmmp</string>
+		<string>gpay</string>
+		<string>fbapi</string>
+		<string>fbauth2</string>
+		<string>fb-messenger-share-api</string>
+		<string>fbshareextension</string>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -101,24 +104,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-    <key>LSApplicationQueriesSchemes</key>
-    <array>
-        <string>ppemerchantsdkv1</string>
-        <string>ppemerchantsdkv2</string>
-        <string>ppemerchantsdkv3</string>
-        <string>paytmmp</string>
-        <string>gpay</string>
-        <!-- Facebook SDK common schemes -->
-        <string>fbapi</string>
-        <string>fbauth2</string>
-        <string>fb-messenger-share-api</string>
-        <string>fbshareextension</string>
-    </array>
-    <key>FacebookAppID</key>
-    <string>1531333880759386</string>
-    <key>FacebookClientToken</key>
-    <string>e63f081dc4e3727b70ae462513551999</string>
-    <key>FacebookDisplayName</key>
-    <string>Good Grab</string>
 </dict>
 </plist>

@@ -325,8 +325,8 @@ class CartController extends GetxController {
             await PrefManager.getDouble(AppConstants.platformGst);
         combinedGst.value = totalGst.value + platformGst.value;
         menuList.addAll(cartModel.data!.cartDetails!.menuDetail!);
-        // totalPay.value = subTotalFinalPrice.value + combinedGst.value + platformFee.value;
-        totalPay.value = 1;
+        totalPay.value = subTotalFinalPrice.value + combinedGst.value + platformFee.value;
+        // totalPay.value = 1;
 
         print("sjkdfk ${menuList.length}");
 
@@ -449,8 +449,8 @@ class CartController extends GetxController {
           platformGst.value =
               await PrefManager.getDouble(AppConstants.platformGst);
           combinedGst.value = totalGst.value + platformGst.value;
-          //  totalPay.value = subTotalFinalPrice.value + combinedGst.value + platformFee.value;
-          totalPay.value = 1;
+            totalPay.value = subTotalFinalPrice.value + combinedGst.value + platformFee.value;
+          //  totalPay.value = 1;
 
           menuList.refresh();
         } else {
