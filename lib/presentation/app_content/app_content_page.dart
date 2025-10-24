@@ -206,24 +206,24 @@ class AppContentPage extends BaseView<AppContentController> {
                                   height: 45,
                                 ),
                               ),
-                              // Expanded(
-                              //   child: Column(
-                              //     crossAxisAlignment: CrossAxisAlignment.start,
-                              //     children: [
-                              //       Text(
-                              //         'Call'.tr,
-                              //         maxLines: 2,
-                              //         style: boldTextStyle(fontSize: dimen13, color: ColorsTheme.colBlack),
-                              //       ),
-                              //       Obx(
-                              //             () => Text(
-                              //           controller.phoneNumber.value,
-                              //           style: regularTextStyle(fontSize: dimen11, color: ColorsTheme.colBlack),
-                              //         ),
-                              //       )
-                              //     ],
-                              //   ),
-                              // ),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Call'.tr,
+                                      maxLines: 2,
+                                      style: boldTextStyle(fontSize: dimen13, color: ColorsTheme.colBlack),
+                                    ),
+                                    Obx(
+                                          () => Text(
+                                        controller.phoneNumber.value,
+                                        style: regularTextStyle(fontSize: dimen11, color: ColorsTheme.colBlack),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
                               Container(
                                 decoration: BoxDecoration(color: ColorsTheme.colPrimary, borderRadius: BorderRadius.circular(30)),
                                 alignment: Alignment.center,

@@ -9,8 +9,6 @@ PODS:
     - Flutter
   - device_info_plus (0.0.1):
     - Flutter
-  - downloads_path_provider_28 (0.0.1):
-    - Flutter
   - facebook_app_events (0.0.1):
     - FBAudienceNetwork (= 6.16)
     - FBSDKCoreKit (~> 18.0)
@@ -300,7 +298,6 @@ PODS:
 DEPENDENCIES:
   - camera_avfoundation (from `.symlinks/plugins/camera_avfoundation/ios`)
   - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
-  - downloads_path_provider_28 (from `.symlinks/plugins/downloads_path_provider_28/ios`)
   - facebook_app_events (from `.symlinks/plugins/facebook_app_events/ios`)
   - firebase_analytics (from `.symlinks/plugins/firebase_analytics/ios`)
   - firebase_auth (from `.symlinks/plugins/firebase_auth/ios`)
@@ -376,8 +373,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/camera_avfoundation/ios"
   device_info_plus:
     :path: ".symlinks/plugins/device_info_plus/ios"
-  downloads_path_provider_28:
-    :path: ".symlinks/plugins/downloads_path_provider_28/ios"
   facebook_app_events:
     :path: ".symlinks/plugins/facebook_app_events/ios"
   firebase_analytics:
@@ -441,7 +436,6 @@ SPEC CHECKSUMS:
   AppAuth: d4f13a8fe0baf391b2108511793e4b479691fb73
   camera_avfoundation: 04b44aeb14070126c6529e5ab82cc7c9fca107cf
   device_info_plus: 335f3ce08d2e174b9fdc3db3db0f4e3b1f66bd89
-  downloads_path_provider_28: c6b2480f4450e3f1e814d0e8b46bc737bf06a04f
   facebook_app_events: 015d0181fcb1bf667ada2b8f02d0f53b9ea296dc
   FBAEMKit: b2ed182002dbcb65d5a60059c9693d322186cd00
   FBAudienceNetwork: d1670939884e3a2e0ad98dca98d7e0c841417228

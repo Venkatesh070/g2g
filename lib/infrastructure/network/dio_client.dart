@@ -790,9 +790,9 @@ class DioClient {
       var user = await PrefManager.getUser();
       Map<String, dynamic> param = {"user_id": user!.id};
       Dio dio1 = Dio();
-
+      final version = await CommonFunction.getAppVersion();
       dio1.options = BaseOptions(
-          baseUrl: baseurl, headers: {'content-type': 'application/json'});
+          baseUrl: baseurl, headers: {'content-type': 'application/json','X-App-Version': version});
       var response = await dio1.post(apiEndPoints.apiUpdateToken, data: param);
       if (response.data['success']! && response.data['data'] != null) {
         PrefManager.putString(
