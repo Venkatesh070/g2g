@@ -1,9 +1,9 @@
+import 'dart:convert';
 import 'dart:io';
-
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:new_version_plus/new_version_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../presentation/widgets/mandatory_update_dialog.dart';
@@ -14,6 +14,8 @@ class UpdateCheckerService {
   UpdateCheckerService._internal();
 
   bool _dialogShown = false;
+  final String _iosAppId = '6451374378';
+  final String _appStoreUrl = 'https://apps.apple.com/in/app/good-to-grab/id6451374378';
 
   Future<bool> checkAndShowMandatoryUpdate() async {
     if (_dialogShown) return true;
@@ -22,54 +24,94 @@ class UpdateCheckerService {
       final PackageInfo packageInfo = await PackageInfo.fromPlatform();
       final String currentVersion = packageInfo.version;
 
-      final newVersion = NewVersionPlus(
-        androidId: 'com.good.grab',
-        iOSId: 'com.good.grab',
-      );
-      final VersionStatus? status = await newVersion.getVersionStatus();
-
-      if (status == null) return false;
-      final String storeVersion = status.storeVersion;
-
-      if (_isStoreVersionNewer(currentVersion, storeVersion)) {
+      final String? storeVersion = await _getStoreVersion();
+      
+      if (storeVersion != null && _isStoreVersionNewer(currentVersion, storeVersion)) {
         _dialogShown = true;
-        await _showMandatoryDialog(status.appStoreLink);
+        await _showMandatoryDialog();
         return true;
       }
-    } catch (_) {
-      return false;
+    } catch (e) {
+      debugPrint('Update check error: $e');
     }
 
     return false;
+  }
+
+  Future<String?> _getStoreVersion() async {
+    try {
+      const List<String> urls = [
+        'https://itunes.apple.com/lookup?id=6451374378&country=in',
+        'https://itunes.apple.com/lookup?id=6451374378&country=us',
+        'https://itunes.apple.com/lookup?id=6451374378',
+      ];
+
+      for (final url in urls) {
+        final String? version = await _fetchVersionFromUrl(url);
+        if (version != null) return version;
+      }
+    } catch (e) {
+      debugPrint('Store version fetch error: $e');
+    }
+    
+    return null;
+  }
+
+  Future<String?> _fetchVersionFromUrl(String url) async {
+    try {
+      final response = await http.get(Uri.parse(url));
+      
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        
+        if (jsonResponse['resultCount'] > 0) {
+          return jsonResponse['results'][0]['version'];
+        }
+      }
+    } catch (e) {
+      debugPrint('URL fetch error: $e');
+    }
+    
+    return null;
   }
 
   bool _isStoreVersionNewer(String current, String store) {
-    List<int> parse(String v) => v.split('.').map((e) => int.tryParse(e) ?? 0).toList();
-    final a = parse(current);
-    final b = parse(store);
-    final int maxLen = a.length > b.length ? a.length : b.length;
-    for (int i = 0; i < maxLen; i++) {
-      final ai = i < a.length ? a[i] : 0;
-      final bi = i < b.length ? b[i] : 0;
-      if (bi > ai) return true;
-      if (bi < ai) return false;
+    try {
+      List<int> parse(String v) => v.split('.').map((e) => int.tryParse(e) ?? 0).toList();
+      final List<int> currentParts = parse(current);
+      final List<int> storeParts = parse(store);
+      
+      for (int i = 0; i < storeParts.length; i++) {
+        if (i >= currentParts.length) return true;
+        if (storeParts[i] > currentParts[i]) return true;
+        if (storeParts[i] < currentParts[i]) return false;
+      }
+      return false;
+    } catch (e) {
+      debugPrint('Version comparison error: $e');
+      return false;
     }
-    return false;
   }
 
-  Future<void> _showMandatoryDialog(String appLink) async {
+  Future<void> _showMandatoryDialog() async {
     await Get.dialog(
       MandatoryUpdateDialog(
         onUpdateNow: () async {
-          final uri = Uri.parse(appLink);
-          if (await canLaunchUrl(uri)) {
-            await launchUrl(uri, mode: LaunchMode.externalApplication);
+          try {
+            final uri = Uri.parse(_appStoreUrl);
+            if (await canLaunchUrl(uri)) {
+              await launchUrl(uri, mode: LaunchMode.externalApplication);
+            }
+          } catch (e) {
+            debugPrint('App Store launch error: $e');
           }
         },
       ),
       barrierDismissible: false,
     );
   }
+
+  void reset() {
+    _dialogShown = false;
+  }
 }
-
-
