@@ -438,7 +438,7 @@ class HomeView extends GetView<HomeController> {
                           ),
                         ),
                         Text(
-                          'Magical Bag x ${controller.cartHomeList[0].totalQuantity}',
+                          'Item x ${controller.cartHomeList[0].totalQuantity}',
                           style: regularTextStyle(
                               fontSize: dimen11, color: ColorsTheme.colWhite),
                         ),

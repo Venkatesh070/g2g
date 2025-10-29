@@ -50,7 +50,7 @@ errorScreen({error}) {
                 height: 20,
               ),
               Text(
-                "Error!",
+                error == 'Let’s find another one to save!' ? "You just Missed It!" : "Error!",
                 style: boldTextStyle(fontSize: dimen17, color: ColorsTheme.colBlack),
               ),
               const SizedBox(
