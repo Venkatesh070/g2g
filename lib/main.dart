@@ -25,6 +25,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Initializer.init();
   await Upgrader.clearSavedSettings();
+  
   // await Firebase.initializeApp();
 
   runApp(const Main());

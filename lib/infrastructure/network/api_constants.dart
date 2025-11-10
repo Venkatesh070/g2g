@@ -5,8 +5,8 @@ class ApiConstants {
   
   //Miraki end points
   //  var baseUrl = 'http://13.203.248.52/g2g-staging/api/${AppConstants.apiVersion}';
-  // var baseUrl = 'http://13.203.248.52/api/${AppConstants.apiVersion}';
-  var baseUrl = 'https://goodtograb.com/api/${AppConstants.apiVersion}';
+  var baseUrl = 'http://13.203.248.52/api/${AppConstants.apiVersion}';
+  // var baseUrl = 'https://goodtograb.com/api/${AppConstants.apiVersion}';
   // var baseUrl = 'http://goodtograb.com/public/new_code/G2G-NEW/api/${AppConstants.apiVersion}';
 
   //Miraki end points

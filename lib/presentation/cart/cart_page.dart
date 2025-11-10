@@ -194,13 +194,25 @@ class CartPage extends BaseView<CartController> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          Text(
-                                            '${controller.menuList[index].menuName} : ${controller.menuList[index].menuType == 'preDefined' ? "Menu" : "Magic Bag"}',
+                                          Row(
+                                            children: [
+                                              Text(
+                                                '${controller.menuList[index].menuName} : ${controller.menuList[index].menuType == 'preDefined' ? "Menu" : "Magic Bag"}',
+                                                maxLines: 2,
+                                                style: regularTextStyle(
+                                                    fontSize: dimen11,
+                                                    color: ColorsTheme.colBlack),
+                                              ),
+                                                 Text(
+                                                  ' Out of Stock',
                                             maxLines: 2,
                                             style: regularTextStyle(
                                                 fontSize: dimen11,
-                                                color: ColorsTheme.colBlack),
+                                                color: ColorsTheme.colFF4E4E),
                                           ),
+                                            ],
+                                          ),
+                                        
                                           Row(
                                             children: [
                                               Text(
