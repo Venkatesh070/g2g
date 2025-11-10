@@ -203,13 +203,15 @@ class CartPage extends BaseView<CartController> {
                                                     fontSize: dimen11,
                                                     color: ColorsTheme.colBlack),
                                               ),
-                                                 Text(
+                                                 if ((controller.menuList[index].menuSelectedQuantity ?? 0) > 
+                                                  (controller.menuList[index].menuQuantity ?? 0))
+                                                Text(
                                                   ' Out of Stock',
-                                            maxLines: 2,
-                                            style: regularTextStyle(
-                                                fontSize: dimen11,
-                                                color: ColorsTheme.colFF4E4E),
-                                          ),
+                                                  maxLines: 2,
+                                                  style: regularTextStyle(
+                                                      fontSize: dimen11,
+                                                      color: ColorsTheme.colFF4E4E),
+                                                ),
                                             ],
                                           ),
                                         
