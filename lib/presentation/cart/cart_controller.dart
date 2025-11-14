@@ -704,7 +704,7 @@ class CartController extends GetxController {
     print(base64Body);
     phonePeCheckSum.value =
         '${sha256.convert(utf8.encode('$base64Body/pg/v1/pay${AppConstants.phonePeSaltKey}')).toString()}###${AppConstants.phonePeSaltIndex}';
-
+    print('phonepayChecksum: $phonePeCheckSum');
     return base64Body;
   }
 

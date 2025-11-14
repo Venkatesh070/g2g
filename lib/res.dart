@@ -34,6 +34,7 @@ class Res {
   static const String icMap = "assets/images/bottomIcons/icMap.png";
   static const String icMinus = "assets/images/icMinus.png";
   static const String icNonVeg = "assets/images/icNonVeg.png";
+  static const String icEgg = "assets/images/icEgg.png";
   static const String icNotification = "assets/images/icNotification.png";
   static const String icOrder = "assets/images/bottomIcons/icOrder.png";
   static const String icPickupTime = "assets/images/icPickupTime.png";

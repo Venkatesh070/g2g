@@ -184,6 +184,10 @@ class CartPage extends BaseView<CartController> {
                                                         .foodPrefrence ==
                                                     'non-veg'
                                                 ? Res.icNonVeg
+                                                  : controller.menuList[index]
+                                                        .foodPrefrence ==
+                                                    'egg'
+                                                    ? Res.icEgg
                                                 : Res.icDummyFoodType,
                                         width: 16,
                                         height: 16,
@@ -203,15 +207,13 @@ class CartPage extends BaseView<CartController> {
                                                     fontSize: dimen11,
                                                     color: ColorsTheme.colBlack),
                                               ),
-                                                 if ((controller.menuList[index].menuSelectedQuantity ?? 0) > 
-                                                  (controller.menuList[index].menuQuantity ?? 0))
-                                                Text(
-                                                  ' Out of Stock',
-                                                  maxLines: 2,
-                                                  style: regularTextStyle(
-                                                      fontSize: dimen11,
-                                                      color: ColorsTheme.colFF4E4E),
-                                                ),
+                                          //        Text(
+                                          //         ' Out of Stock',
+                                          //   maxLines: 2,
+                                          //   style: regularTextStyle(
+                                          //       fontSize: dimen11,
+                                          //       color: ColorsTheme.colFF4E4E),
+                                          // ),
                                             ],
                                           ),
                                         

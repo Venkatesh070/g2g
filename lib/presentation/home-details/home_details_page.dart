@@ -19,6 +19,30 @@ import '../../res.dart';
 class HomeDetailsPage extends BaseView<HomeDetailsController> {
   HomeDetailsPage({super.key});
 
+  // Normalize food preference strings to stable keys: veg | nonveg | egg
+  String _normalizePref(String? pref) {
+    final raw = (pref ?? '').toLowerCase();
+    final compact = raw.replaceAll(RegExp(r'[^a-z]'), '');
+    if (compact.contains('nonveg')) return 'nonveg';
+    if (compact.contains('egg')) return 'egg';
+    if (compact.contains('veg')) return 'veg';
+    return compact;
+  }
+
+  String _selectedPrefKey() {
+    if (controller.selectFoodPref.value == -1) return '';
+    return _normalizePref(
+        controller.foodPrefList[controller.selectFoodPref.value]);
+  }
+
+  // Determines if an item's preference matches the selected filter.
+  bool _matchesSelected(String? itemPref) {
+    final itemKey = _normalizePref(itemPref);
+    final sel = _selectedPrefKey();
+    if (sel.isEmpty) return true;
+    return itemKey == sel;
+  }
+
   @override
   bool onBackPressed() {
     controller.onBack();
@@ -690,11 +714,13 @@ class HomeDetailsPage extends BaseView<HomeDetailsController> {
                 return GestureDetector(
                   onTap: () {
                     if (controller.selectFoodPref.value != index) {
+                      print('first tap $index');
                       controller.selectFoodPref.value = index;
                       controller.selectedMagicMenuCategoryIndex.value = -1;
                       // controller.homeData.refresh();
                       // controller.magicMenuList.refresh();
                     } else {
+                      print('second tap');
                       controller.selectFoodPref.value = -1;
                       controller.selectedMagicMenuCategoryIndex.value = -1;
                     }
@@ -721,7 +747,7 @@ class HomeDetailsPage extends BaseView<HomeDetailsController> {
                           Container(
                             margin: const EdgeInsets.only(right: 8),
                             child: Image.asset(
-                              index == 0 ? Res.icVeg : Res.icNonVeg,
+                              index == 0 ? Res.icVeg : index == 1 ? Res.icNonVeg : Res.icEgg,
                               width: 20,
                               height: 20,
                             ),
@@ -756,10 +782,7 @@ class HomeDetailsPage extends BaseView<HomeDetailsController> {
             : magicBagNotAvailable();
       } else {
         return controller.magicMenuList
-                .where((p0) =>
-                    p0.foodPrefrence ==
-                    controller.foodPrefList[controller.selectFoodPref.value]
-                        .toLowerCase())
+                .where((p0) => _matchesSelected(p0.foodPrefrence))
                 .isNotEmpty
             ? magicBagWidget()
             : magicBagNotAvailable();
@@ -811,7 +834,12 @@ class HomeDetailsPage extends BaseView<HomeDetailsController> {
                                     (controller.selectFoodPref.value == 1 &&
                                         controller.magicMenuCategories[index]
                                                 .food_preference_type ==
-                                            "1")
+                                            "1") ||
+                                    // Egg selection should include only Egg ("3") categories
+                                    (controller.selectFoodPref.value == 2 &&
+                                        controller.magicMenuCategories[index]
+                                                .food_preference_type ==
+                                            "3")
                                 ? Container(
                                     decoration: controller
                                                 .selectedMagicMenuCategoryIndex
@@ -897,12 +925,12 @@ class HomeDetailsPage extends BaseView<HomeDetailsController> {
         },
       );
     } else {
-      return controller.homeData.value.menuData!.preDefined!
-              .where((element) =>
-                  element.foodPrefrence!.toLowerCase() ==
-                  controller.foodPrefList[controller.selectFoodPref.value]
-                      .toLowerCase())
-              .isEmpty
+      // For selected filter, show "no menus" only if no item in any category matches
+      final hasAnyMatchingItem = controller
+          .homeData.value.menuData!.preDefined!
+          .any((cat) => (cat.list ?? [])
+              .any((item) => _matchesSelected(item.foodPrefrence)));
+      return !hasAnyMatchingItem
           ? pMenuDataNotAvailable()
           : ListView.builder(
               shrinkWrap: true,
@@ -916,10 +944,7 @@ class HomeDetailsPage extends BaseView<HomeDetailsController> {
                         null &&
                     controller.homeData.value.menuData!.preDefined![parentIndex]
                         .list!.isNotEmpty) {
-                  return controller.selectFoodPref.value == -1
-                      ? predefinedMenuWidget(parentIndex)
-                      : predefinedMenuWidget(parentIndex);
-                  // : Container();
+                  return predefinedMenuWidget(parentIndex);
                 } else {
                   return Container();
                 }
@@ -931,10 +956,7 @@ class HomeDetailsPage extends BaseView<HomeDetailsController> {
   predefinedMenuWidget(parentIndex) {
     bool hasData = controller.selectFoodPref.value == -1 ||
         controller.homeData.value.menuData!.preDefined![parentIndex].list!.any(
-            (p0) =>
-                p0.foodPrefrence?.toLowerCase() ==
-                controller.foodPrefList[controller.selectFoodPref.value]
-                    .toLowerCase());
+            (p0) => _matchesSelected(p0.foodPrefrence));
     if (!hasData) return SizedBox(); // 🔴 skip rendering if no matching data
 
     return GestureDetector(
@@ -982,19 +1004,11 @@ class HomeDetailsPage extends BaseView<HomeDetailsController> {
                   .homeData.value.menuData!.preDefined![parentIndex].list!)
               : controller
                       .homeData.value.menuData!.preDefined![parentIndex].list!
-                      .where((p0) =>
-                          p0.foodPrefrence ==
-                          controller
-                              .foodPrefList[controller.selectFoodPref.value]
-                              .toLowerCase())
+                      .where((p0) => _matchesSelected(p0.foodPrefrence))
                       .isNotEmpty
                   ? magicItemList(controller
                       .homeData.value.menuData!.preDefined![parentIndex].list!
-                      .where((p0) =>
-                          p0.foodPrefrence ==
-                          controller
-                              .foodPrefList[controller.selectFoodPref.value]
-                              .toLowerCase())
+                      .where((p0) => _matchesSelected(p0.foodPrefrence))
                       .toList())
                   : Container(
                       margin: const EdgeInsets.only(bottom: 20),
@@ -1035,16 +1049,11 @@ class HomeDetailsPage extends BaseView<HomeDetailsController> {
     } else {
       return controller.selectedMagicMenuCategoryIndex.value == -1
           ? controller.magicMenuList
-              .where((p0) =>
-                  p0.foodPrefrence ==
-                  controller.foodPrefList[controller.selectFoodPref.value]
-                      .toLowerCase())
+              .where((p0) => _matchesSelected(p0.foodPrefrence))
               .toList()
           : controller.magicMenuList
               .where((p0) =>
-                  p0.foodPrefrence ==
-                      controller.foodPrefList[controller.selectFoodPref.value]
-                          .toLowerCase() &&
+                  _matchesSelected(p0.foodPrefrence) &&
                   p0.categoryId!.toLowerCase() ==
                       controller
                           .magicMenuCategories[
@@ -1124,12 +1133,13 @@ class HomeDetailsPage extends BaseView<HomeDetailsController> {
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     Image.asset(
-                                      menuList[index].foodPrefrence == 'veg'
+                                      _normalizePref(menuList[index].foodPrefrence) == 'veg'
                                           ? Res.icVeg
-                                          : menuList[index].foodPrefrence ==
-                                                  'non-veg'
+                                          : _normalizePref(menuList[index].foodPrefrence) == 'nonveg'
                                               ? Res.icNonVeg
-                                              : Res.icDummyFoodType,
+                                              : _normalizePref(menuList[index].foodPrefrence) == 'egg'
+                                                  ? Res.icEgg
+                                                  : Res.icDummyFoodType,
                                       width: 20,
                                       height: 20,
                                     ),
@@ -1443,12 +1453,13 @@ class HomeDetailsPage extends BaseView<HomeDetailsController> {
                                           CrossAxisAlignment.center,
                                       children: [
                                         Image.asset(
-                                          menuList[index].foodPrefrence == 'veg'
+                                          _normalizePref(menuList[index].foodPrefrence) == 'veg'
                                               ? Res.icVeg
-                                              : menuList[index].foodPrefrence ==
-                                                      'non-veg'
+                                              : _normalizePref(menuList[index].foodPrefrence) == 'nonveg'
                                                   ? Res.icNonVeg
-                                                  : Res.icDummyFoodType,
+                                                  : _normalizePref(menuList[index].foodPrefrence) == 'egg'
+                                                      ? Res.icEgg
+                                                      : Res.icDummyFoodType,
                                           width: 20,
                                           height: 20,
                                         ),

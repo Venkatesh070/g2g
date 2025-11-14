@@ -52,7 +52,7 @@ class HomeDetailsController extends GetxController
   var magicMenuCategories = <CategoriesMagic>[].obs;
   var selectedMagicMenuCategoryIndex = Rx(-1);
 
-  var foodPrefList = ['Veg', 'Non-Veg'];
+  var foodPrefList = ['Veg', 'Non-Veg','Egg'];
 
   @override
   void onInit() {

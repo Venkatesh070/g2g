@@ -827,6 +827,12 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                                                   .foodPreference ==
                                               'non-veg'
                                           ? Res.icNonVeg
+                                          :    controller
+                                                  .orderDetailsModel!
+                                                  .menuDetails![index]
+                                                  .foodPreference ==
+                                              'egg'
+                                              ? Res.icEgg
                                           : Res.icVeg,
                                       width: 16,
                                       height: 16,
