@@ -12,25 +12,14 @@ import 'infrastructure/theme/theme.dart';
 import 'initializer.dart';
 import 'infrastructure/analytics/meta_pixel.dart';
 
-// Apple ID saikishoremudhiraj2311@gmail.com
-// Password Subbu@8686
-// Google ID saikishoremudhiraj2311@gmail.com
-// password kishore8686
-
-// Testing Credential
-// 1234567890
-// 123456
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await Initializer.init();
   await Upgrader.clearSavedSettings();
-  
-  // await Firebase.initializeApp();
 
   runApp(const Main());
 
-  // Log app_open after first frame
   WidgetsBinding.instance.addPostFrameCallback((_) {
     AnalyticsService.logAppOpen();
   });

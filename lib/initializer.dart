@@ -1,9 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:facebook_app_events/facebook_app_events.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,7 +19,7 @@ class Initializer {
     try {
       WidgetsFlutterBinding.ensureInitialized();
 
-      /// ✅ Environment Setup
+      /// Environment
       EnvConfig devConfig = EnvConfig(
         appName: "Good To Grab",
         baseUrl: '',
@@ -33,26 +32,23 @@ class Initializer {
         envConfig: devConfig,
       );
 
-      /// ✅ Screen Orientation Lock
       _initScreenPreference();
 
-      /// ✅ Initialize Firebase
+      /// Firebase
       await Firebase.initializeApp();
-
-      /// ✅ Setup Background Notification Handler
       FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
-      /// ✅ Setup Crashlytics
+      /// Crashlytics
       FlutterError.onError =
           FirebaseCrashlytics.instance.recordFlutterFatalError;
 
-      /// ✅ Initialize Facebook SDK
-      await _initializeFacebookSDK();
+      /// Meta Auto-Log (REQUIRED for fb_mobile_install)
+      await _fbAppEvents.setAutoLogAppEventsEnabled(true);
 
-      /// ✅ Setup Analytics (Firebase + Meta)
+      /// Analytics
       await _handleAnalyticsEvents();
 
-      /// ✅ Initialize Push Notifications
+      /// Notifications
       AppNotification().init();
     } catch (err) {
       rethrow;
@@ -66,50 +62,21 @@ class Initializer {
     ]);
   }
 
-  /// ✅ Initialize Facebook SDK
-static Future<void> _initializeFacebookSDK() async {
-  try {
-    await _fbAppEvents.setAutoLogAppEventsEnabled(true);
-    debugPrint('✅ Facebook App Events initialized (auto-log enabled)');
-  } catch (e) {
-    debugPrint('⚠️ Facebook SDK init failed: $e');
-  }
-}
-
-
-  /// ✅ Logs install (once) and app open (every launch)
+  /// Custom first_install logic (internal only)
   static Future<void> _handleAnalyticsEvents() async {
     final analytics = FirebaseAnalytics.instance;
     final prefs = await SharedPreferences.getInstance();
 
-    final hasInstalled = prefs.getBool('has_installed') ?? false;
+    final firstInstall = prefs.getBool('has_installed') ?? false;
 
-    if (!hasInstalled) {
-      /// ✅ Firebase: first_install
-      await analytics.logEvent(
-        name: 'first_install',
-        parameters: {
-          'timestamp': DateTime.now().toIso8601String(),
-          'platform': 'flutter',
-        },
-      );
-
-      /// ✅ Facebook: first_install
-      await _fbAppEvents.logEvent(
-        name: 'first_install',
-        parameters: {
-          'timestamp': DateTime.now().toIso8601String(),
-          'platform': 'flutter',
-        },
-      );
+    if (!firstInstall) {
+      await analytics.logEvent(name: 'first_install');
+      await _fbAppEvents.logEvent(name: 'first_install');
 
       await prefs.setBool('has_installed', true);
-      debugPrint('🔥 Logged first_install (Firebase + Facebook)');
     }
 
-    /// ✅ Always log app open (Firebase + Facebook)
     await analytics.logAppOpen();
     await _fbAppEvents.logEvent(name: 'app_open');
-    debugPrint('📲 Logged app_open (Firebase + Facebook)');
   }
 }
