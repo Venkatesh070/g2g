@@ -465,9 +465,9 @@ class HomeDetailsPage extends BaseView<HomeDetailsController> {
                     Text(
                       'Menu'.tr,
                     ),
-                    Text(
-                      'Magic Bag'.tr,
-                    ),
+                    // Text(
+                    //   'Magic Bag'.tr,
+                    // ),
                   ],
                   onTap: (index) {
                     controller.selectedTabIndex.value = index;
@@ -1024,7 +1024,7 @@ class HomeDetailsPage extends BaseView<HomeDetailsController> {
     return Container(
       margin: const EdgeInsets.only(left: 10, right: 10, top: 20),
       child: Text(
-        "No Menus available, but enjoy our Magic Bags instead!",
+        "No Menus available!",
         style:
             semiBoldTextStyle(fontSize: dimen13, color: ColorsTheme.colBlack),
       ),

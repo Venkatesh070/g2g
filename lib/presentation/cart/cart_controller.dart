@@ -398,7 +398,7 @@ class CartController extends GetxController {
       addRemoveCartApi(index, tempQuantity);
     } else {
       SnackBarUtil.showError(
-          message: 'Your magic bag quantity has been maxed out');
+          message: 'Item quantity has been maxed out');
     }
   }
 

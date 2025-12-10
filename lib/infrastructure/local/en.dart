@@ -134,7 +134,7 @@ Map<String, String> enLang = {
   'no_fav_title' : 'There are no favorites yet!',
   'no_fav_subtitle' : 'check out some nearby places and tap on the ''favorite'' button- you will then get a notification when they have items available!',
   'no_orders_title' : 'Looking a bit empty here',
-  'no_orders_subtitle' : 'Let\'s find a magical bag for you to save!',
+  'no_orders_subtitle' : 'Start saving with a single tap!',
   'no_magical_title' : 'Looking a bit empty here?',
   'no_magical_subtitle' : 'Let\'s find a magical bag for you to save!',
   "no_country_found":"No Country Found",

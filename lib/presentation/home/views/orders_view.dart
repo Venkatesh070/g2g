@@ -80,7 +80,7 @@ class OrdersView extends GetView<HomeController> {
                                         margin: const EdgeInsets.only(
                                             left: 28, right: 28, top: 25),
                                         child: Text(
-                                          'Save your First Magic Bag'.tr,
+                                          'Explore Now'.tr,
                                           style: semiBoldTextStyle(
                                               fontSize: dimen13,
                                               color: ColorsTheme.colWhite),
