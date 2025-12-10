@@ -1332,14 +1332,25 @@ class HomeController extends GetxController {
     }
   }
 
-  alertBoxRemoveCart() {
-    Get.dialog(AlertDialog(
-        backgroundColor: ColorsTheme.colWhite,
+ alertBoxRemoveCart() {
+  Get.dialog(
+    Theme(
+      data: Theme.of(Get.context!).copyWith(
+        dialogBackgroundColor: Colors.white, // force white
+        colorScheme: Theme.of(Get.context!).colorScheme.copyWith(
+              surface: Colors.white, // override Material 3 surface color
+              surfaceTint: Colors.transparent, // remove green overlay tint
+            ),
+      ),
+      child: AlertDialog(
+        backgroundColor: Colors.white, // ensure pure white
+        surfaceTintColor: Colors.transparent, // disable Material3 tint
         shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(32.0))),
-        content: Wrap(children: [
-          Container(
-            child: Column(
+          borderRadius: BorderRadius.all(Radius.circular(32.0)),
+        ),
+        content: Wrap(
+          children: [
+            Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -1347,66 +1358,63 @@ class HomeController extends GetxController {
                   "Remove Cart",
                   style: boldTextStyle(fontSize: dimen19, color: Colors.black),
                 ),
-                const SizedBox(
-                  height: 15,
-                ),
+                const SizedBox(height: 15),
                 Text(
                   "Are you sure you want to remove this item?".tr,
                   textAlign: TextAlign.center,
-                  style:
-                      regularTextStyle(fontSize: dimen13, color: Colors.black),
+                  style: regularTextStyle(fontSize: dimen13, color: Colors.black),
                 ),
-                const SizedBox(
-                  height: 30,
-                ),
+                const SizedBox(height: 30),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: InkWell(
-                          onTap: () {
-                            Get.back();
-                            removeCart(cartHomeList[0].cartId,
-                                cartHomeList[0].restroDetail!.restaurantId);
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                                color: ColorsTheme.colPrimary,
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(color: Colors.black)),
-                            padding: EdgeInsets.symmetric(
-                                vertical: 14, horizontal: 30),
-                            margin: EdgeInsets.only(left: 5, right: 5),
-                            child: Center(
-                              child: Text(
-                                "Yes".tr,
-                                overflow: TextOverflow.ellipsis,
-                                style: boldTextStyle(
-                                    fontSize: dimen14,
-                                    color: ColorsTheme.colWhite),
-                              ),
-                            ),
-                          )),
-                    ),
                     Expanded(
                       child: InkWell(
                         onTap: () {
                           Get.back();
+                          removeCart(
+                            cartHomeList[0].cartId,
+                            cartHomeList[0].restroDetail!.restaurantId,
+                          );
                         },
                         child: Container(
                           decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: Colors.black)),
-                          padding: EdgeInsets.symmetric(
+                            color: ColorsTheme.colPrimary,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: Colors.black),
+                          ),
+                          padding: const EdgeInsets.symmetric(
                               vertical: 14, horizontal: 30),
-                          margin: EdgeInsets.only(right: 5, left: 5),
+                          margin: const EdgeInsets.symmetric(horizontal: 5),
                           child: Center(
                             child: Text(
-                              "cancel".tr,
-                              overflow: TextOverflow.ellipsis,
+                              "Yes".tr,
                               style: boldTextStyle(
-                                  fontSize: dimen14, color: Colors.black),
+                                fontSize: dimen14,
+                                color: ColorsTheme.colWhite,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: InkWell(
+                        onTap: Get.back,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: Colors.black),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 14, horizontal: 10),
+                          margin: const EdgeInsets.symmetric(horizontal: 5),
+                          child: Center(
+                            child: Text(
+                              "Cancel".tr,
+                              style: boldTextStyle(
+                                fontSize: dimen14,
+                                color: Colors.black,
+                              ),
                             ),
                           ),
                         ),
@@ -1416,9 +1424,12 @@ class HomeController extends GetxController {
                 ),
               ],
             ),
-          ),
-        ])));
-  }
+          ],
+        ),
+      ),
+    ),
+  );
+}
 
   removeCart(int? cartId, int? restaurantId) async {
     ProgressDialog progressDialog = ProgressDialog();

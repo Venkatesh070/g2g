@@ -66,7 +66,7 @@ class PaymentFailedWidget extends StatelessWidget {
             width: double.infinity,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: ColorsTheme.coldF04F60,
+                backgroundColor: ColorsTheme.colPrimary,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),

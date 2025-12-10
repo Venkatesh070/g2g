@@ -26,7 +26,6 @@ class Initializer {
         baseUrlGooglePlace: '',
         shouldCollectCrashLog: true,
       );
-
       BuildConfig.instantiate(
         envType: Environment.development,
         envConfig: devConfig,
@@ -36,6 +35,8 @@ class Initializer {
 
       /// Firebase
       await Firebase.initializeApp();
+ 
+      /// ✅ Setup Background Notification Handler
       FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
       /// Crashlytics
@@ -54,7 +55,7 @@ class Initializer {
       rethrow;
     }
   }
-
+ 
   static void _initScreenPreference() {
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -78,5 +79,43 @@ class Initializer {
 
     await analytics.logAppOpen();
     await _fbAppEvents.logEvent(name: 'app_open');
+  }
+}
+ 
+ 
+  /// ✅ Logs install (once) and app open (every launch)
+  static Future<void> _handleAnalyticsEvents() async {
+    final analytics = FirebaseAnalytics.instance;
+    final prefs = await SharedPreferences.getInstance();
+ 
+    final hasInstalled = prefs.getBool('has_installed') ?? false;
+ 
+    if (!hasInstalled) {
+      /// ✅ Firebase: first_install
+      await analytics.logEvent(
+        name: 'first_install',
+        parameters: {
+          'timestamp': DateTime.now().toIso8601String(),
+          'platform': 'flutter',
+        },
+      );
+ 
+      /// ✅ Facebook: first_install
+      await _fbAppEvents.logEvent(
+        name: 'first_install',
+        parameters: {
+          'timestamp': DateTime.now().toIso8601String(),
+          'platform': 'flutter',
+        },
+      );
+ 
+      await prefs.setBool('has_installed', true);
+      debugPrint('🔥 Logged first_install (Firebase + Facebook)');
+    }
+ 
+    /// ✅ Always log app open (Firebase + Facebook)
+    await analytics.logAppOpen();
+    await _fbAppEvents.logEvent(name: 'app_open');
+    debugPrint('📲 Logged app_open (Firebase + Facebook)');
   }
 }
