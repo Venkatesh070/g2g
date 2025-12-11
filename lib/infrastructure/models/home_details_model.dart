@@ -182,7 +182,7 @@ class MenuDataList {
   String? startTime;
   bool isTapImage = false;
   String? endTime;
-
+  String? expirtyDate;
   String? categoryId;
   String? menuType;
 
@@ -200,6 +200,7 @@ class MenuDataList {
       this.endTime,
       this.foodPrefrence,
       this.categoryId,
+      this.expirtyDate, 
       this.menuType});
 
   MenuDataList.fromJson(Map<String, dynamic> json) {
@@ -211,6 +212,7 @@ class MenuDataList {
     finalPrice = double.parse((json['final_price'] ?? 0).toString());
     offerPrice = double.parse((json['offer_price'] ?? 0).toString());
     quantity = int.parse((json['quantity'] ?? 0).toString());
+    expirtyDate = (json['expiry_date'] ?? '').toString();
     selectedQuantity = int.parse((json['selected_quantity'] ?? 0).toString());
     foodPrefrence = json['food_prefrence'] ?? '';
     menuImage = json['menu_image'] ?? '';
@@ -231,6 +233,7 @@ class MenuDataList {
     data['offer_price'] = offerPrice;
     data['quantity'] = quantity;
     data['selected_quantity'] = selectedQuantity;
+    data['expiry_date'] = expirtyDate;
     data['food_prefrence'] = foodPrefrence;
     data['menu_image'] = menuImage;
     data['start_time'] = startTime;

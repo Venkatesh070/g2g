@@ -921,9 +921,9 @@ class HomeController extends GetxController {
     if (!isFilter.value) {
       // Kick off filters fetch in background; don't block first render
       getFilterData();
-    }
+    } 
 
-    try {
+    try { 
       Map<String, dynamic> params = homeDataParams();
       ApiResponseModel<HomeModel> homeModel =
           await DioClient.base().funHomeApi(params);

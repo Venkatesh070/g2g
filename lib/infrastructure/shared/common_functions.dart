@@ -105,6 +105,18 @@ class CommonFunction {
     final now = DateTime.now();
     return now.day == day && now.month == month && now.year == year;
   }
+  static String formatDateDMY(String date) {
+  if (date.isEmpty) return '';
+
+  // handles both `2025-12-13` and `2025-12-13T00:00:00`
+  final pureDate = date.split('T').first;
+  final parts = pureDate.split('-');
+
+  if (parts.length != 3) return date;
+
+  return '${parts[2]}-${parts[1]}-${parts[0]}';
+}
+
 
   static bool isTomorrow(day, month, year) {
     final now = DateTime.now();

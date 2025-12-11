@@ -747,7 +747,11 @@ class HomeDetailsPage extends BaseView<HomeDetailsController> {
                           Container(
                             margin: const EdgeInsets.only(right: 8),
                             child: Image.asset(
-                              index == 0 ? Res.icVeg : index == 1 ? Res.icNonVeg : Res.icEgg,
+                              index == 0
+                                  ? Res.icVeg
+                                  : index == 1
+                                      ? Res.icEgg
+                                      : Res.icNonVeg,
                               width: 20,
                               height: 20,
                             ),
@@ -926,8 +930,7 @@ class HomeDetailsPage extends BaseView<HomeDetailsController> {
       );
     } else {
       // For selected filter, show "no menus" only if no item in any category matches
-      final hasAnyMatchingItem = controller
-          .homeData.value.menuData!.preDefined!
+      final hasAnyMatchingItem = controller.homeData.value.menuData!.preDefined!
           .any((cat) => (cat.list ?? [])
               .any((item) => _matchesSelected(item.foodPrefrence)));
       return !hasAnyMatchingItem
@@ -955,8 +958,8 @@ class HomeDetailsPage extends BaseView<HomeDetailsController> {
 
   predefinedMenuWidget(parentIndex) {
     bool hasData = controller.selectFoodPref.value == -1 ||
-        controller.homeData.value.menuData!.preDefined![parentIndex].list!.any(
-            (p0) => _matchesSelected(p0.foodPrefrence));
+        controller.homeData.value.menuData!.preDefined![parentIndex].list!
+            .any((p0) => _matchesSelected(p0.foodPrefrence));
     if (!hasData) return SizedBox(); // 🔴 skip rendering if no matching data
 
     return GestureDetector(
@@ -1133,11 +1136,17 @@ class HomeDetailsPage extends BaseView<HomeDetailsController> {
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     Image.asset(
-                                      _normalizePref(menuList[index].foodPrefrence) == 'veg'
+                                      _normalizePref(menuList[index]
+                                                  .foodPrefrence) ==
+                                              'veg'
                                           ? Res.icVeg
-                                          : _normalizePref(menuList[index].foodPrefrence) == 'nonveg'
+                                          : _normalizePref(menuList[index]
+                                                      .foodPrefrence) ==
+                                                  'nonveg'
                                               ? Res.icNonVeg
-                                              : _normalizePref(menuList[index].foodPrefrence) == 'egg'
+                                              : _normalizePref(menuList[index]
+                                                          .foodPrefrence) ==
+                                                      'egg'
                                                   ? Res.icEgg
                                                   : Res.icDummyFoodType,
                                       width: 20,
@@ -1288,7 +1297,7 @@ class HomeDetailsPage extends BaseView<HomeDetailsController> {
                       Container(
                         margin: const EdgeInsets.only(right: 8),
                         child: Text(
-                          'Pickup Time',
+                          'Pickup Time :',
                           style: mediumTextStyle(
                               fontSize: dimen12, color: ColorsTheme.colBlack),
                         ),
@@ -1301,6 +1310,36 @@ class HomeDetailsPage extends BaseView<HomeDetailsController> {
                     ],
                   ),
                 ),
+                menuList[index].expirtyDate == null ||
+                        menuList[index].expirtyDate == ''
+                    ? Container()
+                    : Container(
+                        margin: const EdgeInsets.only(
+                            left: 15, right: 15, top: 5, bottom: 5),
+                        child: Row(
+                          children: [
+                            Container(
+                              margin: const EdgeInsets.only(right: 8),
+                              child: Text(
+                                'Expiry Date :',
+                                style: mediumTextStyle(
+                                    fontSize: dimen12,
+                                    color: ColorsTheme.colBlack),
+                              ),
+                            ),
+                            Text(
+                              (menuList[index].expirtyDate != null &&
+                                      menuList[index].expirtyDate!.isNotEmpty)
+                                  ? formatDateDMY(menuList[index].expirtyDate!)
+                                  : '--',
+                              style: regularTextStyle(
+                                fontSize: dimen12,
+                                color: ColorsTheme.colBlack,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                 menuList.length - 1 == index
                     ? Container()
                     : Container(
@@ -1453,11 +1492,18 @@ class HomeDetailsPage extends BaseView<HomeDetailsController> {
                                           CrossAxisAlignment.center,
                                       children: [
                                         Image.asset(
-                                          _normalizePref(menuList[index].foodPrefrence) == 'veg'
+                                          _normalizePref(menuList[index]
+                                                      .foodPrefrence) ==
+                                                  'veg'
                                               ? Res.icVeg
-                                              : _normalizePref(menuList[index].foodPrefrence) == 'nonveg'
+                                              : _normalizePref(menuList[index]
+                                                          .foodPrefrence) ==
+                                                      'nonveg'
                                                   ? Res.icNonVeg
-                                                  : _normalizePref(menuList[index].foodPrefrence) == 'egg'
+                                                  : _normalizePref(menuList[
+                                                                  index]
+                                                              .foodPrefrence) ==
+                                                          'egg'
                                                       ? Res.icEgg
                                                       : Res.icDummyFoodType,
                                           width: 20,
@@ -1555,12 +1601,12 @@ class HomeDetailsPage extends BaseView<HomeDetailsController> {
                           child: Container(
                             margin: const EdgeInsets.only(left: 15),
                             child: Text(
-                              'Qty Left : ${(menuList[index].quantity ?? 0).toString()}',
-                              style: regularTextStyle(
-                                  fontSize: dimen13,
-                                  color: ColorsTheme.colBlack),
-                              maxLines: 2,
-                            ),
+                                  'Qty Left : ${(menuList[index].quantity ?? 0).toString()}',
+                                  style: regularTextStyle(
+                                      fontSize: dimen13,
+                                      color: ColorsTheme.colBlack),
+                                  maxLines: 2,
+                                ),
                           ),
                         ),
                         Container(
@@ -1663,5 +1709,17 @@ class HomeDetailsPage extends BaseView<HomeDetailsController> {
         ),
       );
     }));
+  }
+
+  formatDateDMY(String date) {
+    if (date.isEmpty) return '';
+
+    // handles both `2025-12-13` and `2025-12-13T00:00:00`
+    final pureDate = date.split('T').first;
+    final parts = pureDate.split('-');
+
+    if (parts.length != 3) return date;
+
+    return '${parts[2]}-${parts[1]}-${parts[0]}';
   }
 }
