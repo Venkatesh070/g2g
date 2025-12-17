@@ -9,13 +9,11 @@ PODS:
     - Flutter
   - device_info_plus (0.0.1):
     - Flutter
-  - facebook_app_events (0.0.1):
-    - FBAudienceNetwork (= 6.16)
+  - facebook_app_events (0.20.0):
     - FBSDKCoreKit (~> 18.0)
     - Flutter
   - FBAEMKit (18.0.1):
     - FBSDKCoreKit_Basics (= 18.0.1)
-  - FBAudienceNetwork (6.16.0)
   - FBSDKCoreKit (18.0.1):
     - FBAEMKit (= 18.0.1)
     - FBSDKCoreKit_Basics (= 18.0.1)
@@ -332,7 +330,6 @@ SPEC REPOS:
   trunk:
     - AppAuth
     - FBAEMKit
-    - FBAudienceNetwork
     - FBSDKCoreKit
     - FBSDKCoreKit_Basics
     - Firebase
@@ -436,9 +433,8 @@ SPEC CHECKSUMS:
   AppAuth: d4f13a8fe0baf391b2108511793e4b479691fb73
   camera_avfoundation: 04b44aeb14070126c6529e5ab82cc7c9fca107cf
   device_info_plus: 335f3ce08d2e174b9fdc3db3db0f4e3b1f66bd89
-  facebook_app_events: 015d0181fcb1bf667ada2b8f02d0f53b9ea296dc
+  facebook_app_events: cfa07e73912a052992b5f218f79a19a66a99bf1a
   FBAEMKit: b2ed182002dbcb65d5a60059c9693d322186cd00
-  FBAudienceNetwork: d1670939884e3a2e0ad98dca98d7e0c841417228
   FBSDKCoreKit: 7f96852f2539bdb88ba8d47e5ab4ae70a6f8d691
   FBSDKCoreKit_Basics: 22d4c1a509ded4e45116f3bb167a14907550f62e
   Firebase: 0312a2352584f782ea56f66d91606891d4607f06
