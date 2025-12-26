@@ -328,7 +328,6 @@ class CartController extends GetxController {
         totalPay.value = subTotalFinalPrice.value + combinedGst.value + platformFee.value;
         // totalPay.value = 1;
 
-        print("sjkdfk ${menuList.length}");
 
         Future.delayed(const Duration(milliseconds: 500), () {
           cartLoader.value = false;
@@ -686,7 +685,9 @@ class CartController extends GetxController {
     getPhonePeCallBackUrl();
     phonePeTId.value = getRandomNumber();
 
-    ///changes by krishna
+    ///changes by krishna - Old Change
+    ///
+    ///Updated redirect Url in payload by praneeth on Dec 26 - Added redirectUrl same as callbackUrl
 
     final requestData = {
       "merchantId": AppConstants.phonePeMerchantId,
@@ -694,7 +695,8 @@ class CartController extends GetxController {
       "merchantUserId": userId.value.toString(),
       "amount": (getTotalPay().toInt() * 100),
       "callbackUrl":
-          'https://goodtograb.com/callback-url', //'https://webhook.site/99e62550-a8dd-4550-b324-5f2627be9ec5',//phonePeCallBack.value,
+          'https://goodtograb.com/callback-url', 
+      "redirectUrl": 'https://goodtograb.com/callback-url',
       "mobileNumber": userPhoneNumber.value,
       "paymentInstrument": {"type": "PAY_PAGE"},
     };

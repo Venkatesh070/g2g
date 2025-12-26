@@ -739,13 +739,13 @@ class HomeDetailsPage extends BaseView<HomeDetailsController> {
                                   color: ColorsTheme.colBlack, width: 1),
                               borderRadius: BorderRadius.circular(50)),
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 10),
+                          horizontal: 10, vertical: 5),
                       margin: const EdgeInsets.only(left: 6, right: 6, top: 5),
                       alignment: Alignment.center,
                       child: Row(
                         children: [
                           Container(
-                            margin: const EdgeInsets.only(right: 8),
+                            margin: const EdgeInsets.only(right: 4),
                             child: Image.asset(
                               index == 0
                                   ? Res.icVeg
