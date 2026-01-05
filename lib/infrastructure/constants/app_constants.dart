@@ -47,4 +47,11 @@ class AppConstants {
 
   static String? appId = null;
   static bool enableLogging = true;
+
+  static const String linkrunnerToken = 'gWsDHO9F5aW5YLFgKGhqoghG';
+  static const String linkrunnerSecretKey = '2e768f22-5550-43bd-839d-3120dc953e89';
+  static const String linkrunnerKeyId = '019b7da1-0b1d-7ff1-92b3-4cbe1e9d53f1';
+  static const String linkrunnerIOSSecretKey = '4d5aee27-0372-4dcd-a346-c02eab03d5b6';
+  static const String linkrunnerIOSKeyId = '019b7da2-eccb-7993-b3ef-8d106fef626f';
+
 }

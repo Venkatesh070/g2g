@@ -3,6 +3,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission  android:name="android.permission.INTERNET"  />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" tools:node="remove" />
@@ -15,6 +16,8 @@
         android:label="Good To Grab"
         android:name="${applicationName}"
         android:allowBackup="false"
+        android:fullBackupContent="@xml/linkrunner_backup_descriptor"
+        android:dataExtractionRules="@xml/linkrunner_backup_rules"
         android:usesCleartextTraffic="true"
         android:icon="@drawable/ic_stat_ic_notification">
 
@@ -54,13 +57,36 @@
 
             <!--deeplink process-->
             <meta-data android:name="flutter_deeplinking_enabled" android:value="true" />
+            <!-- Firebase Dynamic Links (if still used) -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="http" android:host="goodtograb.page.link" />
-                <data android:scheme="https" />
+                <data
+                    android:scheme="https"
+                    android:host="goodtograb.page.link" />
             </intent-filter>
+
+            <!-- Main Website -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="https"
+                    android:host="goodtograb.com" />
+            </intent-filter>
+
+            <!-- LinkRunner Subdomain -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="https"
+                    android:host="app.goodtograb.com" />
+            </intent-filter>
+
 
 
             <intent-filter>
