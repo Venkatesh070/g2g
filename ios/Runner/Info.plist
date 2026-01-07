@@ -94,6 +94,8 @@
 	<string>Good To Grab need access camera for edit user profile.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Good To Grab need access camera for edit user profile.</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>This identifier will be used to deliver personalized ads and improve your app experience.</string>
 	<key>SKAdNetworkItems</key>
 	<array>
 		<dict>

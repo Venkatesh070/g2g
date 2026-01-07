@@ -17,7 +17,7 @@ import 'infrastructure/firebase/push_firebase_notification.dart';
 import 'infrastructure/constants/app_constants.dart';
 import 'infrastructure/shared/pref_manager.dart';
 import 'infrastructure/models/user_model.dart';
-import 'package:flutter/foundation.dart';  // For kDebugMode
+import 'package:flutter/foundation.dart'; // For kDebugMode
 
 class Initializer {
   static final FacebookAppEvents _fbAppEvents = FacebookAppEvents();
@@ -56,8 +56,6 @@ class Initializer {
       /// Meta Auto-Log (REQUIRED for fb_mobile_install)
       await _fbAppEvents.setAutoLogAppEventsEnabled(true);
 
-      
-
       /// Analytics
       await _handleAnalyticsEvents();
 
@@ -75,27 +73,25 @@ class Initializer {
     ]);
   }
 
-static Future<void> _initLinkRunner() async {
-  try {
-    debugPrint('[LinkRunner] Initializing LinkRunner SDK');
+  static Future<void> _initLinkRunner() async {
+    try {
 
-    await LinkRunner().init(
-      AppConstants.linkrunnerToken,
-      Platform.isIOS
-          ? AppConstants.linkrunnerIOSSecretKey
-          : AppConstants.linkrunnerSecretKey,
-      Platform.isIOS
-          ? AppConstants.linkrunnerIOSKeyId
-          : AppConstants.linkrunnerKeyId,
-      false,        // disableIdfaCollection (Android safe)
-      false
-    );
+      await LinkRunner().init(
+          AppConstants.linkrunnerToken,
+          Platform.isIOS
+              ? AppConstants.linkrunnerIOSSecretKey
+              : AppConstants.linkrunnerSecretKey,
+          Platform.isIOS
+              ? AppConstants.linkrunnerIOSKeyId
+              : AppConstants.linkrunnerKeyId,
+          false, // disableIdfaCollection (Android safe)
+          false);
 
-    debugPrint('[LinkRunner] Initialization successful');
-  } catch (e) {
-    debugPrint('[LinkRunner] Initialization failed: $e');
+      debugPrint('[LinkRunner] Initialization successful');
+    } catch (e) {
+      debugPrint('[LinkRunner] Initialization failed: $e');
+    }
   }
-}
 
   static Future<void> _handleLinkRunnerUserData() async {
     try {
