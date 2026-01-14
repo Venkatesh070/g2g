@@ -73,6 +73,7 @@ class Res {
   static const String appstore = "assets/appstore.json";
   static const String playstore = "assets/playstore.json";
   static const String takeAway = "assets/takeAway.json";
+  static const String orderConfirmed = "assets/orderConfirmed.json";
 
   //Added Later
   static const String icConfirmPending = "assets/images/icConfirmPending.png";

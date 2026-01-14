@@ -10,7 +10,9 @@
 	</array>
 	<key>com.apple.developer.associated-domains</key>
 	<array>
-		<string>applinks:goodtograb.page.link</string>
+		<!-- <string>applinks:goodtograb.page.link</string> -->
+		<string>applinks:goodtograb.com</string>
+		<string>applinks:app.goodtograb.com</string>
 	</array>
 </dict>
 </plist>

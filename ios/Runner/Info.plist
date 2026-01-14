@@ -32,7 +32,7 @@
 				<string>com.googleusercontent.apps.4519581228-h2f5cfh78fh5ahukvt0ntdk75gnmscg7</string>
 			</array>
 		</dict>
-		<dict>
+		<!-- <dict>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
@@ -40,6 +40,26 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>https</string>
+			</array>
+		</dict> -->
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>goodtograb</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>goodtograb</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>goodtograb</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>app.goodtograb</string>
 			</array>
 		</dict>
 	</array>

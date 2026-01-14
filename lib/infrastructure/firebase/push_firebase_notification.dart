@@ -9,6 +9,10 @@ import 'package:get/get_core/src/get_main.dart';
 import '../constants/app_constants.dart';
 import '../navigation/routes.dart';
 import '../shared/pref_manager.dart';
+import '../../infrastructure/shared/snackbar.util.dart';
+import '../../presentation/order_details/order_details_controller.dart';
+import '../../presentation/notification/notification_controller.dart';
+import '../../presentation/home/home_controller.dart';
 
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print("Handling a background message");
@@ -35,6 +39,21 @@ class AppNotification {
     if (initialMessage != null) {
       //  Utils.successSnackBar(initialMessage.notification!.title);
       print('// App received a notification when it was killed');
+      if (initialMessage.data.isNotEmpty) {
+        if (initialMessage.data['type'] == 'order_confirmed') {
+          var orderId = initialMessage.data['order_id'];
+          if (orderId != null) {
+            Future.delayed(const Duration(seconds: 1), () {
+              Get.toNamed(Routes.orderDetails, arguments: {
+                'orderId': int.tryParse(orderId.toString()) ?? 0,
+                'resId': 0,
+                'currency': '₹',
+                'orderStatus': '',
+              });
+            });
+          }
+        }
+      }
     }
   }
 
@@ -59,9 +78,9 @@ class AppNotification {
     );
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      RemoteNotification notification = message.notification!;
-      AndroidNotification android = message.notification!.android!;
-      if (message != null && message.data.isNotEmpty) {
+      RemoteNotification? notification = message.notification;
+      AndroidNotification? android = message.notification?.android;
+      if (message.data.isNotEmpty) {
         print("notification_onMessageOpenedApp1 ${message.data.toString()}");
         /// Handle navigation or other actions here
 
@@ -74,6 +93,90 @@ class AppNotification {
            //   'resId': int.parse(message.data['body']['resId']),
            //   'orderStatus': message.data['body']['pending_pick_up'],
            // });
+         }
+
+         if (message.data['type'] == 'order_confirmed') {
+           var orderId = message.data['order_id'];
+           
+           SnackBarUtil.showOrderConfirmation(
+             message: message.notification?.body ?? 'Your order has been confirmed!',
+             onOrderDetails: () {
+               Get.back(); // close dialog
+               if (Get.isRegistered<HomeController>()) {
+                 Get.find<HomeController>().onSelectIndex(2); // Orders tab
+               }
+             },
+             onOrdersHistory: () {
+               Get.back(); // close dialog
+               if (Get.isRegistered<HomeController>()) {
+                 Get.find<HomeController>().onSelectIndex(2); // Orders tab
+               }
+             },
+             onCancel: () {
+               Get.back(); // close dialog
+             },
+           );
+           
+           // Real-time UI refresh
+           if (orderId != null) {
+              int id = int.tryParse(orderId.toString()) ?? 0;
+              if (Get.isRegistered<OrderDetailsController>()) {
+                var controller = Get.find<OrderDetailsController>();
+                if (controller.orderId == id) {
+                  controller.getOrderDetails();
+                }
+              }
+           }
+           
+           if (Get.isRegistered<HomeController>()) {
+              var homeController = Get.find<HomeController>();
+              homeController.currentPage.value = 1;
+              homeController.orderList.clear();
+              homeController.getOrdersList();
+           }
+
+           if (Get.isRegistered<NotificationController>()) {
+              Get.find<NotificationController>().onInit();
+           }
+         }
+
+         if (message.data['type'] == 'order_cancelled') {
+           var orderId = message.data['order_id'];
+
+           SnackBarUtil.showOrderCancellation(
+             message: message.notification?.body ?? 'Your order has been cancelled!',
+             onOrderDetails: () {
+               Get.back(); // close dialog
+               if (Get.isRegistered<HomeController>()) {
+                 Get.find<HomeController>().onSelectIndex(2); // Orders tab
+               }
+             },
+             onCancel: () {
+               Get.back(); // close dialog
+             },
+           );
+
+           // Real-time UI refresh
+           if (orderId != null) {
+             int id = int.tryParse(orderId.toString()) ?? 0;
+             if (Get.isRegistered<OrderDetailsController>()) {
+               var controller = Get.find<OrderDetailsController>();
+               if (controller.orderId == id) {
+                 controller.getOrderDetails();
+               }
+             }
+           }
+
+           if (Get.isRegistered<HomeController>()) {
+             var homeController = Get.find<HomeController>();
+             homeController.currentPage.value = 1;
+             homeController.orderList.clear();
+             homeController.getOrdersList();
+           }
+
+           if (Get.isRegistered<NotificationController>()) {
+             Get.find<NotificationController>().onInit();
+           }
          }
       }
       if (notification != null && android != null) {
@@ -111,12 +214,20 @@ class AppNotification {
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage? message) {
       if (message != null && message.data.isNotEmpty) {
-        print("notification_onMessageOpenedApp ${message.data.toString()}");
+        print("notification_onMessageOpenedApp ${message.data}");
         /// Handle navigation or other actions here
-        /// For example:
-        /// if (message.data['type'] == 'profile_update') {
-        ///  Get.offNamed(Routes.EDIT_PROFILE);
-        /// }
+        
+        if (message.data['type'] == 'order_confirmed' || message.data['type'] == 'order_cancelled') {
+           var orderId = message.data['order_id'];
+           if (orderId != null) {
+              Get.toNamed(Routes.orderDetails, arguments: {
+                'orderId': int.tryParse(orderId.toString()) ?? 0,
+                'resId': 0, // Fallback if not provided
+                'currency': '₹',
+                'orderStatus': '',
+              });
+           }
+        }
       }
     });
 
@@ -156,5 +267,5 @@ class AppNotification {
     );
   }
 
-   navigateToNotificationScreen(data, Map<String, dynamic> data2) {}
+  navigateToNotificationScreen(data, Map<String, dynamic> data2) {}
 }

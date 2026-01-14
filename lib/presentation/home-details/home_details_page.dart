@@ -518,7 +518,7 @@ class HomeDetailsPage extends BaseView<HomeDetailsController> {
                   FirebaseDynamicLinks dynamicLinks =
                       FirebaseDynamicLinks.instance;
                   var parameters = DynamicLinkParameters(
-                    uriPrefix: 'https://goodtograb.page.link',
+                    uriPrefix: 'https://goodtograb',
                     link: Uri.parse(
                         'https://goodtograb.com/homeDetails?resId=${controller.resId}&currency=${controller.currency}'),
                     androidParameters: const AndroidParameters(

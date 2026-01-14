@@ -2,6 +2,7 @@
 -keep class com.razorpay.** { *; }
 -keepattributes *Annotation*
 -dontwarn proguard.annotation.**
+-dontwarn com.razorpay.**
 
 # Keep PhonePe IntentSDK
 -keep class phonepe.intentsdk.** { *; }
@@ -18,3 +19,4 @@
 -dontwarn com.google.**
 -dontwarn okhttp3.**
 -dontwarn org.conscrypt.**
+

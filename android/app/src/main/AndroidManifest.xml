@@ -58,14 +58,14 @@
             <!--deeplink process-->
             <meta-data android:name="flutter_deeplinking_enabled" android:value="true" />
             <!-- Firebase Dynamic Links (if still used) -->
-            <intent-filter android:autoVerify="true">
+            <!-- <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data
                     android:scheme="https"
                     android:host="goodtograb.page.link" />
-            </intent-filter>
+            </intent-filter> -->
 
             <!-- Main Website -->
             <intent-filter android:autoVerify="true">
@@ -85,6 +85,14 @@
                 <data
                     android:scheme="https"
                     android:host="app.goodtograb.com" />
+            </intent-filter>
+
+            <!-- LinkRunner Custom URI Scheme -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="goodtograb" />
             </intent-filter>
 
 

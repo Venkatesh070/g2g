@@ -4,9 +4,11 @@ import 'package:get/get.dart';
 import 'package:good_grab/infrastructure/constants/app_constants.dart';
 import 'package:good_grab/infrastructure/shared/pref_manager.dart';
 import '../../infrastructure/firebase/dynamic_link_service.dart';
+import '../../infrastructure/linkrunner/linkrunner_service.dart';
 import '../../infrastructure/update/update_checker.dart';
 import '../../infrastructure/navigation/routes.dart';
 import '../../infrastructure/shared/permission_fun.dart';
+import 'package:linkrunner/linkrunner.dart';
 
 
 class SplashController extends GetxController with GetTickerProviderStateMixin{
