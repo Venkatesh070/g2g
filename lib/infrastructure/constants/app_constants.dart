@@ -54,4 +54,9 @@ class AppConstants {
   static const String linkrunnerIOSSecretKey = '4d5aee27-0372-4dcd-a346-c02eab03d5b6';
   static const String linkrunnerIOSKeyId = '019b7da2-eccb-7993-b3ef-8d106fef626f';
 
+  static const String activeSurvey = "activeSurvey";
+  static const String surveyAnswers = "surveyAnswers";
+  static const String surveyCurrentIndex = "surveyCurrentIndex";
+  static const String skippedSurveys = "skippedSurveys";
+
 }

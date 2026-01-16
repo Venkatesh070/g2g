@@ -620,6 +620,23 @@ class DioClient {
     return null;
   }
 
+  Future<ApiResponseModel<EmptyResponse>?> funSubmitSurveyApi(params) async {
+    try {
+      Response response =
+          await _dio.post(apiEndPoints.apiSubmitSurvey, data: params);
+      final raw = response.data as Map<String, dynamic>;
+      final success = raw['success'] ?? raw['status'];
+      return ApiResponseModel<EmptyResponse>(
+        success: success == true,
+        message: raw['message']?.toString(),
+        data: null,
+      );
+    } catch (error) {
+      catchErrorHandler();
+    }
+    return null;
+  }
+
   Future funRestaurantAvailabilityApi(params) async {
     try {
       Response response = await _dio.post(

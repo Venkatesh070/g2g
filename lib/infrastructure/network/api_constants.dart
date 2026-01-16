@@ -78,8 +78,12 @@ class ApiConstants {
   var apiOrderCancelReasons = '/cancel-reasons';
   var apiOrderCancel = '/order-cancel';
   var apiOrderRating = '/add-rating';
+  var apiSubmitSurvey = '/submit-survey';
   var apiDownloadInvoice = '/download-invoice';
   var apiDownloadRefundInvoice = '/download-refund-invoice';
+
+  // assets
+  var assetsBaseUrl = 'https://dev.goodtograb.com/g2g-staging/admin/assets';
 
   //fav
   var apiAddFavourites = '/add-favourites';

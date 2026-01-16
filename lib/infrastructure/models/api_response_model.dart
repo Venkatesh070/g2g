@@ -23,3 +23,8 @@ class ApiResponseModel<T extends Serializable> {
 abstract class Serializable {
   Map<String, dynamic> toJson();
 }
+
+class EmptyResponse extends Serializable {
+  @override
+  Map<String, dynamic> toJson() => <String, dynamic>{};
+}
