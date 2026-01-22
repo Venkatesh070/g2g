@@ -184,7 +184,7 @@ class SurveyPopup extends StatelessWidget {
         Lottie.asset(
           'assets/successOrder.json',
           height: 100,
-          repeat: false,
+          repeat: true,
         ),
         SizedBox(height: 2.h),
         Text(
