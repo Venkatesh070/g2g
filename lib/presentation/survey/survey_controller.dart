@@ -76,10 +76,36 @@ class SurveyController extends GetxController with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       if (activeSurvey.value == null) {
+        // Only load state if no active survey - loadSurveyState will check for skipped surveys
         loadSurveyState();
-      } else if (!Get.isDialogOpen!) {
-        showSurveyPopup();
+      } else {
+        // If there's an active survey, verify it wasn't skipped before showing
+        if (activeSurvey.value != null) {
+          _checkAndShowSurveyIfNotSkipped();
+        }
       }
+    }
+  }
+  
+  // Helper method to check if survey was skipped before showing
+  Future<void> _checkAndShowSurveyIfNotSkipped() async {
+    if (activeSurvey.value == null) return;
+    
+    String skippedJson = await PrefManager.getString(AppConstants.skippedSurveys);
+    List<int> skippedIds = [];
+    if (skippedJson.isNotEmpty) {
+      skippedIds = List<int>.from(jsonDecode(skippedJson));
+    }
+    
+    if (skippedIds.contains(activeSurvey.value!.surveyId)) {
+      print("SurveyController: Survey ${activeSurvey.value!.surveyId} was skipped, clearing state.");
+      await clearSurveyState();
+      return;
+    }
+    
+    // Survey not skipped, safe to show
+    if (!Get.isDialogOpen!) {
+      showSurveyPopup();
     }
   }
 
@@ -87,7 +113,23 @@ class SurveyController extends GetxController with WidgetsBindingObserver {
   Future<void> loadSurveyState() async {
     String surveyJson = await PrefManager.getString(AppConstants.activeSurvey);
     if (surveyJson.isNotEmpty) {
-      activeSurvey.value = SurveyModel.fromJson(jsonDecode(surveyJson));
+      final survey = SurveyModel.fromJson(jsonDecode(surveyJson));
+      
+      // CRITICAL: Check if this survey was already skipped before loading state
+      String skippedJson = await PrefManager.getString(AppConstants.skippedSurveys);
+      List<int> skippedIds = [];
+      if (skippedJson.isNotEmpty) {
+        skippedIds = List<int>.from(jsonDecode(skippedJson));
+      }
+      
+      if (skippedIds.contains(survey.surveyId)) {
+        print("SurveyController: Survey ${survey.surveyId} was skipped, clearing saved state.");
+        // Survey was skipped, clear all saved state and don't show popup
+        await clearSurveyState();
+        return;
+      }
+      
+      activeSurvey.value = survey;
       
       // Load current index
       currentIndex.value = await PrefManager.getInt(AppConstants.surveyCurrentIndex);
@@ -113,11 +155,26 @@ class SurveyController extends GetxController with WidgetsBindingObserver {
         showLanding.value = true;
       }
 
+      // Double-check skip status before showing (defensive check)
+      // This prevents any race conditions or stale state
+      String finalSkippedJson = await PrefManager.getString(AppConstants.skippedSurveys);
+      List<int> finalSkippedIds = [];
+      if (finalSkippedJson.isNotEmpty) {
+        finalSkippedIds = List<int>.from(jsonDecode(finalSkippedJson));
+      }
+      
+      if (finalSkippedIds.contains(activeSurvey.value!.surveyId)) {
+        print("SurveyController: Final check - Survey ${activeSurvey.value!.surveyId} was skipped, clearing state.");
+        await clearSurveyState();
+        return;
+      }
+
       // If we have an active survey, show the popup after a short delay
       // to ensure UI is ready (especially for app launch)
       Future.delayed(Duration(seconds: 1), () {
+        // Final check before showing - ensure survey wasn't skipped in the meantime
         if (activeSurvey.value != null && !Get.isDialogOpen!) {
-          showSurveyPopup();
+          _checkAndShowSurveyIfNotSkipped();
         }
       });
     }
@@ -156,7 +213,8 @@ class SurveyController extends GetxController with WidgetsBindingObserver {
   // Start a new survey from notification
   Future<void> startSurvey(SurveyModel survey) async {
     print("SurveyController: startSurvey called for ID: ${survey.surveyId}");
-    // Check if this survey was already skipped
+    
+    // CRITICAL: First check if this survey was already skipped
     String skippedJson = await PrefManager.getString(AppConstants.skippedSurveys);
     List<int> skippedIds = [];
     if (skippedJson.isNotEmpty) {
@@ -164,19 +222,32 @@ class SurveyController extends GetxController with WidgetsBindingObserver {
     }
 
     if (skippedIds.contains(survey.surveyId)) {
-      print("SurveyController: Survey ${survey.surveyId} was already skipped.");
+      print("SurveyController: Survey ${survey.surveyId} was already skipped. Ignoring new notification.");
+      // Clear any old state that might exist for this skipped survey
+      if (activeSurvey.value?.surveyId == survey.surveyId) {
+        await clearSurveyState();
+      }
       return;
     }
 
-    // Ignore if same survey is already active
+    // Ignore if same survey is already active (to prevent duplicate popups)
     if (activeSurvey.value?.surveyId == survey.surveyId) {
       print("SurveyController: Survey ${survey.surveyId} is already active.");
       return;
     }
 
+    // IMPORTANT: Clear any old state before starting new survey
+    // This ensures we don't show old/skipped survey data
+    if (activeSurvey.value != null) {
+      print("SurveyController: Clearing old survey state before starting new survey.");
+      await clearSurveyState();
+    }
+
+    // Now start the new survey
     activeSurvey.value = survey;
     currentIndex.value = 0;
     answers.clear();
+    otherAnswers.clear();
     showLanding.value = true;
     showThankYou.value = false;
     await saveSurveyState();
@@ -191,32 +262,60 @@ class SurveyController extends GetxController with WidgetsBindingObserver {
     
     orderId.value = pickedOrderId;
     
+    SurveyModel? finalSurvey;
+    
     // If we have a survey ID, always try to fetch fresh data from remote
     if (pickedSurveyId != null) {
       print("SurveyController: Fetching survey data for ID: $pickedSurveyId");
-      activeSurvey.value = await fetchSurveyData(pickedSurveyId);
+      finalSurvey = await fetchSurveyData(pickedSurveyId);
       
       // If fetch failed but we have a survey object from notification, use it as fallback
-      if (activeSurvey.value == null && survey != null) {
+      if (finalSurvey == null && survey != null) {
         print("SurveyController: Remote fetch failed, using fallback from notification.");
-        activeSurvey.value = survey;
+        finalSurvey = survey;
       }
     } else {
-      activeSurvey.value = survey;
+      finalSurvey = survey;
     }
     
+    // CRITICAL: Check if this survey was already skipped before showing it
+    if (finalSurvey != null) {
+      String skippedJson = await PrefManager.getString(AppConstants.skippedSurveys);
+      List<int> skippedIds = [];
+      if (skippedJson.isNotEmpty) {
+        skippedIds = List<int>.from(jsonDecode(skippedJson));
+      }
+      
+      if (skippedIds.contains(finalSurvey.surveyId)) {
+        print("SurveyController: Survey ${finalSurvey.surveyId} was already skipped, not showing.");
+        // Clear any old state for this skipped survey
+        if (activeSurvey.value?.surveyId == finalSurvey.surveyId) {
+          await clearSurveyState();
+        }
+        return;
+      }
+      
+      // IMPORTANT: Clear any old state before starting new survey
+      // This ensures we don't show old/skipped survey data
+      if (activeSurvey.value != null && activeSurvey.value!.surveyId != finalSurvey.surveyId) {
+        print("SurveyController: Clearing old survey state before starting new survey from notification.");
+        await clearSurveyState();
+      }
+    }
+    
+    activeSurvey.value = finalSurvey;
     print("SurveyController: Final activeSurvey: ${activeSurvey.value?.surveyId}");
     
     currentIndex.value = 0;
     answers.clear();
+    otherAnswers.clear();
     showLanding.value = true;
     showThankYou.value = false;
     
     if (activeSurvey.value != null) {
       await saveSurveyState();
+      showSurveyPopup();
     }
-    
-    showSurveyPopup();
   }
 
   void startSurveyQuestions() {

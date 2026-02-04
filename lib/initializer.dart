@@ -75,7 +75,9 @@ class Initializer {
 
   static Future<void> _initLinkRunner() async {
     try {
-
+      // Linkrunner SDK 3.6.2+ supports Meta view-through conversions
+      // Meta install referrer is configured in AndroidManifest.xml
+      // This enables attribution for installs where users view Meta ads but don't click
       await LinkRunner().init(
           AppConstants.linkrunnerToken,
           Platform.isIOS
@@ -88,6 +90,7 @@ class Initializer {
           false);
 
       debugPrint('[LinkRunner] Initialization successful');
+      debugPrint('[LinkRunner] Meta view-through attribution enabled (SDK 3.6.2+)');
     } catch (e) {
       debugPrint('[LinkRunner] Initialization failed: $e');
     }

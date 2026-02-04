@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
@@ -72,11 +71,13 @@ class SurveyPopup extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(Icons.check_circle, color: ColorsTheme.colPrimary, size: 24),
+                Icon(Icons.check_circle,
+                    color: ColorsTheme.colPrimary, size: 24),
                 const SizedBox(width: 8),
                 Text(
                   'Order Picked Up!',
-                  style: semiBoldTextStyle(fontSize: dimen16, color: ColorsTheme.colBlack),
+                  style: semiBoldTextStyle(
+                      fontSize: dimen16, color: ColorsTheme.colBlack),
                 ),
               ],
             ),
@@ -97,11 +98,12 @@ class SurveyPopup extends StatelessWidget {
         ),
         SizedBox(height: 2.h),
         Text(
-          hasSurvey 
+          hasSurvey
               ? "Thank you for picking up your order 🙌\nHope everything went well.\n\nWould you like to share quick feedback? It takes less than a minute."
               : "Thank you for picking up your order.\nWe hope you enjoy your meal 🍽️",
           textAlign: TextAlign.center,
-          style: regularTextStyle(fontSize: dimen14, color: ColorsTheme.colBlack),
+          style:
+              regularTextStyle(fontSize: dimen14, color: ColorsTheme.colBlack),
         ),
         SizedBox(height: 3.h),
         if (hasSurvey)
@@ -120,7 +122,8 @@ class SurveyPopup extends StatelessWidget {
                     alignment: Alignment.center,
                     child: Text(
                       'Later',
-                      style: mediumTextStyle(fontSize: dimen13, color: ColorsTheme.colPrimary),
+                      style: mediumTextStyle(
+                          fontSize: dimen13, color: ColorsTheme.colPrimary),
                     ),
                   ),
                 ),
@@ -138,7 +141,8 @@ class SurveyPopup extends StatelessWidget {
                     alignment: Alignment.center,
                     child: Text(
                       'Give Feedback',
-                      style: mediumTextStyle(fontSize: dimen13, color: ColorsTheme.colWhite),
+                      style: mediumTextStyle(
+                          fontSize: dimen13, color: ColorsTheme.colWhite),
                     ),
                   ),
                 ),
@@ -159,7 +163,8 @@ class SurveyPopup extends StatelessWidget {
                 alignment: Alignment.center,
                 child: Text(
                   'Close',
-                  style: mediumTextStyle(fontSize: dimen13, color: ColorsTheme.colWhite),
+                  style: mediumTextStyle(
+                      fontSize: dimen13, color: ColorsTheme.colWhite),
                 ),
               ),
             ),
@@ -189,13 +194,15 @@ class SurveyPopup extends StatelessWidget {
         SizedBox(height: 2.h),
         Text(
           "Thank You!",
-          style: semiBoldTextStyle(fontSize: dimen18, color: ColorsTheme.colBlack),
+          style:
+              semiBoldTextStyle(fontSize: dimen18, color: ColorsTheme.colBlack),
           textAlign: TextAlign.center,
         ),
         SizedBox(height: 1.h),
         Text(
           "Your feedback helps us improve our service for you.",
-          style: regularTextStyle(fontSize: dimen14, color: ColorsTheme.colBlack),
+          style:
+              regularTextStyle(fontSize: dimen14, color: ColorsTheme.colBlack),
           textAlign: TextAlign.center,
         ),
         SizedBox(height: 3.h),
@@ -212,7 +219,8 @@ class SurveyPopup extends StatelessWidget {
               alignment: Alignment.center,
               child: Text(
                 "Close",
-                style: mediumTextStyle(fontSize: dimen13, color: ColorsTheme.colWhite),
+                style: mediumTextStyle(
+                    fontSize: dimen13, color: ColorsTheme.colWhite),
               ),
             ),
           ),
@@ -248,12 +256,13 @@ class SurveyPopup extends StatelessWidget {
       children: [
         Text(
           "Feedback",
-          style: semiBoldTextStyle(fontSize: dimen16, color: ColorsTheme.colBlack),
+          style:
+              semiBoldTextStyle(fontSize: dimen16, color: ColorsTheme.colBlack),
         ),
-        GestureDetector(
-          onTap: () => controller.closeSurvey(),
-          child: Icon(Icons.close, color: ColorsTheme.col8FA19C, size: 20),
-        ),
+        // GestureDetector(
+        //   onTap: () => controller.skipSurvey(),
+        //   child: Icon(Icons.close, color: ColorsTheme.col8FA19C, size: 20),
+        // ),
       ],
     );
   }
@@ -264,7 +273,8 @@ class SurveyPopup extends StatelessWidget {
       children: [
         Text(
           "Que ${currentIndex + 1} of $totalQuestions",
-          style: regularTextStyle(fontSize: dimen12, color: ColorsTheme.col8FA19C),
+          style:
+              regularTextStyle(fontSize: dimen12, color: ColorsTheme.col8FA19C),
         ),
         SizedBox(height: 0.8.h),
         ClipRRect(
@@ -280,7 +290,8 @@ class SurveyPopup extends StatelessWidget {
     );
   }
 
-  Widget _buildQuestion(SurveyQuestionModel question, SurveyController controller) {
+  Widget _buildQuestion(
+      SurveyQuestionModel question, SurveyController controller) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -289,7 +300,8 @@ class SurveyPopup extends StatelessWidget {
             children: [
               TextSpan(
                 text: question.text ?? "",
-                style: mediumTextStyle(fontSize: dimen14, color: ColorsTheme.colBlack),
+                style: mediumTextStyle(
+                    fontSize: dimen14, color: ColorsTheme.colBlack),
               ),
               if (question.isMandatory == true)
                 TextSpan(
@@ -305,12 +317,15 @@ class SurveyPopup extends StatelessWidget {
     );
   }
 
-  Widget _renderOptions(SurveyQuestionModel question, SurveyController controller) {
+  Widget _renderOptions(
+      SurveyQuestionModel question, SurveyController controller) {
     if (question.type == "YES_NO") {
       return _buildYesNoOptions(question, controller);
     } else if (question.type == "MULTI_SELECT") {
       return _buildMultiSelectOptions(question, controller);
-    } else if (question.type == "TEXT" || question.type == "OPEN_TEXT" || question.type == "INPUT") {
+    } else if (question.type == "TEXT" ||
+        question.type == "OPEN_TEXT" ||
+        question.type == "INPUT") {
       return _buildTextOptions(question, controller);
     } else if (question.type == "STAR_RATING") {
       return _buildStarRatingOptions(question, controller);
@@ -318,10 +333,13 @@ class SurveyPopup extends StatelessWidget {
     return SizedBox.shrink();
   }
 
-  Widget _buildTextOptions(SurveyQuestionModel question, SurveyController controller) {
-    final currentAnswer = controller.answers[question.questionId]?.toString() ?? "";
-    final textController = controller.getTextController(question.questionId!, currentAnswer);
-    
+  Widget _buildTextOptions(
+      SurveyQuestionModel question, SurveyController controller) {
+    final currentAnswer =
+        controller.answers[question.questionId]?.toString() ?? "";
+    final textController =
+        controller.getTextController(question.questionId!, currentAnswer);
+
     return Container(
       decoration: BoxDecoration(
         color: ColorsTheme.colF5F5F5,
@@ -336,7 +354,8 @@ class SurveyPopup extends StatelessWidget {
         style: regularTextStyle(fontSize: dimen13, color: ColorsTheme.colBlack),
         decoration: InputDecoration(
           hintText: "Write your feedback here...",
-          hintStyle: regularTextStyle(fontSize: dimen13, color: ColorsTheme.col8FA19C),
+          hintStyle:
+              regularTextStyle(fontSize: dimen13, color: ColorsTheme.col8FA19C),
           border: InputBorder.none,
           isDense: true,
           contentPadding: EdgeInsets.symmetric(vertical: 1.5.h),
@@ -345,8 +364,11 @@ class SurveyPopup extends StatelessWidget {
     );
   }
 
-  Widget _buildStarRatingOptions(SurveyQuestionModel question, SurveyController controller) {
-    final currentAnswer = int.tryParse(controller.answers[question.questionId]?.toString() ?? "0") ?? 0;
+  Widget _buildStarRatingOptions(
+      SurveyQuestionModel question, SurveyController controller) {
+    final currentAnswer = int.tryParse(
+            controller.answers[question.questionId]?.toString() ?? "0") ??
+        0;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -368,11 +390,13 @@ class SurveyPopup extends StatelessWidget {
     );
   }
 
-  Widget _buildYesNoOptions(SurveyQuestionModel question, SurveyController controller) {
-    final options = question.options ?? [
-      SurveyOption(label: "Yes", value: "YES"),
-      SurveyOption(label: "No", value: "NO"),
-    ];
+  Widget _buildYesNoOptions(
+      SurveyQuestionModel question, SurveyController controller) {
+    final options = question.options ??
+        [
+          SurveyOption(label: "Yes", value: "YES"),
+          SurveyOption(label: "No", value: "NO"),
+        ];
     final currentAnswer = controller.answers[question.questionId];
 
     return Row(
@@ -380,15 +404,19 @@ class SurveyPopup extends StatelessWidget {
         final isSelected = currentAnswer == option.value;
         return Expanded(
           child: GestureDetector(
-            onTap: () => controller.saveAnswer(question.questionId!, option.value),
+            onTap: () =>
+                controller.saveAnswer(question.questionId!, option.value),
             child: Container(
               margin: EdgeInsets.symmetric(horizontal: 1.w),
               padding: EdgeInsets.symmetric(vertical: 1.h),
               decoration: BoxDecoration(
-                color: isSelected ? ColorsTheme.colPrimary : ColorsTheme.colWhite,
+                color:
+                    isSelected ? ColorsTheme.colPrimary : ColorsTheme.colWhite,
                 borderRadius: BorderRadius.circular(25),
                 border: Border.all(
-                  color: isSelected ? ColorsTheme.colPrimary : ColorsTheme.colC4D9D4,
+                  color: isSelected
+                      ? ColorsTheme.colPrimary
+                      : ColorsTheme.colC4D9D4,
                 ),
               ),
               child: Center(
@@ -396,7 +424,9 @@ class SurveyPopup extends StatelessWidget {
                   option.label ?? "",
                   style: semiBoldTextStyle(
                     fontSize: dimen14,
-                    color: isSelected ? ColorsTheme.colWhite : ColorsTheme.colBlack,
+                    color: isSelected
+                        ? ColorsTheme.colWhite
+                        : ColorsTheme.colBlack,
                   ),
                 ),
               ),
@@ -407,9 +437,11 @@ class SurveyPopup extends StatelessWidget {
     );
   }
 
-  Widget _buildMultiSelectOptions(SurveyQuestionModel question, SurveyController controller) {
+  Widget _buildMultiSelectOptions(
+      SurveyQuestionModel question, SurveyController controller) {
     final options = question.options ?? [];
-    final currentAnswers = controller.answers[question.questionId] as List<dynamic>? ?? [];
+    final currentAnswers =
+        controller.answers[question.questionId] as List<dynamic>? ?? [];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -432,27 +464,39 @@ class SurveyPopup extends StatelessWidget {
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 0.8.h),
                 decoration: BoxDecoration(
-                  color: isSelected ? ColorsTheme.colPrimary : ColorsTheme.colWhite,
+                  color: isSelected
+                      ? ColorsTheme.colPrimary
+                      : ColorsTheme.colWhite,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: isSelected ? ColorsTheme.colPrimary : ColorsTheme.colC4D9D4,
+                    color: isSelected
+                        ? ColorsTheme.colPrimary
+                        : ColorsTheme.colC4D9D4,
                   ),
                 ),
                 child: Text(
                   option.label ?? "",
                   style: mediumTextStyle(
                     fontSize: dimen12,
-                    color: isSelected ? ColorsTheme.colWhite : ColorsTheme.colBlack,
+                    color: isSelected
+                        ? ColorsTheme.colWhite
+                        : ColorsTheme.colBlack,
                   ),
                 ),
               ),
             );
           }).toList(),
         ),
-        ...options.where((o) => o.allowsText == true && currentAnswers.contains(o.value)).map((opt) {
-          final otherText = controller.otherAnswers["${question.questionId}_${opt.value}"] ?? "";
-          final otherController = controller.getOtherTextController(question.questionId!, opt.value!, otherText);
-          
+        ...options
+            .where(
+                (o) => o.allowsText == true && currentAnswers.contains(o.value))
+            .map((opt) {
+          final otherText =
+              controller.otherAnswers["${question.questionId}_${opt.value}"] ??
+                  "";
+          final otherController = controller.getOtherTextController(
+              question.questionId!, opt.value!, otherText);
+
           return Container(
             margin: EdgeInsets.only(top: 1.5.h),
             padding: EdgeInsets.symmetric(horizontal: 3.w),
@@ -463,11 +507,14 @@ class SurveyPopup extends StatelessWidget {
             ),
             child: TextField(
               controller: otherController,
-              onChanged: (val) => controller.saveOtherAnswer(question.questionId!, opt.value!, val),
-              style: regularTextStyle(fontSize: dimen12, color: ColorsTheme.colBlack),
+              onChanged: (val) => controller.saveOtherAnswer(
+                  question.questionId!, opt.value!, val),
+              style: regularTextStyle(
+                  fontSize: dimen12, color: ColorsTheme.colBlack),
               decoration: InputDecoration(
                 hintText: opt.placeholder ?? "Please specify",
-                hintStyle: regularTextStyle(fontSize: dimen12, color: ColorsTheme.col8FA19C),
+                hintStyle: regularTextStyle(
+                    fontSize: dimen12, color: ColorsTheme.col8FA19C),
                 border: InputBorder.none,
                 isDense: true,
                 contentPadding: EdgeInsets.symmetric(vertical: 1.h),
@@ -479,13 +526,14 @@ class SurveyPopup extends StatelessWidget {
     );
   }
 
-  Widget _buildNavigationButtons(SurveyController controller, int currentIndex, int totalQuestions) {
+  Widget _buildNavigationButtons(
+      SurveyController controller, int currentIndex, int totalQuestions) {
     final isFirst = currentIndex == 0;
     final isLast = currentIndex == totalQuestions - 1;
 
     return Obx(() {
       final canGoNext = controller.canGoNext;
-      
+
       return Row(
         children: [
           if (!isFirst)
@@ -502,7 +550,8 @@ class SurveyPopup extends StatelessWidget {
                   alignment: Alignment.center,
                   child: Text(
                     "Back",
-                    style: mediumTextStyle(fontSize: dimen13, color: ColorsTheme.colPrimary),
+                    style: mediumTextStyle(
+                        fontSize: dimen13, color: ColorsTheme.colPrimary),
                   ),
                 ),
               ),
@@ -511,26 +560,31 @@ class SurveyPopup extends StatelessWidget {
           Expanded(
             flex: 2,
             child: GestureDetector(
-              onTap: canGoNext ? () {
-                if (isLast) {
-                  controller.submitSurvey();
-                } else {
-                  controller.nextQuestion();
-                }
-              } : null,
+              onTap: canGoNext
+                  ? () {
+                      if (isLast) {
+                        controller.submitSurvey();
+                      } else {
+                        controller.nextQuestion();
+                      }
+                    }
+                  : null,
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
-                  color: canGoNext ? ColorsTheme.colPrimary : ColorsTheme.colE7F8F3,
+                  color: canGoNext
+                      ? ColorsTheme.colPrimary
+                      : ColorsTheme.colE7F8F3,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 alignment: Alignment.center,
                 child: Text(
                   isLast ? "Submit" : "Next",
                   style: mediumTextStyle(
-                    fontSize: dimen13, 
-                    color: canGoNext ? ColorsTheme.colWhite : ColorsTheme.col8FA19C
-                  ),
+                      fontSize: dimen13,
+                      color: canGoNext
+                          ? ColorsTheme.colWhite
+                          : ColorsTheme.col8FA19C),
                 ),
               ),
             ),

@@ -2,9 +2,12 @@ import 'package:good_grab/infrastructure/constants/app_constants.dart';
 
 class ApiConstants {
   // var baseUrl = 'http://13.126.64.76/api/${AppConstants.apiVersion}';
-  
+
   //Miraki end points
-   var baseUrl = 'https://dev.goodtograb.com/g2g-staging/api/${AppConstants.apiVersion}';
+  var baseUrl =
+      'https://dev.goodtograb.com/g2g-staging/api/${AppConstants.apiVersion}';
+  // var baseUrl = 'https://dev.goodtograb.com/api/${AppConstants.apiVersion}';
+
   // var baseUrl = 'http://13.203.248.52/api/${AppConstants.apiVersion}';
   // var baseUrl = 'https://goodtograb.com/api/${AppConstants.apiVersion}';
   // var baseUrl = 'http://goodtograb.com/public/new_code/G2G-NEW/api/${AppConstants.apiVersion}';

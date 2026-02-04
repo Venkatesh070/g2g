@@ -29,9 +29,12 @@
         <meta-data android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyCwosLydPkofKtiKCgoUGz7jx-g4uP_1b0"/>
         <!-- Meta (Facebook) App Events configuration -->
+        <!-- Linkrunner SDK 3.6.2+ automatically reads Facebook App ID from com.facebook.sdk.ApplicationId -->
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
+        <meta-data android:name="com.linkrunner.FacebookApplicationId" android:value="@string/facebook_app_id" />
+
         <meta-data
             android:name="com.facebook.sdk.ClientToken"
             android:value="@string/facebook_client_token" />
