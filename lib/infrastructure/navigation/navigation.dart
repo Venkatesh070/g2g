@@ -45,6 +45,8 @@ import '../../presentation/order_details/order_details_binding.dart';
 import '../../presentation/order_details/order_details_page.dart';
 import '../../presentation/order_status/order_status_binding.dart';
 import '../../presentation/order_status/order_status_page.dart';
+import '../../presentation/order_picked/order_picked_binding.dart';
+import '../../presentation/order_picked/order_picked_page.dart';
 import 'routes.dart';
 
 class AppPages {
@@ -201,6 +203,14 @@ class AppPages {
         name: Routes.imageDetail,
         page: () =>  ImageDetailPage(),
         binding:  ImageDetailBinding(),
+        transition: Transition.downToUp,
+        curve: Curves.fastOutSlowIn,
+        transitionDuration: const Duration(milliseconds: 500)
+    ),
+    GetPage(
+        name: Routes.orderPicked,
+        page: () =>  OrderPickedPage(),
+        binding: OrderPickedBinding(),
         transition: Transition.downToUp,
         curve: Curves.fastOutSlowIn,
         transitionDuration: const Duration(milliseconds: 500)

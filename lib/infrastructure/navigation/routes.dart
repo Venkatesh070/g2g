@@ -20,5 +20,6 @@ class Routes {
   static const appSettings = '/appSettings';
   static const paymentStatus = '/paymentStatus';
   static const imageDetail = '/imageDetail';
+  static const orderPicked = '/order-picked';
 
 }

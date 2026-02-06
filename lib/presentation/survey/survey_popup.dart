@@ -36,24 +36,20 @@ class SurveyPopup extends StatelessWidget {
                 )
               ],
             ),
-            child: SingleChildScrollView(
-              child: Obx(() {
-                // If neither thank you nor landing (nor active survey) is true, something is wrong
-                if (controller.showThankYou.value) {
-                  return _buildThankYouState(controller);
-                }
+            child: Obx(() {
+              // If neither thank you nor landing (nor active survey) is true, something is wrong
+              if (controller.showThankYou.value) {
+                return _buildThankYouState(controller);
+              }
 
-                if (controller.showLanding.value) {
-                  return _buildLandingState(controller);
-                }
-
-                if (controller.activeSurvey.value != null) {
-                  return _buildSurveyQuestionsState(controller);
-                }
-
-                return SizedBox.shrink();
-              }),
-            ),
+              return SingleChildScrollView(
+                child: controller.showLanding.value
+                    ? _buildLandingState(controller)
+                    : controller.activeSurvey.value != null
+                        ? _buildSurveyQuestionsState(controller)
+                        : SizedBox.shrink(),
+              );
+            }),
           ),
         ),
       ),
@@ -174,65 +170,121 @@ class SurveyPopup extends StatelessWidget {
   }
 
   Widget _buildThankYouState(SurveyController controller) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            GestureDetector(
-              onTap: () => controller.closeSurvey(),
-              child: Icon(Icons.close, color: ColorsTheme.col8FA19C, size: 20),
-            )
-          ],
-        ),
-        Lottie.asset(
-          'assets/successOrder.json',
-          height: 100,
-          repeat: true,
-        ),
-        SizedBox(height: 2.h),
-        Text(
-          "Thank You!",
-          style:
-              semiBoldTextStyle(fontSize: dimen18, color: ColorsTheme.colBlack),
-          textAlign: TextAlign.center,
-        ),
-        SizedBox(height: 1.h),
-        Text(
-          "Your feedback helps us improve our service for you.",
-          style:
-              regularTextStyle(fontSize: dimen14, color: ColorsTheme.colBlack),
-          textAlign: TextAlign.center,
-        ),
-        SizedBox(height: 3.h),
-        SizedBox(
-          width: double.infinity,
-          child: GestureDetector(
-            onTap: () => controller.closeSurvey(),
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              decoration: BoxDecoration(
-                color: ColorsTheme.colPrimary,
-                borderRadius: BorderRadius.circular(10),
+    return Container(
+      width: Get.width * 0.85,
+      decoration: BoxDecoration(
+        color: ColorsTheme.colPrimary, // Dark teal/green background
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            spreadRadius: 2,
+          )
+        ],
+      ),
+      padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 4.h),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              GestureDetector(
+                onTap: () => controller.closeSurvey(),
+                child: Icon(Icons.close, color: ColorsTheme.colWhite, size: 20),
+              )
+            ],
+          ),
+          SizedBox(height: 2.h),
+          // Smiley face icon with heart
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              Icon(
+                Icons.sentiment_very_satisfied_outlined,
+                size: 80,
+                color: ColorsTheme.colWhite,
               ),
-              alignment: Alignment.center,
-              child: Text(
-                "Close",
-                style: mediumTextStyle(
-                    fontSize: dimen13, color: ColorsTheme.colWhite),
+              Positioned(
+                top: 10,
+                right: 20,
+                child: Icon(
+                  Icons.favorite_outline,
+                  size: 24,
+                  color: ColorsTheme.colWhite,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 3.h),
+          // "Thank you!" text in yellow/gold
+          Text(
+            "Thank you!",
+            style: TextStyle(
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+              color: Colors.amber.shade300, // Yellow/gold color
+              letterSpacing: 0.5,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 2.h),
+          // Descriptive text in white
+          Text(
+            "We love hearing from you and will use your feedback to improve what we do.",
+            style: regularTextStyle(
+              fontSize: dimen14,
+              color: ColorsTheme.colWhite,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 4.h),
+          // Close button with white background and dark teal text
+          SizedBox(
+            width: double.infinity,
+            child: GestureDetector(
+              onTap: () => controller.closeSurvey(),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                decoration: BoxDecoration(
+                  color: ColorsTheme.colWhite,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  "Close",
+                  style: mediumTextStyle(
+                    fontSize: dimen14,
+                    color: ColorsTheme.colPrimary,
+                  ),
+                ),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
   Widget _buildSurveyQuestionsState(SurveyController controller) {
-    final survey = controller.activeSurvey.value!;
+    final survey = controller.activeSurvey.value;
+    if (survey == null) {
+      return SizedBox.shrink();
+    }
+
     final currentIndex = controller.currentIndex.value;
     final totalQuestions = survey.questions?.length ?? 0;
+
+    // Safety checks for questions and currentIndex
+    if (totalQuestions == 0 || survey.questions == null) {
+      return SizedBox.shrink();
+    }
+
+    if (currentIndex < 0 || currentIndex >= totalQuestions) {
+      return SizedBox.shrink();
+    }
+
     final currentQuestion = survey.questions![currentIndex];
 
     return Column(
@@ -259,10 +311,10 @@ class SurveyPopup extends StatelessWidget {
           style:
               semiBoldTextStyle(fontSize: dimen16, color: ColorsTheme.colBlack),
         ),
-        // GestureDetector(
-        //   onTap: () => controller.skipSurvey(),
-        //   child: Icon(Icons.close, color: ColorsTheme.col8FA19C, size: 20),
-        // ),
+        GestureDetector(
+          onTap: () => controller.closeSurvey(),
+          child: Icon(Icons.close, color: ColorsTheme.col8FA19C, size: 20),
+        ),
       ],
     );
   }
@@ -349,8 +401,13 @@ class SurveyPopup extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 3.w),
       child: TextField(
         controller: textController,
-        onChanged: (val) => controller.saveAnswer(question.questionId!, val),
+        onChanged: (val) => controller.saveAnswer(question.questionId!, val,
+            autoAdvance: false),
+        onSubmitted: (val) {
+          controller.saveAnswer(question.questionId!, val, autoAdvance: true);
+        },
         maxLines: 4,
+        textInputAction: TextInputAction.done,
         style: regularTextStyle(fontSize: dimen13, color: ColorsTheme.colBlack),
         decoration: InputDecoration(
           hintText: "Write your feedback here...",
@@ -529,68 +586,31 @@ class SurveyPopup extends StatelessWidget {
   Widget _buildNavigationButtons(
       SurveyController controller, int currentIndex, int totalQuestions) {
     final isFirst = currentIndex == 0;
-    final isLast = currentIndex == totalQuestions - 1;
 
-    return Obx(() {
-      final canGoNext = controller.canGoNext;
-
-      return Row(
-        children: [
-          if (!isFirst)
-            Expanded(
-              child: GestureDetector(
-                onTap: () => controller.previousQuestion(),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  decoration: BoxDecoration(
-                    color: ColorsTheme.colWhite,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: ColorsTheme.colPrimary),
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    "Back",
-                    style: mediumTextStyle(
-                        fontSize: dimen13, color: ColorsTheme.colPrimary),
-                  ),
-                ),
-              ),
-            ),
-          if (!isFirst) SizedBox(width: 10),
+    // Only show back button, no next button (auto-advance enabled)
+    return Row(
+      children: [
+        if (!isFirst)
           Expanded(
-            flex: 2,
             child: GestureDetector(
-              onTap: canGoNext
-                  ? () {
-                      if (isLast) {
-                        controller.submitSurvey();
-                      } else {
-                        controller.nextQuestion();
-                      }
-                    }
-                  : null,
+              onTap: () => controller.previousQuestion(),
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
-                  color: canGoNext
-                      ? ColorsTheme.colPrimary
-                      : ColorsTheme.colE7F8F3,
+                  color: ColorsTheme.colWhite,
                   borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: ColorsTheme.colPrimary),
                 ),
                 alignment: Alignment.center,
                 child: Text(
-                  isLast ? "Submit" : "Next",
+                  "Back",
                   style: mediumTextStyle(
-                      fontSize: dimen13,
-                      color: canGoNext
-                          ? ColorsTheme.colWhite
-                          : ColorsTheme.col8FA19C),
+                      fontSize: dimen13, color: ColorsTheme.colPrimary),
                 ),
               ),
             ),
           ),
-        ],
-      );
-    });
+      ],
+    );
   }
 }

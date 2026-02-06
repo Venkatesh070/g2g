@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -75,8 +76,13 @@ class AppNotification {
         }
 
         // Handle Survey / Order Picked Notification when app killed and opened via notification
-        if (initialMessage.data['type'] == 'order_picked' || initialMessage.data['type'] == 'order_pick') {
-          _handleOrderPickedNotification(initialMessage.data);
+        if (initialMessage.data['type'] == 'order_picked' ||
+            initialMessage.data['type'] == 'order_pick') {
+          // Small delay only for killed state to ensure app is fully initialized
+          Future.delayed(const Duration(milliseconds: 500), () {
+            _handleOrderPickedNotification(initialMessage.data,
+                isFromKilledState: true);
+          });
         } else {
           _handleSurveyNotification(initialMessage.data);
         }
@@ -121,6 +127,22 @@ class AppNotification {
           //   'resId': int.parse(message.data['body']['resId']),
           //   'orderStatus': message.data['body']['pending_pick_up'],
           // });
+        }
+
+        // Handle order_picked notification - add notification body to data for extraction
+        if (message.data['type'] == 'order_picked' ||
+            message.data['type'] == 'order_pick') {
+          print(
+              "🔔 Foreground: order_picked notification received, navigating from ANY screen");
+          // Merge notification body into data for order ID extraction
+          Map<String, dynamic> enhancedData =
+              Map<String, dynamic>.from(message.data);
+          if (notification?.body != null) {
+            enhancedData['message'] = notification!.body;
+          }
+          // Navigate immediately - works from ANY screen
+          _handleOrderPickedNotification(enhancedData);
+          return; // Don't show local notification, we're navigating directly
         }
 
         if (message.data['type'] == 'order_confirmed') {
@@ -210,22 +232,32 @@ class AppNotification {
         }
 
         // Handle Survey / Order Picked Notification
-        if (message.data['type'] == 'order_picked' || message.data['type'] == 'order_pick') {
-          _handleOrderPickedNotification(message.data);
-        }
-        if (notification != null && android != null) {
-          flutterLocalNotificationsPlugin.show(
-              notification.hashCode,
-              notification.title,
-              notification.body,
-              NotificationDetails(
-                android: AndroidNotificationDetails(
-                  channel.id,
-                  channel.name,
-                  // channel.description,
-                  icon: android.smallIcon,
-                ),
-              ));
+        if (message.data['type'] == 'order_picked' ||
+            message.data['type'] == 'order_pick') {
+          // Don't show local notification for order_picked, navigate directly
+          // Merge notification body into data for order ID extraction
+          Map<String, dynamic> enhancedData =
+              Map<String, dynamic>.from(message.data);
+          if (notification?.body != null) {
+            enhancedData['message'] = notification!.body;
+          }
+          _handleOrderPickedNotification(enhancedData);
+        } else {
+          // Show local notification for other types
+          if (notification != null && android != null) {
+            flutterLocalNotificationsPlugin.show(
+                notification.hashCode,
+                notification.title,
+                notification.body,
+                NotificationDetails(
+                  android: AndroidNotificationDetails(
+                    channel.id,
+                    channel.name,
+                    // channel.description,
+                    icon: android.smallIcon,
+                  ),
+                ));
+          }
         }
       }
     });
@@ -267,9 +299,21 @@ class AppNotification {
         }
 
         // Handle Survey / Order Picked Notification when app opened from notification
-        if (message.data['type'] == 'order_picked' || message.data['type'] == 'order_pick') {
-          _handleOrderPickedNotification(message.data);
-        } else {
+        if (message.data['type'] == 'order_picked' ||
+            message.data['type'] == 'order_pick') {
+          print(
+              "🔔 Background/Opened: order_picked notification received, navigating from ANY screen");
+          // Merge notification body into data for order ID extraction
+          Map<String, dynamic> enhancedData =
+              Map<String, dynamic>.from(message.data);
+          if (message.notification?.body != null) {
+            enhancedData['message'] = message.notification!.body;
+          }
+          // Navigate immediately - works from ANY screen
+          _handleOrderPickedNotification(enhancedData);
+        } else if (message.data['type'] != 'order_confirmed' &&
+            message.data['type'] != 'order_cancelled') {
+          // Only handle survey notification if it's not order_confirmed or order_cancelled
           _handleSurveyNotification(message.data);
         }
       }
@@ -321,49 +365,128 @@ class AppNotification {
     }
   }
 
-  _handleOrderPickedNotification(Map<String, dynamic> data) {
+  _handleOrderPickedNotification(Map<String, dynamic> data,
+      {bool isFromKilledState = false}) {
     if (data.isEmpty) return;
 
     try {
+      print(
+          "_handleOrderPickedNotification called with data: $data, isFromKilledState: $isFromKilledState");
+
       // Try to get order_id (various keys) from top level, then payload
-      int? orderId = int.tryParse(
-          (data['order_id'] ?? data['Order_id'] ?? data['orderId'] ?? data['id'])
-              .toString());
-      
+      int? orderId = int.tryParse((data['order_id'] ??
+              data['Order_id'] ??
+              data['orderId'] ??
+              data['id'] ??
+              data['order_number'])
+          .toString());
+
       dynamic payloadRaw = data['payload'];
       if (payloadRaw is String) {
         try {
           var decoded = jsonDecode(payloadRaw);
           if (orderId == null && decoded is Map) {
-            orderId = int.tryParse(
-                (decoded['order_id'] ??
-                        decoded['Order_id'] ??
-                        decoded['orderId'] ??
-                        decoded['id'])
-                    .toString());
+            orderId = int.tryParse((decoded['order_id'] ??
+                    decoded['Order_id'] ??
+                    decoded['orderId'] ??
+                    decoded['id'] ??
+                    decoded['order_number'])
+                .toString());
           }
         } catch (_) {}
       } else if (payloadRaw is Map) {
         if (orderId == null) {
-          orderId = int.tryParse(
-              (payloadRaw['order_id'] ??
-                      payloadRaw['Order_id'] ??
-                      payloadRaw['orderId'] ??
-                      payloadRaw['id'])
-                  .toString());
+          orderId = int.tryParse((payloadRaw['order_id'] ??
+                  payloadRaw['Order_id'] ??
+                  payloadRaw['orderId'] ??
+                  payloadRaw['id'] ??
+                  payloadRaw['order_number'])
+              .toString());
+        }
+      }
+
+      // If orderId is still null, try to extract from message text
+      // Example: "Order #38932 has been successfully picked!"
+      if (orderId == null) {
+        String? messageText = data['message']?.toString();
+        if (messageText != null && messageText.isNotEmpty) {
+          // Try to extract order number from message like "Order #38932" or "Order 38932"
+          RegExp orderIdRegex =
+              RegExp(r'Order\s*#?\s*(\d+)', caseSensitive: false);
+          Match? match = orderIdRegex.firstMatch(messageText);
+          if (match != null && match.groupCount >= 1) {
+            orderId = int.tryParse(match.group(1) ?? '');
+            print("Extracted orderId from message text: $orderId");
+          }
         }
       }
 
       final surveyData = _extractSurveyData(data);
-      SurveyModel? survey = surveyData != null ? SurveyModel.fromJson(surveyData) : null;
-      
       int? surveyId = _extractSurveyId(data);
 
-      if (Get.isRegistered<SurveyController>()) {
-        Get.find<SurveyController>().onOrderPicked(orderId, pickedSurveyId: surveyId, survey: survey);
+      print(
+          "Extracted orderId: $orderId, surveyId: $surveyId, surveyData: ${surveyData != null}");
+
+      // Navigate INSTANTLY to Order Picked screen with rating section
+      // Use offAllNamed to replace entire navigation stack - works from ANY screen
+      if (orderId != null) {
+        print(
+            "Navigating INSTANTLY to OrderPickedPage with orderId: $orderId from ANY screen");
+
+        // Navigate immediately - use offAllNamed to replace entire stack
+        // This works from ANY screen (home, order details, cart, profile, etc.)
+        // Use WidgetsBinding to ensure UI is ready, then navigate
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          // Small delay to ensure navigation context is ready
+          Future.delayed(const Duration(milliseconds: 300), () {
+            try {
+              // offAllNamed clears entire navigation stack and navigates
+              // This ensures it works from ANY screen in the app (home, cart, profile, etc.)
+              Get.offAllNamed(Routes.orderPicked, arguments: {
+                'orderId': orderId,
+                'resId': 0,
+                'surveyData': surveyData, // Pass survey data if available
+                'surveyId': surveyId, // Pass survey ID if available
+              });
+              print(
+                  "✅ Navigation to OrderPickedPage successful from ANY screen");
+            } catch (e) {
+              print("❌ Navigation error: $e");
+              // Retry navigation after a brief moment
+              Future.delayed(const Duration(milliseconds: 500), () {
+                try {
+                  Get.offAllNamed(Routes.orderPicked, arguments: {
+                    'orderId': orderId,
+                    'resId': 0,
+                    'surveyData': surveyData,
+                    'surveyId': surveyId,
+                  });
+                  print("✅ Retry navigation successful");
+                } catch (e2) {
+                  print("❌ Retry navigation also failed: $e2");
+                }
+              });
+            }
+          });
+        });
+      } else {
+        print("❌ Error: orderId is null, cannot navigate. Full data: $data");
       }
     } catch (e) {
       print("Error in _handleOrderPickedNotification: $e");
+      // Show error popup as fallback
+      Get.dialog(
+        AlertDialog(
+          title: Text('Order Picked!'.tr),
+          content: Text('Your order has been picked up successfully.'.tr),
+          actions: [
+            TextButton(
+              onPressed: () => Get.back(),
+              child: Text('OK'.tr),
+            ),
+          ],
+        ),
+      );
     }
   }
 
@@ -387,13 +510,14 @@ class AppNotification {
       // Prioritize survey object from logs
       if (payloadMap['survey'] is Map) {
         var surveyObj = payloadMap['survey'];
-        int? id = int.tryParse((surveyObj['survey_id'] ?? surveyObj['id']).toString());
+        int? id = int.tryParse(
+            (surveyObj['survey_id'] ?? surveyObj['id']).toString());
         if (id != null) return id;
       }
-      
+
       // Fallback to top-level survey_id, id
-      return int.tryParse((payloadMap['survey_id'] ?? 
-                           payloadMap['id']).toString());
+      return int.tryParse(
+          (payloadMap['survey_id'] ?? payloadMap['id']).toString());
     } catch (_) {}
     return null;
   }
@@ -420,10 +544,12 @@ class AppNotification {
       if (payloadMap['survey'] is Map) {
         surveyData = Map<String, dynamic>.from(payloadMap['survey']);
         // Merge survey_type or survey_code if they exist in the wrapper
-        if (surveyData['survey_id'] == null && payloadMap['survey_type'] != null) {
+        if (surveyData['survey_id'] == null &&
+            payloadMap['survey_type'] != null) {
           surveyData['survey_id'] = payloadMap['survey_type'];
         }
-        if (surveyData['survey_code'] == null && payloadMap['survey_code'] != null) {
+        if (surveyData['survey_code'] == null &&
+            payloadMap['survey_code'] != null) {
           surveyData['survey_code'] = payloadMap['survey_code'];
         }
         // Merge order_id if it exists in the wrapper payload

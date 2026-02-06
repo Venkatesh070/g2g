@@ -15,7 +15,6 @@ import '../../infrastructure/theme/colors.theme.dart';
 import '../../infrastructure/theme/text.theme.dart';
 import '../../res.dart';
 import 'order_details_controller.dart';
-import 'countdown_progree.dart';
 
 class OrderDetailsPage extends BaseView<OrderDetailsController> {
   OrderDetailsPage({super.key});
@@ -718,25 +717,62 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
   }
 
   rateOrder() {
-    return Container(
+    return Obx(() => Container(
       margin: const EdgeInsets.only(bottom: 15, left: 18, right: 18),
       child: Container(
           decoration: BoxDecoration(
-              border: Border.all(color: ColorsTheme.colC4D9D4, width: 1),
-              borderRadius: BorderRadius.circular(16)),
+              border: Border.all(
+                  color: controller.isFromNotification.value && 
+                         !controller.isRated.value && 
+                         (controller.surveyData != null || controller.surveyId != null)
+                      ? ColorsTheme.colPrimary 
+                      : ColorsTheme.colC4D9D4, 
+                  width: controller.isFromNotification.value && 
+                         !controller.isRated.value && 
+                         (controller.surveyData != null || controller.surveyId != null)
+                      ? 2 
+                      : 1),
+              borderRadius: BorderRadius.circular(16),
+              color: controller.isFromNotification.value && 
+                     !controller.isRated.value && 
+                     (controller.surveyData != null || controller.surveyId != null)
+                  ? ColorsTheme.colE7F8F3.withOpacity(0.5)
+                  : Colors.transparent),
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
           width: Get.width,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                margin: const EdgeInsets.only(bottom: 9),
-                child: Text(
-                  'Rate the order'.tr,
-                  style: semiBoldTextStyle(
-                      fontSize: dimen12, color: ColorsTheme.colBlack),
-                ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Rate the order'.tr,
+                      style: semiBoldTextStyle(
+                          fontSize: dimen12, color: ColorsTheme.colBlack),
+                    ),
+                  ),
+                  if (controller.isFromNotification.value && 
+                      !controller.isRated.value && 
+                      (controller.surveyData != null || controller.surveyId != null))
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: ColorsTheme.colPrimary,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        'How was your experience?'.tr,
+                        style: mediumTextStyle(
+                            fontSize: dimen10, color: ColorsTheme.colWhite),
+                      ),
+                    ),
+                ],
               ),
+              SizedBox(height: controller.isFromNotification.value && 
+                              !controller.isRated.value && 
+                              (controller.surveyData != null || controller.surveyId != null) 
+                          ? 8 : 0),
               controller.isRated.value
                   ? Container(
                       margin: const EdgeInsets.only(bottom: 4),
@@ -780,7 +816,7 @@ class OrderDetailsPage extends BaseView<OrderDetailsController> {
                     )
             ],
           )),
-    );
+    ));
   }
 
   orderDetails() {
