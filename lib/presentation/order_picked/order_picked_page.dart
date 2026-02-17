@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
-import 'package:lottie/lottie.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:lottie/lottie.dart';
 import '../../infrastructure/core/base/base_view.dart';
-import '../../infrastructure/models/order_details_model.dart';
 import '../../infrastructure/models/survey_model.dart'
-    show SurveyModel, SurveyQuestionModel, SurveyOption;
+    show SurveyQuestionModel, SurveyOption;
 import '../../infrastructure/theme/colors.theme.dart';
 import '../../infrastructure/theme/text.theme.dart';
-import '../../res.dart';
 import '../survey/survey_controller.dart';
 import 'order_picked_controller.dart';
 
@@ -23,170 +21,271 @@ class OrderPickedPage extends BaseView<OrderPickedController> {
   }
 
   @override
+  Color pageBackgroundColor() => ColorsTheme.colF5F5F5;
+
+  @override
+  AppBar? appBar() => null;
+
+  @override
   Widget body(BuildContext context) {
-    return SafeArea(
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              ColorsTheme.colPrimary.withOpacity(0.1),
-              ColorsTheme.colWhite,
-            ],
+    return Container(
+      color: ColorsTheme.colF5F5F5,
+      child: Column(
+        children: [
+          Obx(() => _buildAppBar(context)),
+          Expanded(
+            child: Obx(() {
+              if (controller.showSurvey.value &&
+                  Get.isRegistered<SurveyController>()) {
+                final surveyController = Get.find<SurveyController>();
+                if (surveyController.showThankYou.value) {
+                  return _buildThankYouPage();
+                }
+                return _buildSurveyContent();
+              }
+              return _buildInitialOrderScreen();
+            }),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAppBar(BuildContext context) {
+    // Check if ThankYou page is currently being displayed
+    final showThankYou = controller.showSurvey.value &&
+        Get.isRegistered<SurveyController>() &&
+        Get.find<SurveyController>().showThankYou.value;
+
+    // ONLY hide app bar when ThankYou page is shown
+    if (showThankYou) {
+      return const SizedBox.shrink();
+    }
+
+    // Show app bar for all other scenarios (initial order screen, survey form, etc.)
+    final showSurvey = controller.showSurvey.value;
+
+    if (showSurvey) {
+      // App bar for survey screen
+      return Container(
+        color: ColorsTheme.colF5F5F5,
+        padding: EdgeInsets.only(
+          top: MediaQuery.of(context).padding.top,
+          left: 4,
+          right: 4,
+          bottom: 8,
         ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+              icon: Icon(Icons.arrow_back_ios_new,
+                  color: ColorsTheme.colPrimary, size: 20),
+              onPressed: () => controller.skipToHome(),
+            ),
+            IconButton(
+              icon: Icon(Icons.close, color: ColorsTheme.colPrimary, size: 24),
+              onPressed: () async {
+                if (Get.isRegistered<SurveyController>()) {
+                  await Get.find<SurveyController>().skipSurvey();
+                  controller.navigateToOrderListing();
+                }
+              },
+            ),
+          ],
+        ),
+      );
+    }
+
+    // App bar for initial order picked screen (rating section)
+    return Container(
+      color: ColorsTheme.colF5F5F5,
+      padding: EdgeInsets.only(
+        top: MediaQuery.of(context).padding.top,
+        left: 4,
+        right: 8,
+        bottom: 8,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          IconButton(
+            icon: Icon(Icons.arrow_back_ios_new,
+                color: ColorsTheme.colBlack, size: 20),
+            onPressed: () => controller.skipToHome(),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            'Your Order'.tr,
+            style:
+                boldTextStyle(fontSize: dimen18, color: ColorsTheme.colBlack),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Initial screen (Image 1): Green rating card + White order details card + Need help?
+  Widget _buildInitialOrderScreen() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _buildGreenRatingCard(),
+          const SizedBox(height: 16),
+          Obx(() {
+            if (controller.isLoadingOrderDetails.value) {
+              return Container(
+                padding: const EdgeInsets.all(24),
+                child: Center(
+                  child:
+                      CircularProgressIndicator(color: ColorsTheme.colPrimary),
+                ),
+              );
+            }
+            if (controller.orderDetailsModel != null) {
+              return _buildOrderDetailsCardImage1();
+            }
+            return const SizedBox.shrink();
+          }),
+          const SizedBox(height: 24),
+          _buildNeedHelp(),
+          const SizedBox(height: 24),
+        ],
+      ),
+    );
+  }
+
+  /// Green card: "How was your experience?" + 5 white stars (Image 1)
+  Widget _buildGreenRatingCard() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      decoration: BoxDecoration(
+        color: ColorsTheme.colPrimary,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        children: [
+          Text(
+            'How was your experience?'.tr,
+            style: semiBoldTextStyle(
+              fontSize: dimen16,
+              color: ColorsTheme.colWhite,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          controller.isRated.value
+              ? _buildRatedStarsWhite()
+              : _buildRatingStarsWhite(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRatingStarsWhite() {
+    return RatingBar(
+      initialRating: 0,
+      minRating: 0,
+      direction: Axis.horizontal,
+      allowHalfRating: false,
+      itemCount: 5,
+      itemSize: 36,
+      itemPadding: const EdgeInsets.symmetric(horizontal: 6),
+      ratingWidget: RatingWidget(
+        full: Icon(Icons.star, color: ColorsTheme.colWhite),
+        empty: Icon(Icons.star_border, color: ColorsTheme.colWhite),
+        half: Icon(Icons.star_half, color: ColorsTheme.colWhite),
+      ),
+      onRatingUpdate: (r) => controller.submitRating(r),
+    );
+  }
+
+  Widget _buildRatedStarsWhite() {
+    final rating = controller.rating.value;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(5, (index) {
+        final starValue = index + 1;
+        final isRated = starValue <= rating;
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6),
+          child: isRated
+              ? Icon(Icons.star, color: ColorsTheme.colWhite, size: 36)
+              : Container(
+                  decoration: BoxDecoration(
+                    // color: Colors.red,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  padding: const EdgeInsets.all(2),
+                  child: Icon(
+                    Icons.star_border,
+                    color: ColorsTheme.colWhite,
+                    size: 32,
+                  ),
+                ),
+        );
+      }),
+    );
+  }
+
+  /// Custom rating indicator for survey header with unrated stars showing red background
+  Widget _buildCustomRatingIndicator() {
+    final rating = controller.rating.value;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(5, (index) {
+        final starValue = index + 1;
+        final isRated = starValue <= rating;
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: isRated
+              ? Icon(Icons.star, color: ColorsTheme.colPrimary, size: 28)
+              : Container(
+                  decoration: BoxDecoration(
+                    // color: Colors.red,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  padding: const EdgeInsets.all(2),
+                  child: Icon(
+                    Icons.star_border,
+                    color: ColorsTheme.colPrimary,
+                    size: 24,
+                  ),
+                ),
+        );
+      }),
+    );
+  }
+
+  /// Need help? with question mark in green circle (Image 1)
+  Widget _buildNeedHelp() {
+    return Center(
+      child: GestureDetector(
+        onTap: () => controller.navigateToContactScreen(),
         child: Column(
           children: [
-            // Header with close button
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  GestureDetector(
-                    onTap: () => controller.skipToHome(),
-                    child: Container(
-                      padding: const EdgeInsets.all(3),
-                      decoration: BoxDecoration(
-                        color: ColorsTheme.colWhite,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 4,
-                            spreadRadius: 1,
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        Icons.close,
-                        color: ColorsTheme.colBlack,
-                        size: 20,
-                      ),
-                    ),
-                  ),
-                ],
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                // color: ColorsTheme.colPrimary.withOpacity(0.15),
+                border: Border.all(color: ColorsTheme.colPrimary),
               ),
+              child: Icon(Icons.question_mark,
+                  color: ColorsTheme.colPrimary, size: 26),
             ),
-
-            Expanded(
-              child: Obx(() {
-                // Check if survey is active and show thank you or survey questions
-                if (controller.showSurvey.value &&
-                    Get.isRegistered<SurveyController>()) {
-                  final surveyController = Get.find<SurveyController>();
-
-                  // Show thank you page if survey is completed
-                  if (surveyController.showThankYou.value) {
-                    return _buildThankYouPage();
-                  }
-
-                  // Show survey questions below rating section
-                  return _buildSurveyContent();
-                }
-
-                // Otherwise show order picked content
-                return SingleChildScrollView(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 5),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      SizedBox(height: 1),
-
-                      // Rating section at TOP
-                      _buildRatingSection(),
-
-                      SizedBox(height: 20),
-
-                      // Success animation
-                      SizedBox(
-                        height: 150,
-                        child: Lottie.asset(
-                          'assets/successOrder.json',
-                          repeat: true,
-                          animate: true,
-                        ),
-                      ),
-
-                      SizedBox(height: 30),
-
-                      // "Order Picked" message
-                      Text(
-                        'Order Picked! 🎉'.tr,
-                        style: boldTextStyle(
-                          fontSize: dimen24,
-                          color: ColorsTheme.colBlack,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-
-                      SizedBox(height: 16),
-
-                      // Catchy text with Order ID
-                      RichText(
-                        textAlign: TextAlign.center,
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                              text: 'Your order '.tr,
-                              style: semiBoldTextStyle(
-                                fontSize: dimen16,
-                                color: ColorsTheme.colBlack.withOpacity(0.7),
-                              ),
-                            ),
-                            TextSpan(
-                              text: '#${controller.orderId}',
-                              style: boldTextStyle(
-                                fontSize: dimen18,
-                                color: ColorsTheme.colPrimary,
-                              ),
-                            ),
-                            TextSpan(
-                              text: ' has been picked up successfully!'.tr,
-                              style: semiBoldTextStyle(
-                                fontSize: dimen16,
-                                color: ColorsTheme.colBlack.withOpacity(0.7),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      SizedBox(height: 12),
-
-                      Text(
-                        'Thank you for choosing us. We hope you enjoy your meal! 😊'
-                            .tr,
-                        style: regularTextStyle(
-                          fontSize: dimen14,
-                          color: ColorsTheme.col475751,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-
-                      SizedBox(height: 20),
-
-                      // Order Details Card at bottom
-                      Obx(() => controller.isLoadingOrderDetails.value
-                          ? Container(
-                              padding: const EdgeInsets.all(20),
-                              child: Center(
-                                child: CircularProgressIndicator(
-                                  color: ColorsTheme.colPrimary,
-                                ),
-                              ),
-                            )
-                          : controller.orderDetailsModel != null
-                              ? _buildOrderDetailsCard()
-                              : SizedBox.shrink()),
-
-                      SizedBox(height: 20),
-                    ],
-                  ),
-                );
-              }),
+            const SizedBox(height: 10),
+            Text(
+              'Need help?'.tr,
+              style: regularTextStyle(
+                  fontSize: dimen14, color: ColorsTheme.col475751),
             ),
           ],
         ),
@@ -194,435 +293,247 @@ class OrderPickedPage extends BaseView<OrderPickedController> {
     );
   }
 
-  Widget _buildOrderDetailsCard() {
+  /// White order details card (Image 1): Collected, logo, name, address, two columns
+  Widget _buildOrderDetailsCardImage1() {
     final order = controller.orderDetailsModel!;
-    final restaurantName =
-        order.restaurantDetail?.restaurantName ?? 'Restaurant';
+    final rest = order.restaurantDetail;
+    final restaurantName = rest?.restaurantName ?? 'Restaurant'.tr;
+    final address = rest?.restaurantAddress ?? '';
     final paymentMethodRaw = order.paymentMethod ?? 'N/A';
     final paymentMethod = paymentMethodRaw.isNotEmpty
         ? paymentMethodRaw[0].toUpperCase() +
             paymentMethodRaw.substring(1).toLowerCase()
         : 'N/A';
     final totalPaid = order.totalPaid ?? '0';
-    final itemQty = order.itemQty ?? 0;
+    final orderIdStr = '${order.orderId}';
+    final date = order.pickupDate ?? order.createdDate ?? '';
+    final itemName = order.menuDetails != null && order.menuDetails!.isNotEmpty
+        ? (order.menuDetails!.first.menuName ?? 'Item'.tr)
+        : 'Item'.tr;
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 0),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: ColorsTheme.colWhite,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: ColorsTheme.colC4D9D4,
-          width: 1,
-        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: ColorsTheme.colD2D3D4, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            spreadRadius: 2,
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 8,
             offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
         children: [
-          // Restaurant Name
           Row(
             children: [
-              Icon(
-                Icons.restaurant,
-                color: ColorsTheme.colPrimary,
-                size: 18,
-              ),
-              SizedBox(width: 6),
-              Expanded(
-                child: Text(
-                  restaurantName,
-                  style: semiBoldTextStyle(
-                    fontSize: dimen14,
-                    color: ColorsTheme.colBlack,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-
-          SizedBox(height: 12),
-
-          // Price and Quantity Row
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Final Paid Price
-              Row(
-                children: [
-                  Text(
-                    'Paid : '.tr,
-                    style: regularTextStyle(
-                      fontSize: dimen12,
-                      color: ColorsTheme.col475751,
-                    ),
-                  ),
-                  Text(
-                    '₹$totalPaid',
-                    style: semiBoldTextStyle(
-                      fontSize: dimen14,
-                      color: ColorsTheme.colPrimary,
-                    ),
-                  ),
-                ],
-              ),
-              // Quantity
-              Row(
-                children: [
-                  Text(
-                    'Qty : '.tr,
-                    style: regularTextStyle(
-                      fontSize: dimen12,
-                      color: ColorsTheme.col475751,
-                    ),
-                  ),
-                  Text(
-                    '$itemQty',
-                    style: semiBoldTextStyle(
-                      fontSize: dimen14,
-                      color: ColorsTheme.colBlack,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-
-          SizedBox(height: 8),
-
-          // Price
-          // Row(
-          //   children: [
-          //     Text(
-          //       'Price: '.tr,
-          //       style: regularTextStyle(
-          //         fontSize: dimen12,
-          //         color: ColorsTheme.col475751,
-          //       ),
-          //     ),
-          //     Text(
-          //       '₹$price',
-          //       style: semiBoldTextStyle(
-          //         fontSize: dimen13,
-          //         color: ColorsTheme.colBlack,
-          //       ),
-          //     ),
-          //   ],
-          // ),
-
-          SizedBox(height: 8),
-
-          // Payment Method - Compact
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.payment,
-                color: ColorsTheme.colPrimary,
-                size: 16,
-              ),
-              SizedBox(width: 6),
+              Icon(Icons.check_circle, color: ColorsTheme.colPrimary, size: 20),
+              const SizedBox(width: 8),
               Text(
-                'Payment : '.tr,
-                style: regularTextStyle(
-                  fontSize: dimen11,
-                  color: ColorsTheme.col475751,
-                ),
-              ),
-              Text(
-                paymentMethod,
+                'Collected'.tr,
                 style: semiBoldTextStyle(
-                  fontSize: dimen12,
-                  color: ColorsTheme.colBlack,
-                ),
+                    fontSize: dimen14, color: ColorsTheme.colPrimary),
               ),
             ],
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMenuItemRow(MenuDetails menuItem) {
-    final hasDiscount = menuItem.offerPrice != null &&
-        menuItem.finalPrice != null &&
-        menuItem.offerPrice! > menuItem.finalPrice!;
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Food preference icon
-          Container(
-            margin: const EdgeInsets.only(right: 10, top: 2),
-            child: Image.asset(
-              menuItem.foodPreference == 'non-veg'
-                  ? Res.icNonVeg
-                  : menuItem.foodPreference == 'egg'
-                      ? Res.icEgg
-                      : Res.icVeg,
-              width: 16,
-              height: 16,
-            ),
-          ),
-
-          // Item details
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '${menuItem.menuName ?? 'Item'}${menuItem.menuType != null && menuItem.menuType!.isNotEmpty ? ' : ${menuItem.menuType}' : ''}',
-                  style: semiBoldTextStyle(
-                    fontSize: dimen13,
-                    color: ColorsTheme.colBlack,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+          const SizedBox(height: 16),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: ColorsTheme.colPrimary,
+                  borderRadius: BorderRadius.circular(24),
                 ),
-                SizedBox(height: 4),
-                Row(
+                child: rest?.restaurantProfile != null &&
+                        rest!.restaurantProfile!.isNotEmpty
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(24),
+                        child: CachedNetworkImage(
+                          imageUrl: rest.restaurantProfile!,
+                          fit: BoxFit.cover,
+                          placeholder: (_, __) => Center(
+                            child: SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                color: ColorsTheme.colWhite,
+                                strokeWidth: 2,
+                              ),
+                            ),
+                          ),
+                          errorWidget: (_, __, ___) => Center(
+                            child: Text(
+                              restaurantName.isNotEmpty
+                                  ? restaurantName[0].toUpperCase()
+                                  : 'R',
+                              style: semiBoldTextStyle(
+                                  fontSize: dimen18,
+                                  color: ColorsTheme.colWhite),
+                            ),
+                          ),
+                        ),
+                      )
+                    : Center(
+                        child: Text(
+                          restaurantName.isNotEmpty
+                              ? restaurantName[0].toUpperCase()
+                              : 'R',
+                          style: semiBoldTextStyle(
+                              fontSize: dimen18, color: ColorsTheme.colWhite),
+                        ),
+                      ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (hasDiscount) ...[
-                      Text(
-                        '₹${menuItem.offerPrice ?? 0}',
-                        style: TextStyle(
-                          fontSize: dimen11,
-                          color: ColorsTheme.col5dD6E68,
-                          fontWeight: FontWeight.w500,
-                          decoration: TextDecoration.lineThrough,
-                        ),
-                      ),
-                      SizedBox(width: 8),
-                    ],
                     Text(
-                      '₹${menuItem.finalPrice ?? menuItem.offerPrice ?? 0}',
-                      style: semiBoldTextStyle(
-                        fontSize: dimen13,
-                        color: ColorsTheme.colPrimary,
-                      ),
+                      restaurantName,
+                      style: boldTextStyle(
+                          fontSize: dimen14, color: ColorsTheme.colBlack),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    if (menuItem.quantity != null &&
-                        menuItem.quantity! > 1) ...[
-                      SizedBox(width: 8),
+                    if (address.isNotEmpty) ...[
+                      const SizedBox(height: 4),
                       Text(
-                        'x${menuItem.quantity}',
+                        address,
                         style: regularTextStyle(
-                          fontSize: dimen11,
-                          color: ColorsTheme.col475751,
-                        ),
+                            fontSize: dimen12, color: ColorsTheme.col475751),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ],
                 ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRatingSection() {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        // color: ColorsTheme.colPrimary.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: ColorsTheme.colPrimary,
-          width: 0.5,
-        ),
-        // boxShadow: [
-        //   BoxShadow(
-        //     color: ColorsTheme.colPrimary.withOpacity(0.05),
-        //     blurRadius: 15,
-        //     spreadRadius: 3,
-        //     offset: const Offset(0, 4),
-        //   ),
-        // ],
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Icon(
-              //   Icons.star,
-              //   color: ColorsTheme.colPrimary,
-              //   size: 24,
-              // ),
-              // SizedBox(width: 8),
-              Text(
-                'Rate Your Experience'.tr,
-                style: boldTextStyle(
-                  fontSize: dimen14,
-                  color: ColorsTheme.colBlack,
-                ),
-                textAlign: TextAlign.center,
               ),
             ],
           ),
-
-          SizedBox(height: 8),
-
-          Text(
-            'How was your experience?'.tr,
-            style: regularTextStyle(
-              fontSize: dimen12,
-              color: ColorsTheme.col475751,
-            ),
-            textAlign: TextAlign.center,
+          const SizedBox(height: 20),
+          Container(height: 1, color: ColorsTheme.colD2D3D4),
+          const SizedBox(height: 16),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _orderLabel('COLLECTED'.tr),
+                    Text(date,
+                        style: regularTextStyle(
+                            fontSize: dimen13, color: ColorsTheme.colBlack)),
+                    const SizedBox(height: 12),
+                    _orderLabel('ITEM NAME'.tr),
+                    Text(itemName,
+                        style: regularTextStyle(
+                            fontSize: dimen13, color: ColorsTheme.colBlack)),
+                    const SizedBox(height: 12),
+                    _orderLabel('PAYMENT METHOD'.tr),
+                    Text(paymentMethod,
+                        style: regularTextStyle(
+                            fontSize: dimen13, color: ColorsTheme.colBlack)),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _orderLabel('ORDER ID'.tr),
+                    Text(orderIdStr,
+                        style: regularTextStyle(
+                            fontSize: dimen13, color: ColorsTheme.colBlack)),
+                    const SizedBox(height: 12),
+                    _orderLabel('TOTAL'.tr),
+                    Text('₹$totalPaid',
+                        style: semiBoldTextStyle(
+                            fontSize: dimen14, color: ColorsTheme.colBlack)),
+                  ],
+                ),
+              ),
+            ],
           ),
-
-          SizedBox(height: 12),
-
-          // Rating stars
-          controller.isRated.value ? _buildRatedStars() : _buildRatingStars(),
-
-          SizedBox(height: 3),
-
-          // Skip button (only show if not rated)
-          // if (!controller.isRated.value)
-          //   TextButton(
-          //     onPressed: () => controller.skipToHome(),
-          //     child: Text(
-          //       'Skip for now'.tr,
-          //       style: mediumTextStyle(
-          //         fontSize: dimen14,
-          //         color: ColorsTheme.col475751,
-          //       ),
-          //     ),
-          //   ),
         ],
       ),
     );
   }
 
-  Widget _buildRatingStars() {
-    return RatingBar(
-      initialRating: 0,
-      minRating: 0,
-      direction: Axis.horizontal,
-      allowHalfRating: false,
-      itemCount: 5,
-      itemSize: 30,
-      itemPadding: const EdgeInsets.symmetric(horizontal: 4.0),
-      ratingWidget: RatingWidget(
-        full: Icon(
-          Icons.star,
-          color: ColorsTheme.colPrimary,
-        ),
-        empty: Icon(
-          Icons.star_border,
-          color: ColorsTheme.colPrimary.withOpacity(0.5),
-        ),
-        half: Container(),
+  Widget _orderLabel(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Text(
+        text,
+        style:
+            regularTextStyle(fontSize: dimen11, color: ColorsTheme.col8FA19C),
       ),
-      onRatingUpdate: (rating) {
-        controller.submitRating(rating);
-      },
     );
   }
 
-  Widget _buildRatedStars() {
-    return RatingBarIndicator(
-      rating: controller.rating.value,
-      itemSize: 30,
-      itemPadding: const EdgeInsets.symmetric(horizontal: 4.0),
-      itemBuilder: (BuildContext context, int index) {
-        return Icon(
-          Icons.star,
-          color: ColorsTheme.colPrimary,
-        );
-      },
-    );
-  }
-
+  /// Survey header (Image 2): Emoji based on rating in green circle outline + restaurant name + 5 stars + green line
   Widget _buildRestaurantHeader() {
     final restaurant = controller.orderDetailsModel?.restaurantDetail;
+    final name = restaurant?.restaurantName ?? 'Restaurant'.tr;
+    final rating = controller.rating.value.toInt();
+    final emoji = rating >= 4
+        ? '😊'
+        : rating <= 2
+            ? '😔'
+            : '😑';
 
     return Column(
       children: [
-        // Restaurant icon
         Container(
-          width: 80,
-          height: 80,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: ColorsTheme.colWhite,
-            border: Border.all(
-              color: ColorsTheme.colPrimary,
-              width: 2,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 8,
-                spreadRadius: 2,
-              ),
-            ],
-          ),
-          child: ClipOval(
-            child: restaurant?.restaurantProfile != null &&
-                    restaurant!.restaurantProfile!.isNotEmpty
-                ? CachedNetworkImage(
-                    imageUrl: restaurant.restaurantProfile!,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => Center(
-                      child: CircularProgressIndicator(
-                        color: ColorsTheme.colPrimary,
-                        strokeWidth: 2,
-                      ),
-                    ),
-                    errorWidget: (context, url, error) => Icon(
-                      Icons.restaurant,
-                      size: 40,
-                      color: ColorsTheme.colPrimary,
-                    ),
-                  )
-                : Icon(
-                    Icons.restaurant,
-                    size: 40,
-                    color: ColorsTheme.colPrimary,
-                  ),
+          width: 72,
+          height: 72,
+          // decoration: BoxDecoration(
+          //   shape: BoxShape.circle,
+          //   color: Colors.transparent,
+          //   // border: Border.all(color: ColorsTheme.colPrimary, width: 2.5),
+          // ),
+          alignment: Alignment.center,
+          child: Text(
+            emoji,
+            style: const TextStyle(fontSize: 45),
           ),
         ),
-
-        SizedBox(height: 16),
-
-        // Restaurant name
+        const SizedBox(height: 12),
         Text(
-          restaurant?.restaurantName ?? 'Restaurant'.tr,
-          style: semiBoldTextStyle(
-            fontSize: dimen18,
-            color: ColorsTheme.colBlack,
-          ),
+          name,
+          style:
+              semiBoldTextStyle(fontSize: dimen16, color: ColorsTheme.colBlack),
           textAlign: TextAlign.center,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
         ),
+        const SizedBox(height: 12),
+        _buildCustomRatingIndicator(),
+        const SizedBox(height: 7),
+        // Container(
+        //   height: 4,
+        //   margin: const EdgeInsets.symmetric(horizontal: 48),
+        //   decoration: BoxDecoration(
+        //     color: ColorsTheme.colPrimary,
+        //     borderRadius: BorderRadius.circular(2),
+        //   ),
+        // ),
       ],
     );
   }
 
+  /// Survey screen (Image 2/3): Header + white card (progress, question, options) + Skip at bottom
   Widget _buildSurveyContent() {
     if (!Get.isRegistered<SurveyController>()) {
       return Center(
           child: CircularProgressIndicator(color: ColorsTheme.colPrimary));
     }
-
     final surveyController = Get.find<SurveyController>();
 
     return Obx(() {
@@ -631,11 +542,8 @@ class OrderPickedPage extends BaseView<OrderPickedController> {
         return Center(
             child: CircularProgressIndicator(color: ColorsTheme.colPrimary));
       }
-
       final currentIndex = surveyController.currentIndex.value;
       final totalQuestions = survey.questions?.length ?? 0;
-
-      // Safety checks
       if (totalQuestions == 0 || survey.questions == null) {
         return Center(
           child: Text(
@@ -645,7 +553,6 @@ class OrderPickedPage extends BaseView<OrderPickedController> {
           ),
         );
       }
-
       if (currentIndex < 0 || currentIndex >= totalQuestions) {
         return Center(
           child: Text(
@@ -655,146 +562,84 @@ class OrderPickedPage extends BaseView<OrderPickedController> {
           ),
         );
       }
-
       final currentQuestion = survey.questions![currentIndex];
 
       return Column(
         children: [
-          // Scrollable content
+          // Header section
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            child: _buildRestaurantHeader(),
+          ),
+          // White background section - full width and extends to bottom
           Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+            child: Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: ColorsTheme.colWhite,
+                // borderRadius: const BorderRadius.only(
+                //   topLeft: Radius.circular(16),
+                //   topRight: Radius.circular(16),
+                // ),
+                // border: Border.all(color: ColorsTheme.colD2D3D4),
+                // boxShadow: [
+                //   BoxShadow(
+                //     color: Colors.black.withOpacity(0.06),
+                //     blurRadius: 8,
+                //     offset: const Offset(0, -2),
+                //   ),
+                // ],
+              ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  SizedBox(height: 20),
-
-                  // Restaurant icon and name (after rating is submitted)
-                  Obx(() {
-                    if (controller.isRated.value) {
-                      return _buildRestaurantHeader();
-                    }
-                    return const SizedBox.shrink();
-                  }),
-
-                  SizedBox(height: 30),
-
-                  // Survey Questions Card with white background - Centered
-                  Center(
-                    child: Container(
-                      constraints: const BoxConstraints(maxWidth: 500),
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: ColorsTheme.colWhite,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: ColorsTheme.colC4D9D4,
-                          width: 1,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 10,
-                            spreadRadius: 2,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
+                  Expanded(
+                    child: SingleChildScrollView(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          // Progress bar
-                          _buildSurveyProgressBar(currentIndex, totalQuestions),
-
-                          SizedBox(height: 30),
-
-                          // Question
-                          _buildSurveyQuestion(
-                              currentQuestion, surveyController),
-
-                          SizedBox(height: 20),
-
-                          // Submit button for final question (especially if multi-select)
-                          if (currentIndex == totalQuestions - 1)
-                            GestureDetector(
-                              onTap: () {
-                                // Validate if answer is provided
-                                final answer = surveyController
-                                    .answers[currentQuestion.questionId];
-                                final isValidAnswer = answer != null &&
-                                    !(answer is List && answer.isEmpty) &&
-                                    !(answer is String && answer.isEmpty);
-
-                                if (currentQuestion.isMandatory == true &&
-                                    !isValidAnswer) {
-                                  // Show error if mandatory question not answered
-                                  return;
-                                }
-
-                                // Submit survey
-                                surveyController.submitSurvey();
-                              },
-                              child: Container(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 14),
-                                decoration: BoxDecoration(
-                                  color: ColorsTheme.colPrimary,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                alignment: Alignment.center,
-                                child: Obx(() {
-                                  if (surveyController.isSubmitting.value) {
-                                    return SizedBox(
-                                      height: 20,
-                                      width: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        valueColor:
-                                            AlwaysStoppedAnimation<Color>(
-                                                ColorsTheme.colWhite),
-                                      ),
-                                    );
-                                  }
-                                  return Text(
-                                    "Submit".tr,
-                                    style: semiBoldTextStyle(
-                                      fontSize: dimen14,
-                                      color: ColorsTheme.colWhite,
-                                    ),
-                                  );
-                                }),
-                              ),
+                          // Progress bar as top border
+                          _buildSurveyProgressBarOnly(
+                              currentIndex, totalQuestions),
+                          const SizedBox(height: 20),
+                          // Question content
+                          Padding(
+                            padding: const EdgeInsets.all(24),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                _buildSurveyQuestion(
+                                    currentQuestion, surveyController),
+                                if (currentIndex == totalQuestions - 1) ...[
+                                  const SizedBox(height: 34),
+                                  _buildSubmitButton(
+                                      currentQuestion, surveyController),
+                                ],
+                              ],
                             ),
+                          ),
                         ],
                       ),
                     ),
                   ),
-
-                  SizedBox(height: 30),
-                ],
-              ),
-            ),
-          ),
-
-          // Skip option fixed at bottom of screen
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 20),
-            decoration: BoxDecoration(
-              color: Colors.transparent,
-            ),
-            child: Center(
-              child: GestureDetector(
-                onTap: () async {
-                  await surveyController.skipSurvey();
-                  controller.navigateToOrderListing();
-                },
-                child: Text(
-                  "Skip Question".tr,
-                  style: regularTextStyle(
-                    fontSize: dimen14,
-                    color: ColorsTheme.col475751,
+                  // Skip Question at bottom of screen
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 20),
+                    child: Center(
+                      child: GestureDetector(
+                        onTap: () async {
+                          await surveyController.skipSurvey();
+                          controller.navigateToOrderListing();
+                        },
+                        child: Text(
+                          "Skip Question".tr,
+                          style: regularTextStyle(
+                              fontSize: dimen14, color: ColorsTheme.col475751),
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 40),
+                ],
               ),
             ),
           ),
@@ -803,109 +648,150 @@ class OrderPickedPage extends BaseView<OrderPickedController> {
     });
   }
 
-  Widget _buildThankYouPage() {
-    return Container(
-      // decoration: BoxDecoration(
-      //   // gradient: LinearGradient(
-      //   //   begin: Alignment.topCenter,
-      //   //   end: Alignment.bottomCenter,
-      //   //   colors: [
-      //   //     ColorsTheme.colPrimary.withOpacity(0.1),
-      //   //     ColorsTheme.colWhite,
-      //   //   ],
-      //   // ),
-      // ),
-      child: Stack(
-        children: [
-          SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(height: 60),
-
-                // Success animation
-                SizedBox(
-                  height: 200,
-                  child: Lottie.asset(
-                    'assets/successOrder.json',
-                    repeat: true,
-                    animate: true,
-                  ),
+  Widget _buildSubmitButton(
+      SurveyQuestionModel currentQuestion, SurveyController surveyController) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width * 0.5,
+            ),
+            child: GestureDetector(
+              onTap: () {
+                final answer =
+                    surveyController.answers[currentQuestion.questionId];
+                final isValid = answer != null &&
+                    !(answer is List && answer.isEmpty) &&
+                    !(answer is String && answer.isEmpty);
+                if (currentQuestion.isMandatory == true && !isValid) return;
+                surveyController.submitSurvey();
+              },
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  color: ColorsTheme.colPrimary,
+                  borderRadius: BorderRadius.circular(25),
                 ),
-
-                SizedBox(height: 30),
-
-                // "Thank you!" text in yellow/gold
-                Text(
-                  "Thank you!",
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: ColorsTheme.colPrimary,
-                    letterSpacing: 0.5,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-
-                SizedBox(height: 16),
-
-                // Descriptive text
-                Text(
-                  "We value your feedback!".tr,
-                  style: semiBoldTextStyle(
-                    fontSize: dimen18,
-                    color: ColorsTheme.colPrimary,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-
-                SizedBox(height: 12),
-
-                Text(
-                  "We love hearing from you and will use your feedback to improve what we do."
-                      .tr,
-                  style: regularTextStyle(
-                    fontSize: dimen14,
-                    color: ColorsTheme.col475751,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-
-                SizedBox(height: 40),
-              ],
+                alignment: Alignment.center,
+                child: Obx(() {
+                  if (surveyController.isSubmitting.value) {
+                    return SizedBox(
+                      height: 22,
+                      width: 22,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor:
+                            AlwaysStoppedAnimation<Color>(ColorsTheme.colWhite),
+                      ),
+                    );
+                  }
+                  return Text(
+                    "Submit".tr,
+                    style: semiBoldTextStyle(
+                        fontSize: dimen16, color: ColorsTheme.colWhite),
+                  );
+                }),
+              ),
             ),
           ),
+        );
+      },
+    );
+  }
 
-          // Close icon positioned at top right (absolute)
-          // Positioned(
-          //   top: 16,
-          //   right: 16,
-          //   child: GestureDetector(
-          //     onTap: () => controller.closeThankYouAndNavigate(),
-          //     child: Container(
-          //       padding: const EdgeInsets.all(8),
-          //       decoration: BoxDecoration(
-          //         color: ColorsTheme.colWhite,
-          //         shape: BoxShape.circle,
-          //         boxShadow: [
-          //           BoxShadow(
-          //             color: Colors.black.withOpacity(0.1),
-          //             blurRadius: 4,
-          //             spreadRadius: 1,
-          //           ),
-          //         ],
-          //       ),
-          //       child: Icon(
-          //         Icons.close,
-          //         color: ColorsTheme.colBlack,
-          //         size: 20,
-          //       ),
-          //     ),
-          //   ),
-          // ),
-        ],
+  /// Thank you screen (Image 4): Dark teal background, icon, "Thank you!" yellow, white text, Close button
+  Widget _buildThankYouPage() {
+    return Container(
+      width: double.infinity,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Color(0xFF01563F),
+            Color(0xFF014030),
+          ],
+        ),
+      ),
+      child: SafeArea(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Spacer(flex: 2),
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                Icon(Icons.sentiment_very_satisfied_outlined,
+                    color: ColorsTheme.colWhite, size: 95),
+                // Positioned(
+                //   top: 10,
+                //   right: 20,
+                //   child: Icon(Icons.favorite_outline,
+                //       color: ColorsTheme.colPrimary, size: 24),
+                // ),
+              ],
+
+              // SizedBox(
+              //   width: 200,
+              //   height: 200,
+              //   child: Lottie.asset(
+              //     'assets/orderConfirmed.json',
+              //     fit: BoxFit.contain,
+              //   ),
+            ),
+            const SizedBox(height: 32),
+            Text(
+              "Thank You!",
+              style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: Colors.amber.shade300,
+                letterSpacing: 0.5,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: Text(
+                "We love hearing from you and will use your\nfeedback to improve what we do."
+                    .tr,
+                style: regularTextStyle(
+                  fontSize: dimen15,
+                  color: ColorsTheme.colWhite,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            const Spacer(flex: 2),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 48),
+              child: SizedBox(
+                width: double.infinity,
+                child: TextButton(
+                  onPressed: () => controller.closeThankYouAndNavigate(),
+                  style: TextButton.styleFrom(
+                    backgroundColor: ColorsTheme.colWhite,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(28),
+                    ),
+                  ),
+                  child: Text(
+                    "Close".tr,
+                    style: semiBoldTextStyle(
+                      fontSize: dimen16,
+                      color: ColorsTheme.colPrimary,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 48),
+          ],
+        ),
       ),
     );
   }
@@ -916,50 +802,61 @@ class OrderPickedPage extends BaseView<OrderPickedController> {
       children: [
         Text(
           "Question ${currentIndex + 1} of $totalQuestions".tr,
-          style: regularTextStyle(
-            fontSize: dimen12,
-            color: ColorsTheme.col8FA19C,
-          ),
+          style:
+              regularTextStyle(fontSize: dimen12, color: ColorsTheme.col8FA19C),
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         ClipRRect(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(2),
           child: LinearProgressIndicator(
             value: (currentIndex + 1) / totalQuestions,
             backgroundColor: ColorsTheme.colE7F8F3,
             valueColor: AlwaysStoppedAnimation<Color>(ColorsTheme.colPrimary),
-            minHeight: 6,
+            minHeight: 4,
           ),
         ),
       ],
     );
   }
 
+  Widget _buildSurveyProgressBarOnly(int currentIndex, int totalQuestions) {
+    return ClipRRect(
+      borderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(16),
+        topRight: Radius.circular(16),
+      ),
+      child: LinearProgressIndicator(
+        value: (currentIndex + 1) / totalQuestions,
+        backgroundColor: ColorsTheme.colE7F8F3,
+        valueColor: AlwaysStoppedAnimation<Color>(ColorsTheme.colPrimary),
+        minHeight: 4,
+      ),
+    );
+  }
+
   Widget _buildSurveyQuestion(
-      SurveyQuestionModel question, SurveyController controller) {
+      SurveyQuestionModel question, SurveyController ctrl) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        RichText(
-          text: TextSpan(
+        Text.rich(
+          TextSpan(
             children: [
               TextSpan(
                 text: question.text ?? "",
-                style: mediumTextStyle(
-                  fontSize: dimen14,
-                  color: ColorsTheme.colBlack,
-                ),
+                style: boldTextStyle(
+                    fontSize: dimen16, color: ColorsTheme.colBlack),
               ),
               if (question.isMandatory == true)
-                TextSpan(
-                  text: " *",
-                  style: TextStyle(color: Colors.red, fontSize: dimen14),
-                ),
+                const TextSpan(
+                    text: " *",
+                    style: TextStyle(color: Colors.red, fontSize: 15)),
             ],
           ),
+          textAlign: TextAlign.center,
         ),
-        SizedBox(height: 20),
-        _renderSurveyOptions(question, controller),
+        const SizedBox(height: 35),
+        _renderSurveyOptions(question, ctrl),
       ],
     );
   }
@@ -990,27 +887,26 @@ class OrderPickedPage extends BaseView<OrderPickedController> {
     return Container(
       decoration: BoxDecoration(
         color: ColorsTheme.colF5F5F5,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: ColorsTheme.colC4D9D4),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: ColorsTheme.colD2D3D4),
       ),
-      padding: EdgeInsets.symmetric(horizontal: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 14),
       child: TextField(
         controller: textController,
         onChanged: (val) => controller.saveAnswer(question.questionId!, val,
             autoAdvance: false),
-        onSubmitted: (val) {
-          controller.saveAnswer(question.questionId!, val, autoAdvance: true);
-        },
+        onSubmitted: (val) =>
+            controller.saveAnswer(question.questionId!, val, autoAdvance: true),
         maxLines: 4,
         textInputAction: TextInputAction.done,
-        style: regularTextStyle(fontSize: dimen13, color: ColorsTheme.colBlack),
+        style: regularTextStyle(fontSize: dimen14, color: ColorsTheme.colBlack),
         decoration: InputDecoration(
-          hintText: "Write your feedback here...".tr,
+          hintText: "Describe the contents here".tr,
           hintStyle:
-              regularTextStyle(fontSize: dimen13, color: ColorsTheme.col8FA19C),
+              regularTextStyle(fontSize: dimen14, color: ColorsTheme.col8FA19C),
           border: InputBorder.none,
           isDense: true,
-          contentPadding: EdgeInsets.symmetric(vertical: 12),
+          contentPadding: const EdgeInsets.symmetric(vertical: 14),
         ),
       ),
     );
@@ -1047,28 +943,28 @@ class OrderPickedPage extends BaseView<OrderPickedController> {
     final options = question.options ??
         [
           SurveyOption(label: "Yes", value: "YES"),
-          SurveyOption(label: "No", value: "NO"),
+          SurveyOption(label: "No", value: "NO")
         ];
     final currentAnswer = controller.answers[question.questionId];
 
     return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: options.map((option) {
         final isSelected = currentAnswer == option.value;
-        return Expanded(
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6),
           child: GestureDetector(
             onTap: () =>
                 controller.saveAnswer(question.questionId!, option.value),
             child: Container(
-              margin: EdgeInsets.symmetric(horizontal: 4),
-              padding: EdgeInsets.symmetric(vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 10),
               decoration: BoxDecoration(
                 color:
                     isSelected ? ColorsTheme.colPrimary : ColorsTheme.colWhite,
-                borderRadius: BorderRadius.circular(25),
+                borderRadius: BorderRadius.circular(28),
                 border: Border.all(
-                  color: isSelected
-                      ? ColorsTheme.colPrimary
-                      : ColorsTheme.colC4D9D4,
+                  color: ColorsTheme.colPrimary,
+                  width: 1.5,
                 ),
               ),
               child: Center(
@@ -1078,7 +974,7 @@ class OrderPickedPage extends BaseView<OrderPickedController> {
                     fontSize: dimen14,
                     color: isSelected
                         ? ColorsTheme.colWhite
-                        : ColorsTheme.colBlack,
+                        : ColorsTheme.colPrimary,
                   ),
                 ),
               ),
@@ -1096,11 +992,12 @@ class OrderPickedPage extends BaseView<OrderPickedController> {
         controller.answers[question.questionId] as List<dynamic>? ?? [];
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Wrap(
-          spacing: 8,
-          runSpacing: 8,
+          alignment: WrapAlignment.center,
+          spacing: 10,
+          runSpacing: 10,
           children: options.map((option) {
             final isSelected = currentAnswers.contains(option.value);
             return GestureDetector(
@@ -1114,25 +1011,25 @@ class OrderPickedPage extends BaseView<OrderPickedController> {
                 controller.saveAnswer(question.questionId!, newAnswers);
               },
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
                   color: isSelected
                       ? ColorsTheme.colPrimary
                       : ColorsTheme.colWhite,
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(24),
                   border: Border.all(
-                    color: isSelected
-                        ? ColorsTheme.colPrimary
-                        : ColorsTheme.colC4D9D4,
+                    color: ColorsTheme.colPrimary,
+                    width: 1,
                   ),
                 ),
                 child: Text(
                   option.label ?? "",
                   style: mediumTextStyle(
-                    fontSize: dimen12,
+                    fontSize: dimen13,
                     color: isSelected
                         ? ColorsTheme.colWhite
-                        : ColorsTheme.colBlack,
+                        : ColorsTheme.colPrimary,
                   ),
                 ),
               ),
@@ -1148,28 +1045,31 @@ class OrderPickedPage extends BaseView<OrderPickedController> {
                   "";
           final otherController = controller.getOtherTextController(
               question.questionId!, opt.value!, otherText);
-
           return Container(
-            margin: EdgeInsets.only(top: 12),
-            padding: EdgeInsets.symmetric(horizontal: 12),
+            margin: const EdgeInsets.only(top: 14),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 14,
+            ),
             decoration: BoxDecoration(
               color: ColorsTheme.colF5F5F5,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: ColorsTheme.colC4D9D4),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: ColorsTheme.colD2D3D4),
             ),
             child: TextField(
               controller: otherController,
               onChanged: (val) => controller.saveOtherAnswer(
                   question.questionId!, opt.value!, val),
+              maxLines: 3,
+              textInputAction: TextInputAction.newline,
               style: regularTextStyle(
-                  fontSize: dimen12, color: ColorsTheme.colBlack),
+                  fontSize: dimen13, color: ColorsTheme.colBlack),
               decoration: InputDecoration(
                 hintText: opt.placeholder ?? "Please specify".tr,
                 hintStyle: regularTextStyle(
-                    fontSize: dimen12, color: ColorsTheme.col8FA19C),
+                    fontSize: dimen13, color: ColorsTheme.col8FA19C),
                 border: InputBorder.none,
                 isDense: true,
-                contentPadding: EdgeInsets.symmetric(vertical: 8),
+                contentPadding: const EdgeInsets.symmetric(vertical: 10),
               ),
             ),
           );

@@ -129,9 +129,9 @@ class OrderPickedController extends GetxController {
           await Future.delayed(const Duration(milliseconds: 300));
           await _startSurveyInline();
         } else {
-          // No survey, navigate to order listing/details
+          // No survey data, show ThankYou page directly
           await Future.delayed(const Duration(milliseconds: 500));
-          _navigateToOrderListing();
+          _showThankYouAndNavigate();
         }
       } else {
         progressDialog.dismiss();
@@ -200,21 +200,24 @@ class OrderPickedController extends GetxController {
   }
 
   void _showThankYouAndNavigate() {
-    // Show thank you state inline (don't navigate away)
-    if (Get.isRegistered<SurveyController>()) {
-      final surveyController = Get.find<SurveyController>();
-      surveyController.showThankYou.value = true;
-
-      // Cancel any existing timer
-      thankYouTimer?.cancel();
-
-      // Auto-close after 10 seconds
-      thankYouTimer = Timer(const Duration(seconds: 100000), () {
-        _navigateToOrderListing();
-      });
-    } else {
-      _navigateToOrderListing();
+    // Ensure SurveyController is registered to show ThankYou page
+    if (!Get.isRegistered<SurveyController>()) {
+      Get.put(SurveyController());
     }
+
+    final surveyController = Get.find<SurveyController>();
+    surveyController.showThankYou.value = true;
+
+    // Set showSurvey to true so the page shows ThankYou content
+    showSurvey.value = true;
+
+    // Cancel any existing timer
+    thankYouTimer?.cancel();
+
+    // Auto-close after 10 seconds
+    thankYouTimer = Timer(const Duration(seconds: 10000000), () {
+      _navigateToOrderListing();
+    });
   }
 
   void closeThankYouAndNavigate() {
@@ -247,6 +250,13 @@ class OrderPickedController extends GetxController {
     Get.offAllNamed(Routes.home, arguments: {
       'permission': 1,
       'selectedIndex': 2,
+    });
+  }
+
+  void navigateToContactScreen() {
+    Get.toNamed(Routes.appContents, arguments: {
+      'title': 'Contact us'.tr,
+      'flag': 'contact'
     });
   }
 }

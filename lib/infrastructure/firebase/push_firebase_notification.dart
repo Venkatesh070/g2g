@@ -133,15 +133,18 @@ class AppNotification {
         if (message.data['type'] == 'order_picked' ||
             message.data['type'] == 'order_pick') {
           print(
-              "🔔 Foreground: order_picked notification received, navigating from ANY screen");
+              "🔔 Foreground: order_picked notification received, navigating AUTOMATICALLY from ANY screen");
           // Merge notification body into data for order ID extraction
           Map<String, dynamic> enhancedData =
               Map<String, dynamic>.from(message.data);
           if (notification?.body != null) {
             enhancedData['message'] = notification!.body;
           }
-          // Navigate immediately - works from ANY screen
-          _handleOrderPickedNotification(enhancedData);
+          // Navigate immediately WITHOUT user interaction - works from ANY screen
+          // Use a small delay to ensure Get context is ready, then navigate
+          Future.delayed(const Duration(milliseconds: 100), () {
+            _handleOrderPickedNotification(enhancedData);
+          });
           return; // Don't show local notification, we're navigating directly
         }
 
@@ -427,47 +430,57 @@ class AppNotification {
       print(
           "Extracted orderId: $orderId, surveyId: $surveyId, surveyData: ${surveyData != null}");
 
-      // Navigate INSTANTLY to Order Picked screen with rating section
+      // Navigate AUTOMATICALLY to Order Picked screen without user interaction
       // Use offAllNamed to replace entire navigation stack - works from ANY screen
       if (orderId != null) {
         print(
-            "Navigating INSTANTLY to OrderPickedPage with orderId: $orderId from ANY screen");
+            "Navigating AUTOMATICALLY to OrderPickedPage with orderId: $orderId from ANY screen (no user interaction required)");
 
-        // Navigate immediately - use offAllNamed to replace entire stack
-        // This works from ANY screen (home, order details, cart, profile, etc.)
-        // Use WidgetsBinding to ensure UI is ready, then navigate
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          // Small delay to ensure navigation context is ready
-          Future.delayed(const Duration(milliseconds: 300), () {
-            try {
-              // offAllNamed clears entire navigation stack and navigates
-              // This ensures it works from ANY screen in the app (home, cart, profile, etc.)
-              Get.offAllNamed(Routes.orderPicked, arguments: {
-                'orderId': orderId,
-                'resId': 0,
-                'surveyData': surveyData, // Pass survey data if available
-                'surveyId': surveyId, // Pass survey ID if available
-              });
-              print(
-                  "✅ Navigation to OrderPickedPage successful from ANY screen");
-            } catch (e) {
-              print("❌ Navigation error: $e");
-              // Retry navigation after a brief moment
-              Future.delayed(const Duration(milliseconds: 500), () {
-                try {
-                  Get.offAllNamed(Routes.orderPicked, arguments: {
-                    'orderId': orderId,
-                    'resId': 0,
-                    'surveyData': surveyData,
-                    'surveyId': surveyId,
-                  });
-                  print("✅ Retry navigation successful");
-                } catch (e2) {
-                  print("❌ Retry navigation also failed: $e2");
-                }
-              });
-            }
-          });
+        // Navigate immediately without waiting for postFrameCallback
+        // This ensures automatic navigation works even without user interaction
+        Future.microtask(() {
+          try {
+            // offAllNamed clears entire navigation stack and navigates
+            // This ensures it works from ANY screen in the app (home, cart, profile, etc.)
+            Get.offAllNamed(Routes.orderPicked, arguments: {
+              'orderId': orderId,
+              'resId': 0,
+              'surveyData': surveyData, // Pass survey data if available
+              'surveyId': surveyId, // Pass survey ID if available
+            });
+            print(
+                "✅ Automatic navigation to OrderPickedPage successful from ANY screen");
+          } catch (e) {
+            print("❌ Navigation error: $e");
+            // Retry navigation after a brief moment if first attempt fails
+            Future.delayed(const Duration(milliseconds: 500), () {
+              try {
+                Get.offAllNamed(Routes.orderPicked, arguments: {
+                  'orderId': orderId,
+                  'resId': 0,
+                  'surveyData': surveyData,
+                  'surveyId': surveyId,
+                });
+                print("✅ Retry automatic navigation successful");
+              } catch (e2) {
+                print("❌ Retry navigation also failed: $e2");
+                // Final fallback: use WidgetsBinding if microtask fails
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  try {
+                    Get.offAllNamed(Routes.orderPicked, arguments: {
+                      'orderId': orderId,
+                      'resId': 0,
+                      'surveyData': surveyData,
+                      'surveyId': surveyId,
+                    });
+                    print("✅ Fallback navigation successful");
+                  } catch (e3) {
+                    print("❌ All navigation attempts failed: $e3");
+                  }
+                });
+              }
+            });
+          }
         });
       } else {
         print("❌ Error: orderId is null, cannot navigate. Full data: $data");
