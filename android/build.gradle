@@ -27,9 +27,22 @@ subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
 }
 subprojects {
-    project.evaluationDependsOn(':app')
+    // project.evaluationDependsOn(':app')
 }
 
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
+}
+
+subprojects { subproject ->
+
+    plugins.withId("com.android.library") {
+        def androidExt = subproject.extensions.findByName("android")
+        if (androidExt != null) {
+            if (!androidExt.hasProperty("namespace") || androidExt.namespace == null) {
+                androidExt.namespace = subproject.group ?: "auto.namespace.${subproject.name}"
+            }
+        }
+    }
+
 }
