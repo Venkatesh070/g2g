@@ -21,7 +21,7 @@ import 'package:good_grab/presentation/home/views/home_view.dart';
 import 'package:good_grab/presentation/home/views/map_view.dart';
 import 'package:good_grab/presentation/home/views/me_view.dart';
 import 'package:good_grab/presentation/home/views/orders_view.dart';
-import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
+import 'package:google_maps_cluster_manager_2/google_maps_cluster_manager_2.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:video_player/video_player.dart';

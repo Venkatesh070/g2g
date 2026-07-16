@@ -1,0 +1,12 @@
+node_modules
+build
+dist
+coverage
+android/build
+ios/build
+.gradle
+.git
+*.log
+*.lock
+*.tmp
+DerivedData
